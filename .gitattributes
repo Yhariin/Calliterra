@@ -1,0 +1,2 @@
+Calliterra/assets/models/** filter=lfs diff=lfs merge=lfs -text
+Calliterra/assets/textures/** filter=lfs diff=lfs merge=lfs -text
