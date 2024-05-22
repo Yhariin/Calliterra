@@ -4,6 +4,10 @@ obj/
 
 *.log
 
+# Visual Studio
 .vs/
-
-*.user
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+**.csproj
