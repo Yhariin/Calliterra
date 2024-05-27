@@ -17,8 +17,6 @@ struct WindowProps
 	}
 };
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
-
 class Window
 {
 public:

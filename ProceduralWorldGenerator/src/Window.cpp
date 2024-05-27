@@ -1,21 +1,6 @@
 #include "Window.hpp"
 #include <iostream>
 
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch(uMsg)
-	{
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module
 	  m_CLASSNAME(L"Procedural World Generator")
