@@ -1,4 +1,6 @@
 #pragma once
+#include "Window.hpp"
+#include <memory>
 
 class Application
 {
@@ -10,7 +12,7 @@ public:
 
 	void Run();
 
-	void GetWindow();
+	Window& GetWindow() { return *m_Window; }
 
 	void Close();
 
@@ -20,6 +22,8 @@ private:
 
 private:
 	static Application* s_Instance;
+	std::unique_ptr<Window> m_Window;
+
 	bool m_Running = true;
 	bool m_Minimized = false;
 	float m_LastFrameTime = 0.0f;

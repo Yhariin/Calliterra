@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "Window.hpp"
 
 Application* Application::s_Instance = nullptr;
 
@@ -8,6 +9,8 @@ Application::Application()
 		s_Instance = this;
 
 	// Create Window here
+	m_Window = std::make_unique<Window>();
+	// Set Window Callback here
 
 	// Initialize Renderer here
 }
@@ -25,6 +28,10 @@ void Application::Run()
 		// Calcualte m_LastFrameTime here
 
 		// Update window here
+		if (!m_Window->ProcessMessages())
+		{
+			m_Running = false;
+		}
 	}
 }
 
