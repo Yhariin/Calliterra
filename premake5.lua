@@ -41,4 +41,6 @@ project "ProceduralWorldGenerator"
 
     filter "configurations:Release"
         defines { "NDEBUG" }
+        kind "WindowedApp"
+        entrypoint "mainCRTStartup"
         runtime "Release"
