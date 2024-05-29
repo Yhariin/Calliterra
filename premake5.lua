@@ -17,6 +17,9 @@ project "ProceduralWorldGenerator"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
+    pchheader "pch.h"
+    pchsource "%{prj.name}/src/pch.cpp"
+
     defines
     {
         "_CONSOLE"

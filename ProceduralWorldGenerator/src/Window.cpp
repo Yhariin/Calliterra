@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "Window.h"
-#include <iostream>
 
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module

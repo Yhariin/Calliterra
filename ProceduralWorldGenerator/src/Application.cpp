@@ -1,4 +1,6 @@
+#include "pch.h"
 #include "Application.h"
+
 #include "Window.h"
 
 Application* Application::s_Instance = nullptr;
