@@ -25,7 +25,7 @@ project "ProceduralWorldGenerator"
     files
     {
         "%{prj.name}/src/**.cpp",
-        "%{prj.name}/src/**.hpp"
+        "%{prj.name}/src/**.h"
     }
 
 

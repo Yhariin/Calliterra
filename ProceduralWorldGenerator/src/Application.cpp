@@ -1,5 +1,5 @@
-#include "Application.hpp"
-#include "Window.hpp"
+#include "Application.h"
+#include "Window.h"
 
 Application* Application::s_Instance = nullptr;
 
