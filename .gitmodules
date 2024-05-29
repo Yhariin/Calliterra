@@ -1,0 +1,3 @@
+[submodule "ProceduralWorldGenerator/vendor/spdlog"]
+	path = ProceduralWorldGenerator/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git

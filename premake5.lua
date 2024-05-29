@@ -31,6 +31,11 @@ project "ProceduralWorldGenerator"
         "%{prj.name}/src/**.h"
     }
 
+    includedirs
+    {
+        "%{prj.name}/vendor/spdlog/include",
+    }
+
 
     filter "system:windows"
 		cppdialect "C++20"
