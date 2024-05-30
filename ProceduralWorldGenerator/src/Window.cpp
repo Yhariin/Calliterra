@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Window.h"
+#include "Input.h"
 
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module
@@ -21,7 +22,7 @@ Window::Window(const WindowProps& windowProps)
 	int centerScreenY = GetSystemMetrics(SM_CYSCREEN) / 2 - windowProps.Height / 2;
 
 	// Calculate the required size of the window rectangle based on desired client area size
-	RECT windowRegion = { centerScreenX, centerScreenY, windowProps.Width, windowProps.Height };
+	RECT windowRegion = { centerScreenX, centerScreenY, centerScreenX + windowProps.Width, centerScreenY + windowProps.Height };
 	AdjustWindowRectEx(&windowRegion, style, FALSE, 0);
 
 	m_hWnd = CreateWindowEx(
@@ -86,19 +87,85 @@ LRESULT WINAPI Window::MessageRedirect(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 	return pWindow->MessageHandler(hwnd, uMsg, wParam, lPARAM);
 }
 
-LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM)
+LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
+	// --------------- Window Closing ---------------- //
 	case WM_CLOSE:
 		DestroyWindow(hwnd);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+
+	// --------------- Keyboard Messages -------------- //
+	case WM_KEYDOWN:
+		Input::OnKeyPressed(static_cast<KeyCode>(wParam));
+		break;
+	case WM_KEYUP:
+		Input::OnKeyReleased(static_cast<KeyCode>(wParam));
+		break;
+
+	case WM_CHAR:
+		break;
+
+	// ---------------- Mouse Messages ---------------- //
+	case WM_MOUSEMOVE:
+		POINTS pt = MAKEPOINTS(lParam);
+		Input::OnMouseMove(pt.x, pt.y);
+		break;
+
+	case WM_LBUTTONDOWN:
+		Input::OnMouseButtonPressed(VK_LBUTTON);
+		break;
+	case WM_LBUTTONUP:
+		Input::OnMouseButtonReleased(VK_LBUTTON);
+		break;
+
+	case WM_RBUTTONDOWN:
+		Input::OnMouseButtonPressed(VK_RBUTTON);
+		break;
+	case WM_RBUTTONUP:
+		Input::OnMouseButtonReleased(VK_RBUTTON);
+		break;
+
+	case WM_MBUTTONDOWN:
+		Input::OnMouseButtonPressed(VK_MBUTTON);
+		break;
+	case WM_MBUTTONUP:
+		Input::OnMouseButtonReleased(VK_MBUTTON);
+		break;
+
+	case WM_XBUTTONDOWN:
+	{
+		WORD xButton = GET_XBUTTON_WPARAM(wParam);
+		if (xButton == 1)
+		{
+			Input::OnMouseButtonPressed(VK_XBUTTON1);
+		}
+		else if (xButton == 2)
+		{
+			Input::OnMouseButtonPressed(VK_XBUTTON2);
+		}
+		break;
+	}
+	case WM_XBUTTONUP:
+	{
+		WORD xButton = GET_XBUTTON_WPARAM(wParam);
+		if (xButton == 1)
+		{
+			Input::OnMouseButtonReleased(VK_XBUTTON1);
+		}
+		else if (xButton == 2)
+		{
+			Input::OnMouseButtonReleased(VK_XBUTTON2);
+		}
+		break;
+	}
 	}
 
-	return DefWindowProc(hwnd, uMsg, wParam, lPARAM);
+	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 
 }
 
