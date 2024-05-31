@@ -15,7 +15,7 @@ Window::Window(const WindowProps& windowProps)
 
 	RegisterClass(&wndClass);
 
-	DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
+	DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
 
 	// Calculate center of screen to place window
 	int centerScreenX = GetSystemMetrics(SM_CXSCREEN) / 2 - windowProps.Width / 2;
