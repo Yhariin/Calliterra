@@ -5,7 +5,6 @@
 	#define NOMINMAX
 #endif
 
-typedef unsigned char KeyCode;
 
 #include <Windows.h>
 
@@ -19,5 +18,6 @@ typedef unsigned char KeyCode;
 #include <queue>
 #include <bitset>
 #include <utility>
+#include <functional>
 
-#include "Log.h"
+#include "Core/Log.h"
