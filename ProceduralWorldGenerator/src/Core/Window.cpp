@@ -167,7 +167,6 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		break;
 	}
-	// TODO: Finish events for mouse
 	// ---------------- Mouse Messages ---------------- //
 	case WM_MOUSEMOVE:
 	{
@@ -252,10 +251,16 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		WORD xButton = GET_XBUTTON_WPARAM(wParam);
 		if (xButton == 1)
 		{
+			MouseButtonReleased event(VK_XBUTTON1);
+			m_EventCallback(event);
+
 			Input::OnMouseButtonReleased(VK_XBUTTON1);
 		}
 		else if (xButton == 2)
 		{
+			MouseButtonReleased event(VK_XBUTTON2);
+			m_EventCallback(event);
+
 			Input::OnMouseButtonReleased(VK_XBUTTON2);
 		}
 		break;

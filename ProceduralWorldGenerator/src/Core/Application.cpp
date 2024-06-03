@@ -27,6 +27,7 @@ Application::~Application()
 
 void Application::OnEvent(Event& e)
 {
+	LOG_INFO(e.ToString());
 }
 
 void Application::Run()
