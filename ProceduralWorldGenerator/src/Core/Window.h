@@ -1,7 +1,8 @@
 #pragma once
+#include "pch.h"
 
-#include <Windows.h>
-#include <string>
+#include "Events/Event.h"
+#include "Input.h"
 
 struct WindowProps
 {
@@ -20,23 +21,26 @@ struct WindowProps
 class Window
 {
 public:
+	using EventCallbackFn = std::function<void(Event&)>;
+
 	Window(const WindowProps& windowProps = WindowProps());
 	Window(const Window&) = delete; // delete the copy constructor
 	Window& operator =(const Window&) = delete; // delete the equals operator
 	~Window();
 
-public:
 	static LRESULT CALLBACK MessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
 	static LRESULT WINAPI MessageRedirect(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
 	LRESULT MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
 	bool ProcessMessages();
+	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
+
 
 private:
 	const wchar_t* m_CLASSNAME;
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
 	WindowProps m_WindowProps;
-
-private:
+	EventCallbackFn m_EventCallback;
+	unsigned int m_KeyRepeatCount[Input::NUM_KEY_CODES] = {};
 };
 

@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "Window.h"
 #include "Input.h"
+#include "Events/ApplicationEvents.h"
+#include "Events/KeyEvents.h"
+#include "Events/MouseEvents.h"
 
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module
@@ -15,7 +18,7 @@ Window::Window(const WindowProps& windowProps)
 
 	RegisterClass(&wndClass);
 
-	DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+	DWORD style = WS_CAPTION | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
 
 	// Calculate center of screen to place window
 	int centerScreenX = GetSystemMetrics(SM_CXSCREEN) / 2 - windowProps.Width / 2;
@@ -91,64 +94,155 @@ LRESULT WINAPI Window::MessageRedirect(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 
 LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static int sizeCount = 0;
+
 	switch (uMsg)
 	{
-	// --------------- Window Closing ---------------- //
+		// --------------- Window Closing ---------------- //
 	case WM_CLOSE:
+	{
+		WindowCloseEvent event;
+		m_EventCallback(event);
+
 		DestroyWindow(hwnd);
 		break;
+	}
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 
+		// --------------- Window Events ---------------- //
+	case WM_SIZE:
+	{
+		// Upon window creation there is an initial WM_SIZE message.
+		// To prevent calling m_EventCallback before setup is complete
+		// We will break early if it's the first WM_SIZE message.
+		sizeCount++;
+		if (sizeCount == 1)
+			break;
+
+		UINT width = LOWORD(lParam);
+		UINT height = HIWORD(lParam);
+
+		m_WindowProps.Width = width;
+		m_WindowProps.Height = height;
+
+		WindowResizeEvent event(width, height);
+		m_EventCallback(event);
+
+		break;
+	}
+
 	// --------------- Keyboard Messages -------------- //
 	case WM_KEYDOWN:
-		Input::OnKeyPressed(static_cast<KeyCode>(wParam));
+	{
+		KeyCode keycode = static_cast<KeyCode>(wParam);
+
+		KeyPressedEvent	event(keycode, m_KeyRepeatCount[keycode]);
+		m_EventCallback(event);
+
+		Input::OnKeyPressed(keycode);
+
+		m_KeyRepeatCount[keycode]++;
+
 		break;
+	}
 	case WM_KEYUP:
-		Input::OnKeyReleased(static_cast<KeyCode>(wParam));
-		break;
+	{
+		KeyCode keycode = static_cast<KeyCode>(wParam);
+		KeyReleasedEvent event(keycode);
+		m_EventCallback(event);
 
+		Input::OnKeyReleased(keycode);
+
+		m_KeyRepeatCount[keycode] = 0;
+		break;
+	}
 	case WM_CHAR:
-		break;
+	{
+		KeyCode keycode = static_cast<KeyCode>(wParam);
 
+		KeyTypedEvent event(keycode);
+		m_EventCallback(event);
+
+		break;
+	}
+	// TODO: Finish events for mouse
 	// ---------------- Mouse Messages ---------------- //
 	case WM_MOUSEMOVE:
+	{
 		POINTS pt = MAKEPOINTS(lParam);
-		Input::OnMouseMove(pt.x, pt.y);
-		LOG_INFO("{0}, {1}", pt.x, pt.y);
-		break;
 
+		MouseMovedEvent event(pt.x, pt.y);
+		m_EventCallback(event);
+
+		Input::OnMouseMove(pt.x, pt.y);
+		break;
+	}
 	case WM_LBUTTONDOWN:
+	{
+		MouseButtonPressedEvent event(VK_LBUTTON);
+		m_EventCallback(event);
+
 		Input::OnMouseButtonPressed(VK_LBUTTON);
 		break;
+	}
 	case WM_LBUTTONUP:
+	{
+		MouseButtonReleased event(VK_LBUTTON);
+		m_EventCallback(event);
+
 		Input::OnMouseButtonReleased(VK_LBUTTON);
 		break;
-
+	}
 	case WM_RBUTTONDOWN:
+	{
+		MouseButtonPressedEvent event(VK_RBUTTON);
+		m_EventCallback(event);
+
 		Input::OnMouseButtonPressed(VK_RBUTTON);
 		break;
+	}
 	case WM_RBUTTONUP:
+	{
+		MouseButtonReleased event(VK_RBUTTON);
+		m_EventCallback(event);
+
 		Input::OnMouseButtonReleased(VK_RBUTTON);
 		break;
-
+	}
 	case WM_MBUTTONDOWN:
+	{
+		MouseButtonPressedEvent event(VK_MBUTTON);
+		m_EventCallback(event);
+
 		Input::OnMouseButtonPressed(VK_MBUTTON);
 		break;
+	}
 	case WM_MBUTTONUP:
+	{
+		MouseButtonReleased event(VK_MBUTTON);
+		m_EventCallback(event);
+
 		Input::OnMouseButtonReleased(VK_MBUTTON);
 		break;
+	}
 
 	case WM_XBUTTONDOWN:
 	{
 		WORD xButton = GET_XBUTTON_WPARAM(wParam);
 		if (xButton == 1)
 		{
+			MouseButtonPressedEvent event(VK_XBUTTON1);
+			m_EventCallback(event);
+
 			Input::OnMouseButtonPressed(VK_XBUTTON1);
 		}
 		else if (xButton == 2)
 		{
+			MouseButtonPressedEvent event(VK_XBUTTON2);
+			m_EventCallback(event);
+
 			Input::OnMouseButtonPressed(VK_XBUTTON2);
 		}
 		break;
@@ -165,6 +259,26 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 			Input::OnMouseButtonReleased(VK_XBUTTON2);
 		}
 		break;
+	}
+	case WM_MOUSEWHEEL:
+	{
+		POINTS pt = MAKEPOINTS(lParam);
+		int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+		Input::m_WheelDeltaCarry += delta;
+
+		// Calculate when we should generate a mouse scroll event given delta
+		while (Input::m_WheelDeltaCarry >= WHEEL_DELTA) // Positive scrolling
+		{
+			Input::m_WheelDeltaCarry -= WHEEL_DELTA;
+			MouseScrolledEvent event(0, WHEEL_DELTA);
+			m_EventCallback(event);
+		}
+		while (Input::m_WheelDeltaCarry <= -WHEEL_DELTA) // Negative scrolling
+		{
+			Input::m_WheelDeltaCarry += WHEEL_DELTA;
+			MouseScrolledEvent event(0, -WHEEL_DELTA);
+			m_EventCallback(event);
+		}
 	}
 	}
 
