@@ -1,14 +1,15 @@
 #pragma once
 #include "Window.h"
-#include <memory>
+#include "Events/Event.h"
 
 class Application
 {
 public:
 
 	Application();
-
 	~Application();
+
+	void OnEvent(Event& e);
 
 	void Run();
 

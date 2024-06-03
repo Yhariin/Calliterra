@@ -12,7 +12,9 @@ Application::Application()
 
 	// Create Window here
 	m_Window = std::make_unique<Window>();
+
 	// Set Window Callback here
+	m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
 	// Initialize Renderer here
 }
@@ -21,6 +23,10 @@ Application::~Application()
 {
 
 	// Shutdown Renderer here
+}
+
+void Application::OnEvent(Event& e)
+{
 }
 
 void Application::Run()
