@@ -8,8 +8,8 @@ public:
 	static bool IsKeyPressed(KeyCode key);
 	static bool IsMouseButtonPressed(KeyCode key);
 
-	static float GetMouseX();
-	static float GetMouseY();
+	static int GetMouseX();
+	static int GetMouseY();
 	static std::pair<int, int> GetMousePos();
 public:
 	static constexpr unsigned int NUM_KEY_CODES = 256;

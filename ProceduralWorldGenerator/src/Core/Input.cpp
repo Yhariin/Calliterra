@@ -16,12 +16,12 @@ bool Input::IsMouseButtonPressed(KeyCode key)
 	return true;
 }
 
-float Input::GetMouseX()
+int Input::GetMouseX()
 {
 	return m_MouseX;
 }
 
-float Input::GetMouseY()
+int Input::GetMouseY()
 {
 	return m_MouseY;
 }

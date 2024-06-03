@@ -34,6 +34,7 @@ void Application::Run()
 		{
 			m_Running = false;
 		}
+
 	}
 }
 

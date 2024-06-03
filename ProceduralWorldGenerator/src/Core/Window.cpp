@@ -59,7 +59,9 @@ LRESULT CALLBACK Window::MessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 		if (pWindow == nullptr)
 		{
 			// Error Logging here
-			std::cout << "ERROR: window ptr null" << std::endl;
+			DWORD error = GetLastError();
+			LOG_ERROR("{0} CreateWindowEx failed! pWindow is null.", error);
+			std::exit(error);
 		}
 
 		// set WinAPI-managed user data to store ptr to window class
@@ -114,6 +116,7 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	case WM_MOUSEMOVE:
 		POINTS pt = MAKEPOINTS(lParam);
 		Input::OnMouseMove(pt.x, pt.y);
+		LOG_INFO("{0}, {1}", pt.x, pt.y);
 		break;
 
 	case WM_LBUTTONDOWN:
