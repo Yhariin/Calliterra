@@ -1,9 +1,6 @@
 #pragma once
 
-// Ignore the warnings in the external header
-#pragma warning(push, 0)
-#include "spdlog/spdlog.h"
-#pragma warning(pop)
+#include <spdlog/spdlog.h>
 
 class Log
 {
