@@ -1,4 +1,5 @@
 #pragma once
+#include "KeyCodes.h"
 
 class Input
 {
@@ -25,6 +26,7 @@ private:
 	static std::bitset<NUM_KEY_CODES> m_KeyStates;
 	static int m_MouseX;
 	static int m_MouseY;
+	static int m_WheelDeltaCarry;
 
 };
 

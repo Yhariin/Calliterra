@@ -5,6 +5,7 @@
 std::bitset<Input::NUM_KEY_CODES> Input::m_KeyStates = std::bitset<Input::NUM_KEY_CODES>();
 int Input::m_MouseX = 0;
 int Input::m_MouseY = 0;
+int Input::m_WheelDeltaCarry = 0;
 
 bool Input::IsKeyPressed(KeyCode key)
 {
