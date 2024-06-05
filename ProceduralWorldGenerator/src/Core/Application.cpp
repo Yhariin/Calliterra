@@ -2,6 +2,9 @@
 #include "Application.h"
 
 #include "Window.h"
+#include "DeltaTime.h"
+
+using namespace std::literals::chrono_literals;
 
 Application* Application::s_Instance = nullptr;
 
@@ -39,7 +42,12 @@ void Application::Run()
 {
 	while (m_Running)
 	{
-		// Calcualte m_LastFrameTime here
+		// Calculate deltaTime
+		double time = DeltaTime::GetCurrentTimeMicroseconds();
+		DeltaTime deltaTime = time - m_LastFrameTime;
+		m_LastFrameTime = time;
+
+		//LOG_INFO("{0}ms : {1:.2f} FPS", deltaTime.GetMilliseconds(), 1.f / deltaTime.GetSeconds());
 
 		// Update window here
 		if (!m_Window->ProcessMessages())
