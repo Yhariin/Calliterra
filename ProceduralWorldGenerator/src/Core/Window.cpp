@@ -297,11 +297,6 @@ bool Window::ProcessMessages()
 
 	while (PeekMessage(&msg, nullptr, 0u, 0u, PM_REMOVE))
 	{
-		if (msg.message == WM_QUIT)
-		{
-			return false;
-		}
-
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}

@@ -4,8 +4,6 @@
 #include "Window.h"
 #include "DeltaTime.h"
 
-using namespace std::literals::chrono_literals;
-
 Application* Application::s_Instance = nullptr;
 
 Application::Application()
@@ -35,7 +33,10 @@ Application::~Application()
 
 void Application::OnEvent(Event& e)
 {
-	//LOG_INFO(e.ToString());
+	EventDispatcher dispatcher(e);
+	dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent& e) { return this->OnWindowClose(e); });
+
+	LOG_INFO(e.ToString());
 }
 
 void Application::Run()
@@ -50,16 +51,14 @@ void Application::Run()
 		//LOG_INFO("{0}ms : {1:.2f} FPS", deltaTime.GetMilliseconds(), 1.f / deltaTime.GetSeconds());
 
 		// Update window here
-		if (!m_Window->ProcessMessages())
-		{
-			m_Running = false;
-		}
+		m_Window->ProcessMessages();
 
 	}
 }
 
-void Application::Close()
+bool Application::OnWindowClose(WindowCloseEvent& e)
 {
 	m_Running = false;
+	return true;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "Events/Event.h"
+#include "Events/ApplicationEvents.h"
 
 class Application
 {
@@ -15,7 +16,7 @@ public:
 
 	Window& GetWindow() { return *m_Window; }
 
-	void Close();
+	bool OnWindowClose(WindowCloseEvent& e);
 
 	static Application& Get() { return *s_Instance; }
 
