@@ -7,7 +7,7 @@
 
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module
-	  m_CLASSNAME(L"Procedural World Generator")
+	  m_CLASSNAME(L"Calliterra")
 {
 	WNDCLASS wndClass = {};
 	wndClass.lpszClassName = m_CLASSNAME;

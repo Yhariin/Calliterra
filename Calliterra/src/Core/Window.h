@@ -10,7 +10,7 @@ struct WindowProps
 	uint16_t Width;
 	uint16_t Height;
 
-	WindowProps(const std::string& title = "Procedual World Generator",
+	WindowProps(const std::string& title = "Calliterra",
 		uint16_t width = 1600,
 		uint16_t height = 900)
 		: Title(title), Width(width), Height(height)

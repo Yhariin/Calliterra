@@ -1,4 +1,4 @@
-workspace "ProceduralWorldGenerator"
+workspace "Calliterra"
     architecture "x64"
 
     configurations
@@ -9,8 +9,8 @@ workspace "ProceduralWorldGenerator"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
-project "ProceduralWorldGenerator"
-    location "ProceduralWorldGenerator"
+project "Calliterra"
+    location "Calliterra"
     kind "ConsoleApp"
     language "C++"
 
