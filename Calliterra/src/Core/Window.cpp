@@ -44,6 +44,9 @@ Window::Window(const WindowProps& windowProps)
 	);
 
 	ShowWindow(m_hWnd, SW_SHOW);
+
+	m_GraphicsContext = GraphicsContext::Create(&m_hWnd);
+	m_GraphicsContext->Init();
 }
 
 Window::~Window()

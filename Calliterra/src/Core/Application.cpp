@@ -3,6 +3,7 @@
 
 #include "Window.h"
 #include "DeltaTime.h"
+#include "Renderer/Renderer.h"
 
 Application* Application::s_Instance = nullptr;
 
@@ -23,6 +24,8 @@ Application::Application()
 	m_Window->SetEventCallback([this](Event& e) { return this->OnEvent(e); });
 
 	// Initialize Renderer here
+	Renderer::Init();
+
 }
 
 Application::~Application()
@@ -36,7 +39,7 @@ void Application::OnEvent(Event& e)
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent& e) { return this->OnWindowClose(e); });
 
-	LOG_INFO(e.ToString());
+	//LOG_INFO(e.ToString());
 }
 
 void Application::Run()
