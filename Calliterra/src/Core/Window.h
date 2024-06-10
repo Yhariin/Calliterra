@@ -43,6 +43,5 @@ private:
 	std::unique_ptr<GraphicsContext> m_GraphicsContext;
 	WindowProps m_WindowProps;
 	EventCallbackFn m_EventCallback;
-	unsigned int m_KeyRepeatCount[Input::NUM_KEY_CODES] = {};
 };
 

@@ -27,6 +27,7 @@ private:
 	static int m_MouseX;
 	static int m_MouseY;
 	static int m_WheelDeltaCarry;
+	static uint32_t m_KeyRepeatCount[Input::NUM_KEY_CODES];
 
 };
 

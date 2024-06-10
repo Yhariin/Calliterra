@@ -141,12 +141,12 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	{
 		KeyCode keycode = static_cast<KeyCode>(wParam);
 
-		KeyPressedEvent	event(keycode, m_KeyRepeatCount[keycode]);
+		KeyPressedEvent	event(keycode, Input::m_KeyRepeatCount[keycode]);
 		m_EventCallback(event);
 
 		Input::OnKeyPressed(keycode);
 
-		m_KeyRepeatCount[keycode]++;
+		Input::m_KeyRepeatCount[keycode]++;
 
 		break;
 	}
@@ -158,7 +158,7 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		Input::OnKeyReleased(keycode);
 
-		m_KeyRepeatCount[keycode] = 0;
+		Input::m_KeyRepeatCount[keycode] = 0;
 		break;
 	}
 	case WM_CHAR:
