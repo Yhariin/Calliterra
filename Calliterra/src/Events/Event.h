@@ -10,6 +10,7 @@ enum class EventType
 	MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 };
 
+// We use an unscoped enum here to allow for implicit integer conversion for bitmasking
 enum EventCategory
 {
 	None = 0,

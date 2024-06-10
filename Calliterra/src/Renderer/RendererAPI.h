@@ -3,7 +3,7 @@
 class RendererAPI
 {
 public:
-	enum class API
+	enum API
 	{
 		None = 0, DX11 = 1
 	};

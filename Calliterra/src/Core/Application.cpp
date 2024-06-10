@@ -30,7 +30,7 @@ Application::Application()
 
 Application::~Application()
 {
-
+	Renderer::Shutdown();
 	// Shutdown Renderer here
 }
 
