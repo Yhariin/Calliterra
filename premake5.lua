@@ -37,6 +37,10 @@ project "Calliterra"
         "%{prj.name}/vendor/spdlog/include",
     }
 
+    links
+    {
+        "d3d11"
+    }
 
     filter "system:windows"
 		cppdialect "C++20"
