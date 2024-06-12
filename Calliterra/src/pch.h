@@ -19,4 +19,5 @@
 #include <utility>
 #include <functional>
 
+#include "Core/Assert.h"
 #include "Core/Log.h"

@@ -10,8 +10,7 @@ std::unique_ptr<RendererAPI>RendererAPI::Create()
 	switch (s_API)
 	{
 	case None: 
-		//TODO Throw Assert here
-		LOG_ERROR("RendererAPI::None");
+		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case DX11:
 		return std::make_unique<DX11RendererAPI>();

@@ -4,7 +4,7 @@
 DX11Context::DX11Context(HWND* hWnd)
 	: m_Hwnd(hWnd)
 {
-	//TODO: Add assert to check window handle
+	ASSERT(hWnd, "Window handle is null!");
 }
 
 void DX11Context::Init()

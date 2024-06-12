@@ -9,8 +9,8 @@ Application* Application::s_Instance = nullptr;
 
 Application::Application()
 {
-	if(!s_Instance)
-		s_Instance = this;
+	ASSERT(!s_Instance, "Application already exists!");
+	s_Instance = this;
 
 	// Create Window here
 	m_Window = std::make_unique<Window>();
@@ -30,8 +30,8 @@ Application::Application()
 
 Application::~Application()
 {
-	Renderer::Shutdown();
 	// Shutdown Renderer here
+	Renderer::Shutdown();
 }
 
 void Application::OnEvent(Event& e)
