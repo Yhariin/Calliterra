@@ -1,5 +1,7 @@
 #pragma once
 
+struct WindowProps;
+
 class GraphicsContext
 {
 public:
@@ -8,6 +10,6 @@ public:
 	virtual void Init() = 0;
 	virtual void SwapBuffers() = 0;
 
-	static std::unique_ptr<GraphicsContext> Create(void* window);
+	static std::unique_ptr<GraphicsContext> Create(void* window, WindowProps& windowProps);
 };
 

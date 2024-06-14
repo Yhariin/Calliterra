@@ -25,8 +25,8 @@ public:
 	using EventCallbackFn = std::function<void(Event&)>;
 
 	Window(const WindowProps& windowProps = WindowProps());
-	Window(const Window&) = delete; // delete the copy constructor
-	Window& operator =(const Window&) = delete; // delete the equals operator
+	Window(const Window&) = delete;
+	Window& operator =(const Window&) = delete;
 	~Window();
 
 	static LRESULT CALLBACK MessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
@@ -35,6 +35,7 @@ public:
 	bool ProcessMessages();
 	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
 	HWND GetWindowHandle() const { return m_hWnd; }
+	void OnUpdate();
 
 private:
 	const wchar_t* m_CLASSNAME;

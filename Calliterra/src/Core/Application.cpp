@@ -54,7 +54,7 @@ void Application::Run()
 		//LOG_INFO("{0}ms : {1:.2f} FPS", deltaTime.GetMilliseconds(), 1.f / deltaTime.GetSeconds());
 
 		// Update window here
-		m_Window->ProcessMessages();
+		m_Window->OnUpdate();
 
 	}
 }

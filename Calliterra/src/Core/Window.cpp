@@ -44,8 +44,7 @@ Window::Window(const WindowProps& windowProps)
 	);
 
 	ShowWindow(m_hWnd, SW_SHOW);
-
-	m_GraphicsContext = GraphicsContext::Create(&m_hWnd);
+	m_GraphicsContext = GraphicsContext::Create(&m_hWnd, m_WindowProps);
 	m_GraphicsContext->Init();
 }
 
@@ -305,5 +304,11 @@ bool Window::ProcessMessages()
 	}
 
 	return true;
+}
+
+void Window::OnUpdate()
+{
+	ProcessMessages();
+	m_GraphicsContext->SwapBuffers();
 }
 
