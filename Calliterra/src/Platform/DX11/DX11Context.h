@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <wrl.h>
 
-#include "./Core/Window.h"
+#include "Core/Window.h"
 #include "Renderer/GraphicsContext.h"
 
 using Microsoft::WRL::ComPtr;

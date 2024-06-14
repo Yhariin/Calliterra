@@ -1,8 +1,8 @@
 #include "pch.h"
 
+#include "Core/Timer.h"
 #include "DX11Context.h"
 #include <dxgi1_2.h>
-
 
 DX11Context::DX11Context(HWND* hWnd, WindowProps& windowProps)
 	: m_Hwnd(hWnd), m_WindowProps(windowProps), m_4xMSAAQuality(0)
@@ -12,7 +12,6 @@ DX11Context::DX11Context(HWND* hWnd, WindowProps& windowProps)
 
 void DX11Context::Init()
 {
-
 	CreateDeviceContext();
 	CreateSwapChain();
 	CreateRenderTargetView();
@@ -21,7 +20,9 @@ void DX11Context::Init()
 
 void DX11Context::SwapBuffers()
 {
-	ClearBuffer(1, 0, 1);
+	const float c = sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0f + 0.5f;
+	//ClearBuffer(1, 0, 1);
+	ClearBuffer(c, .5, c);
 	m_SwapChain->Present(1, 0);
 }
 

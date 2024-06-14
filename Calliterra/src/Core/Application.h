@@ -2,6 +2,8 @@
 #include "Window.h"
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
+#include "DeltaTime.h"
+#include "Timer.h"
 
 class Application
 {
@@ -19,8 +21,7 @@ public:
 	bool OnWindowClose(WindowCloseEvent& e);
 
 	static Application& Get() { return *s_Instance; }
-
-private:
+	static DeltaTime GetDeltaTime() { return m_DeltaTime; }
 
 private:
 	static Application* s_Instance;
@@ -29,6 +30,8 @@ private:
 	bool m_Running = true;
 	bool m_Minimized = false;
 	double m_LastFrameTime = 0.0;
+	static DeltaTime m_DeltaTime;
+	static Timer m_ApplicationTimer;
 };
 
 

@@ -2,15 +2,19 @@
 #include "Application.h"
 
 #include "Window.h"
-#include "DeltaTime.h"
 #include "Renderer/Renderer.h"
 
 Application* Application::s_Instance = nullptr;
+DeltaTime Application::m_DeltaTime = DeltaTime();
+Timer Application::m_ApplicationTimer = Timer();
 
 Application::Application()
 {
 	ASSERT(!s_Instance, "Application already exists!");
 	s_Instance = this;
+
+	Timer::SetApplicationTimer(&m_ApplicationTimer);
+	m_ApplicationTimer.Reset();
 
 	// Create Window here
 	m_Window = std::make_unique<Window>();
@@ -23,14 +27,12 @@ Application::Application()
 	// m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 	m_Window->SetEventCallback([this](Event& e) { return this->OnEvent(e); });
 
-	// Initialize Renderer here
 	Renderer::Init();
 
 }
 
 Application::~Application()
 {
-	// Shutdown Renderer here
 	Renderer::Shutdown();
 }
 
@@ -48,12 +50,11 @@ void Application::Run()
 	{
 		// Calculate deltaTime
 		double time = DeltaTime::GetCurrentTimeMicroseconds();
-		DeltaTime deltaTime = time - m_LastFrameTime;
+		m_DeltaTime = time - m_LastFrameTime;
 		m_LastFrameTime = time;
 
-		//LOG_INFO("{0}ms : {1:.2f} FPS", deltaTime.GetMilliseconds(), 1.f / deltaTime.GetSeconds());
+		//LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
 
-		// Update window here
 		m_Window->OnUpdate();
 
 	}

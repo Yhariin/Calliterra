@@ -3,20 +3,16 @@
 
 class DeltaTime
 {
+	friend class Application;
 public:
-	DeltaTime(double timeInMicroseconds = 0.0f)
-		: m_DeltaTimeMicroseconds(timeInMicroseconds)
-	{
-	}
-
 	static double GetCurrentTimeMilliseconds()
 	{
-		return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+		return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 	}
 	
 	static double GetCurrentTimeMicroseconds()
 	{
-		return static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+		return static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 	}
 
 	double GetMicroSeconds()
@@ -26,14 +22,26 @@ public:
 
 	double GetMilliseconds()
 	{
-		return m_DeltaTimeMicroseconds / 1e3f;
+		return m_DeltaTimeMicroseconds / 1e3;
 	}
 
 	double GetSeconds()
 	{
-		return m_DeltaTimeMicroseconds / 1e6f;
+		return m_DeltaTimeMicroseconds / 1e6;
+	}
+
+	static DeltaTime& Get()
+	{
+		return *s_Instance;
 	}
 
 private:
+	DeltaTime(double timeInMicroseconds = 0.0f)
+		: m_DeltaTimeMicroseconds(timeInMicroseconds)
+	{
+		s_Instance = this;
+	}
+
 	double m_DeltaTimeMicroseconds;
+	static DeltaTime* s_Instance;
 };
