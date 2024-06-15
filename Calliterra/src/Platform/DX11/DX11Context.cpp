@@ -15,6 +15,7 @@ void DX11Context::Init()
 	CreateDeviceContext();
 	CreateSwapChain();
 	CreateRenderTargetView();
+	CreateDepthStencilBuffer();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }
 
@@ -153,4 +154,25 @@ void DX11Context::SetRenderViewport(float x, float y, float width, float height)
 	viewportDesc.MaxDepth = 1.0f;
 
 	m_DeviceContext->RSSetViewports(1, &viewportDesc);
+}
+
+void DX11Context::OnWindowResize() 
+{
+	LOG_DEBUG("{0}, {1}", m_WindowProps.Width, m_WindowProps.Height);
+
+	ASSERT(m_DeviceContext);
+	ASSERT(m_Device);
+	ASSERT(m_SwapChain);
+
+	//m_DeviceContext->OMSetRenderTargets(0, 0, 0);
+	m_RenderTargetView.Reset();
+	m_DepthStencilView.Reset();
+	m_DepthStencilBuffer.Reset();
+
+	m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+	CreateRenderTargetView();
+	CreateDepthStencilBuffer();
+
+	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }

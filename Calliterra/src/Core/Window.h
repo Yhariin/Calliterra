@@ -44,5 +44,8 @@ private:
 	std::unique_ptr<GraphicsContext> m_GraphicsContext;
 	WindowProps m_WindowProps;
 	EventCallbackFn m_EventCallback;
+	bool m_Resizing = false;
+	bool m_Active = true;
+	bool m_Minimized = false;
 };
 

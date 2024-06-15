@@ -96,11 +96,11 @@ LRESULT WINAPI Window::MessageRedirect(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 
 LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	static int sizeCount = 0;
+	static int wmSizeMessageCount = 0;
 
 	switch (uMsg)
 	{
-		// --------------- Window Closing ---------------- //
+	// --------------- Window Closing ---------------- //
 	case WM_CLOSE:
 	{
 		WindowCloseEvent event;
@@ -113,28 +113,75 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		PostQuitMessage(0);
 		return 0;
 
-		// --------------- Window Events ---------------- //
+	// --------------- Window Events ---------------- //
+	case WM_ACTIVATE:
+	{
+		if (LOWORD(wParam) == WA_INACTIVE)
+		{
+			m_Active = false;
+		}
+		else
+		{
+			m_Active = true;
+		}
+		break;
+	}
 	case WM_SIZE:
 	{
+		m_WindowProps.Width = LOWORD(lParam);
+		m_WindowProps.Height = HIWORD(lParam);
+
 		// Upon window creation there is an initial WM_SIZE message.
 		// To prevent calling m_EventCallback before setup is complete
 		// We will break early if it's the first WM_SIZE message.
-		sizeCount++;
-		if (sizeCount == 1)
+		wmSizeMessageCount++;
+		if (wmSizeMessageCount == 1)
 			break;
 
-		UINT width = LOWORD(lParam);
-		UINT height = HIWORD(lParam);
+		// If user is dragging the resize bars, then continuous WM_SIZE
+		// messages are sent. Resizing on each WM_SIZE is too slow so we will
+		// Only resize once the user has let go of the resize bar
+		if (m_Resizing)
+			break;
 
-		m_WindowProps.Width = width;
-		m_WindowProps.Height = height;
+		if (wParam == SIZE_MINIMIZED)
+		{
+			m_Minimized = true;
+		}
+		else
+		{
+			WindowResizeEvent event(m_WindowProps.Width, m_WindowProps.Height);
+			m_EventCallback(event);
 
-		WindowResizeEvent event(width, height);
+			m_GraphicsContext->OnWindowResize();
+		}
+		break;
+	}
+	// Sent when the user grabs the resize bars
+	case WM_ENTERSIZEMOVE:
+	{
+		m_Resizing = true;
+		break;
+	}
+	// Sent when the user releases the resize bars
+	case WM_EXITSIZEMOVE:
+	{
+		m_Resizing = false;
+
+		WindowResizeEvent event(m_WindowProps.Width, m_WindowProps.Height);
 		m_EventCallback(event);
+
+		m_GraphicsContext->OnWindowResize();
 
 		break;
 	}
-
+	// Catch this message to prevent the window from becoming too small
+	case WM_GETMINMAXINFO: 
+	{
+		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 640;
+		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 360;
+		break;
+	}
 	// --------------- Keyboard Messages -------------- //
 	case WM_KEYDOWN:
 	{
