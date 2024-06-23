@@ -15,7 +15,7 @@ bool Input::IsKeyPressed(KeyCode key)
 
 bool Input::IsMouseButtonPressed(KeyCode key)
 {
-	return true;
+	return m_KeyStates[key];
 }
 
 int Input::GetMouseX()
