@@ -3,8 +3,6 @@
 
 #include "Platform/DX11/DX11RendererAPI.h"
 
-RendererAPI::API RendererAPI::s_API = DX11;
-
 std::unique_ptr<RendererAPI>RendererAPI::Create()
 {
 	switch (s_API)

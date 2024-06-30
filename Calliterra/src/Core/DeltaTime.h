@@ -43,5 +43,5 @@ private:
 	}
 
 	double m_DeltaTimeMicroseconds;
-	static DeltaTime* s_Instance;
+	inline static DeltaTime* s_Instance = nullptr;
 };

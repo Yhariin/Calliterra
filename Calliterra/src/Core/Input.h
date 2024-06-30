@@ -23,11 +23,12 @@ private:
 	static void OnMouseButtonPressed(KeyCode key);
 	static void OnMouseButtonReleased(KeyCode key);
 private:
-	static std::bitset<NUM_KEY_CODES> m_KeyStates;
-	static int m_MouseX;
-	static int m_MouseY;
-	static int m_WheelDeltaCarry;
-	static uint32_t m_KeyRepeatCount[Input::NUM_KEY_CODES];
+	// Default bitset constructor sets all bits to 0
+	inline static std::bitset<NUM_KEY_CODES> m_KeyStates = std::bitset<NUM_KEY_CODES>();
+	inline static int m_MouseX = 0;
+	inline static int m_MouseY = 0;
+	inline static int m_WheelDeltaCarry = 0;
+	inline static uint32_t m_KeyRepeatCount[Input::NUM_KEY_CODES] = {};
 
 };
 
