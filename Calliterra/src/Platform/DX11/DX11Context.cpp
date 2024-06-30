@@ -15,13 +15,13 @@ void DX11Context::Init()
 	CreateDeviceContext();
 	CreateSwapChain();
 	CreateRenderTargetView();
-	CreateDepthStencilBuffer();
+	//CreateDepthStencilBuffer();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }
 
 void DX11Context::SwapBuffers()
 {
-	const float c = sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0f + 0.5f;
+	const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
 	//ClearBuffer(1, 0, 1);
 	ClearBuffer(c, .5, c);
 	m_SwapChain->Present(1, 0);
@@ -172,7 +172,7 @@ void DX11Context::OnWindowResize()
 	m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
 	CreateRenderTargetView();
-	CreateDepthStencilBuffer();
+	//CreateDepthStencilBuffer();
 
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }

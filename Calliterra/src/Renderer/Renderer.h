@@ -10,6 +10,6 @@ public:
 
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 private:
-	static std::unique_ptr<RendererAPI> s_RendererAPI;
+	inline static std::unique_ptr<RendererAPI> s_RendererAPI = RendererAPI::Create();
 };
 

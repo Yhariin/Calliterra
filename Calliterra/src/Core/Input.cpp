@@ -1,13 +1,6 @@
 #include "pch.h"
 #include "Input.h"
 
-// Default bitset constructor sets all bits to 0
-std::bitset<Input::NUM_KEY_CODES> Input::m_KeyStates = std::bitset<Input::NUM_KEY_CODES>();
-int Input::m_MouseX = 0;
-int Input::m_MouseY = 0;
-int Input::m_WheelDeltaCarry = 0;
-uint32_t Input::m_KeyRepeatCount[Input::NUM_KEY_CODES] = {};
-
 bool Input::IsKeyPressed(KeyCode key)
 {
 	return m_KeyStates[key];
