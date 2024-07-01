@@ -15,7 +15,7 @@ DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float* vertices, size_t
 	// TODO: Allow for construction of buffer with different flags
 	D3D11_BUFFER_DESC vbDesc = {};
 	vbDesc.Usage = D3D11_USAGE_DEFAULT;
-	vbDesc.ByteWidth = m_ElementCountList[0] * sizeof(float);
+	vbDesc.ByteWidth = static_cast<UINT>(m_ElementCountList[0] * sizeof(float));
 	vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbDesc.CPUAccessFlags = 0;
 	vbDesc.MiscFlags = 0;
@@ -49,7 +49,7 @@ DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float** listOfVertexArr
 	{
 		D3D11_BUFFER_DESC vbDesc = {};
 		vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
-		vbDesc.ByteWidth = m_ElementCountList[i] * sizeof(float);
+		vbDesc.ByteWidth = static_cast<UINT>(m_ElementCountList[i] * sizeof(float));
 		vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vbDesc.CPUAccessFlags = 0;
 		vbDesc.MiscFlags = 0;
@@ -75,11 +75,11 @@ void DX11VertexBuffer::Bind()
 	strideList.reserve(m_BufferCount);
 	for (int i = 0; i < m_BufferCount; i++)
 	{
-		strideList.push_back(m_BufferLayoutList[i].GetStride());
+		strideList.push_back(static_cast<UINT>(m_BufferLayoutList[i].GetStride()));
 	}
 
 	UINT offset = 0;
-	m_DX11Context.GetDeviceContext().IASetVertexBuffers(0, m_BufferCount, m_VertexBufferList[0].GetAddressOf(), &strideList[0], &offset);
+	m_DX11Context.GetDeviceContext().IASetVertexBuffers(0, static_cast<UINT>(m_BufferCount), m_VertexBufferList[0].GetAddressOf(), &strideList[0], &offset);
 	
 }
 
