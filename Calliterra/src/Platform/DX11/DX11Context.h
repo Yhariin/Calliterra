@@ -20,6 +20,10 @@ public:
 	virtual void Init() override;
 	virtual void SwapBuffers() override;
 	virtual void OnWindowResize() override;
+
+	ID3D11Device& GetDevice() { return *m_Device.Get(); }
+	ID3D11DeviceContext& GetDeviceContext() { return *m_DeviceContext.Get(); }
+
 private:
 	void ClearBuffer(float r, float g, float b);
 	void CreateDeviceContext();
