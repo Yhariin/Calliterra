@@ -390,4 +390,3 @@ void Window::OnUpdate()
 	ProcessMessages();
 	m_GraphicsContext->SwapBuffers();
 }
-

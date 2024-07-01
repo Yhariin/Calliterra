@@ -4,10 +4,6 @@
 #include "Window.h"
 #include "Renderer/Renderer.h"
 
-Application* Application::s_Instance = nullptr;
-DeltaTime Application::m_DeltaTime = DeltaTime();
-Timer Application::m_ApplicationTimer = Timer();
-
 Application::Application()
 {
 	ASSERT(!s_Instance, "Application already exists!");
@@ -27,7 +23,7 @@ Application::Application()
 	// m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 	m_Window->SetEventCallback([this](Event& e) { return this->OnEvent(e); });
 
-	Renderer::Init();
+	Renderer::Init(m_Window->GetGraphicsContext());
 
 }
 
@@ -46,6 +42,19 @@ void Application::OnEvent(Event& e)
 
 void Application::Run()
 {
+	float vertices[] = {
+		 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	std::shared_ptr<VertexBuffer> vertexBuffer = Renderer::CreateVertexBuffer(vertices, sizeof(vertices) / sizeof(float));
+	vertexBuffer->SetLayout({ 
+		{"Position", ShaderDataType::Float3},
+		{"Color", ShaderDataType::Float3 }
+	});
+	vertexBuffer->Bind();
+
 	while (m_Running)
 	{
 		// Calculate deltaTime

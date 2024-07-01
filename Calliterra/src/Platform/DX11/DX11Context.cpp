@@ -158,7 +158,7 @@ void DX11Context::SetRenderViewport(float x, float y, float width, float height)
 
 void DX11Context::OnWindowResize() 
 {
-	LOG_DEBUG("{0}, {1}", m_WindowProps.Width, m_WindowProps.Height);
+	//LOG_DEBUG("{0}, {1}", m_WindowProps.Width, m_WindowProps.Height);
 
 	ASSERT(m_DeviceContext);
 	ASSERT(m_Device);

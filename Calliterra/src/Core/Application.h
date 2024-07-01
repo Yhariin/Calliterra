@@ -24,14 +24,14 @@ public:
 	static DeltaTime GetDeltaTime() { return m_DeltaTime; }
 
 private:
-	static Application* s_Instance;
+	inline static Application* s_Instance = nullptr;
 	std::unique_ptr<Window> m_Window;
 
 	bool m_Running = true;
 	bool m_Minimized = false;
 	double m_LastFrameTime = 0.0;
-	static DeltaTime m_DeltaTime;
-	static Timer m_ApplicationTimer;
+	inline static DeltaTime m_DeltaTime = DeltaTime();
+	inline static Timer m_ApplicationTimer = Timer();
 };
 
 

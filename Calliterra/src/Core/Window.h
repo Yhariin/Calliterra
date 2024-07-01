@@ -36,6 +36,7 @@ public:
 	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
 	HWND GetWindowHandle() const { return m_hWnd; }
 	void OnUpdate();
+	GraphicsContext& GetGraphicsContext() { return *m_GraphicsContext; }
 
 private:
 	const wchar_t* m_CLASSNAME;
