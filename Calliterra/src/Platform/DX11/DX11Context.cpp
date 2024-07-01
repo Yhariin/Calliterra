@@ -24,7 +24,7 @@ void DX11Context::SwapBuffers()
 	const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
 	//ClearBuffer(1, 0, 1);
 	ClearBuffer(c, .5, c);
-	m_SwapChain->Present(1, 0);
+	ASSERT_HR(m_SwapChain->Present(1, 0));
 }
 
 void DX11Context::CreateDeviceContext()
@@ -32,12 +32,17 @@ void DX11Context::CreateDeviceContext()
 	D3D_FEATURE_LEVEL featureLevel;
 	D3D_FEATURE_LEVEL featureLevelArray[] = { D3D_FEATURE_LEVEL_11_1 };
 	UINT feautreLevelCount = sizeof(featureLevelArray) / sizeof(D3D_FEATURE_LEVEL);
-	
+
+	UINT createDeviceFlags= 0;
+#ifdef DEBUG
+	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
 	ASSERT_HR(D3D11CreateDevice(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		0,
+		createDeviceFlags,
 		featureLevelArray,
 		feautreLevelCount,
 		D3D11_SDK_VERSION,

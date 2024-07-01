@@ -49,7 +49,7 @@ project "Calliterra"
         flags { "MultiProcessorCompile" }
 
     filter "configurations:Debug"
-        defines { "_DEBUG" }
+        defines { "_DEBUG", "DEBUG" }
         runtime "Debug"
 
     filter "configurations:Release"

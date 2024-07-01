@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	#define DEBUGBREAK() __debugbreak()
 	#define ENABLE_ASSERTS
 	#include <winerror.h>
