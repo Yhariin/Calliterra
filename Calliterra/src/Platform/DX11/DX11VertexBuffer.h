@@ -12,18 +12,23 @@ public:
 	void Bind() override;
 	void Unbind() override;
 
-	void SetLayout(const VertexBufferLayout& layout) override { m_BufferLayoutList[0] = layout; }
-	const VertexBufferLayout& GetLayout() override { return m_BufferLayoutList[0]; }
-	void SetLayoutList(std::vector<VertexBufferLayout> layoutList) { m_BufferLayoutList = layoutList; }
-	const std::vector<VertexBufferLayout>& GetLayoutList() { return m_BufferLayoutList; }
+	//void SetLayout(const VertexBufferLayout& layout) override { m_D3DBufferLayoutList[0] = layout; }
+	void SetLayout(int index) override;
+	void CreateLayout(const VertexBufferLayout& layout) override;
+	void CreateLayoutList(const std::vector<VertexBufferLayout>& layoutList) override;
 
 private:
 	DX11Context& m_DX11Context;
 
-	std::vector<ComPtr<ID3D11Buffer>> m_VertexBufferList;
-	std::vector<VertexBufferLayout> m_BufferLayoutList;
+	//std::vector<ComPtr<ID3D11Buffer>> m_D3DVertexBufferList;
+	//std::vector<ComPtr<ID3D11InputLayout>> m_D3DBufferLayoutList;
+	//std::vector<VertexBufferLayout> m_BufferLayoutList;
 	float** m_VertexArrayList;
 	size_t* m_ElementCountList;
 	size_t  m_BufferCount;
+
+	ComPtr<ID3D11Buffer> m_D3DVertexBufferArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = {};
+	ComPtr<ID3D11InputLayout> m_D3DBufferLayoutArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = {};
+	VertexBufferLayout m_BufferLayoutArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = {};
 };
 

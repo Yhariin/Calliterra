@@ -49,11 +49,12 @@ void Application::Run()
 	};
 
 	std::shared_ptr<VertexBuffer> vertexBuffer = Renderer::CreateVertexBuffer(vertices, sizeof(vertices) / sizeof(float));
-	vertexBuffer->SetLayout({ 
-		{"Position", ShaderDataType::Float3},
-		{"Color", ShaderDataType::Float3 }
-	});
-	vertexBuffer->Bind();
+	//vertexBuffer->CreateLayout({ 
+	//	{"Position", 0, ShaderDataType::Float3},
+	//	{"Color", 0, ShaderDataType::Float3 }
+	//});
+	//vertexBuffer->SetLayout();
+	//vertexBuffer->Bind();
 
 	while (m_Running)
 	{
