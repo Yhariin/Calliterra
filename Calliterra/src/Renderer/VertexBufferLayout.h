@@ -34,14 +34,15 @@ static size_t ShaderDataTypeSize(ShaderDataType type)
 struct BufferElement
 {
 	std::string Name;
+	int NameIndex;
 	ShaderDataType Type;
 	size_t Size;
 	size_t Offset;
 
 	BufferElement() = default;
 
-	BufferElement(const std::string& name, ShaderDataType type)
-		: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0)
+	BufferElement(const std::string& name, int nameIndex, ShaderDataType type)
+		: Name(name), NameIndex(nameIndex), Type(type), Size(ShaderDataTypeSize(type)), Offset(0)
 	{
 	}
 
@@ -49,17 +50,17 @@ struct BufferElement
 	{
 		switch (Type)
 		{
-		case ShaderDataType::Float: return 1;
-		case ShaderDataType::Float2: return 2;
-		case ShaderDataType::Float3: return 3;
-		case ShaderDataType::Float4: return 4;
-		case ShaderDataType::Mat3: return 3; // three *float3
-		case ShaderDataType::Mat4: return 4; // four *float4
-		case ShaderDataType::Int: return 1;
-		case ShaderDataType::Int2: return 2;
-		case ShaderDataType::Int3: return 3;
-		case ShaderDataType::Int4: return 4;
-		case ShaderDataType::Bool: return 1;
+		case ShaderDataType::Float:		return 1;
+		case ShaderDataType::Float2:	return 2;
+		case ShaderDataType::Float3:	return 3;
+		case ShaderDataType::Float4:	return 4;
+		case ShaderDataType::Mat3:		return 3; // three *float3
+		case ShaderDataType::Mat4:		return 4; // four *float4
+		case ShaderDataType::Int:		return 1;
+		case ShaderDataType::Int2:		return 2;
+		case ShaderDataType::Int3:		return 3;
+		case ShaderDataType::Int4:		return 4;
+		case ShaderDataType::Bool:		return 1;
 		}
 
 		ASSERT(false, "Invalid ShaderDataType");
@@ -105,3 +106,4 @@ private:
 	std::vector<BufferElement> m_Elements;
 	size_t m_Stride = 0;
 };
+
