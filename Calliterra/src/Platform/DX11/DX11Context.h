@@ -1,6 +1,9 @@
 #pragma once
 #include <d3d11.h>
+#include <dxgi1_2.h>
 #include <wrl.h>
+
+#pragma comment(lib, "d3d11.lib")
 
 #include "Core/Window.h"
 #include "Renderer/GraphicsContext.h"
@@ -35,7 +38,7 @@ private:
 	HWND* m_Hwnd;
 	WindowProps& m_WindowProps;
 	ComPtr<ID3D11Device> m_Device;
-	ComPtr<IDXGISwapChain> m_SwapChain;
+	ComPtr<IDXGISwapChain1> m_SwapChain;
 	ComPtr<ID3D11DeviceContext> m_DeviceContext;
 
 	ComPtr<ID3D11RenderTargetView> m_RenderTargetView;

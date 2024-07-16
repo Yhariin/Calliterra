@@ -39,7 +39,6 @@ project "Calliterra"
 
     links
     {
-        "d3d11"
     }
 
     filter "system:windows"
