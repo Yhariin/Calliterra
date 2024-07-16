@@ -15,15 +15,19 @@ void DX11Context::Init()
 	CreateDeviceContext();
 	CreateSwapChain();
 	CreateRenderTargetView();
-	//CreateDepthStencilBuffer();
+	CreateDepthStencilBuffer();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }
 
 void DX11Context::SwapBuffers()
 {
+	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+
 	const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
 	ClearBuffer(c, .5, c);
+
 	ASSERT_HR(m_SwapChain->Present(1, 0));
+
 }
 
 void DX11Context::CreateDeviceContext()
@@ -60,8 +64,14 @@ void DX11Context::CreateSwapChain()
 	// NOTE: If we want to change the multisampling settings at runtime,
 	// we would have to destroy and recreate the swap chain.
 	// https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-flush	
+	
+	// Since MSAA is not supported when the DXGI flip model we will keep it turned off for now
+	// TODO: Implement MSAA support elsewhere
+	m_DX11ContextProps.Enabled4xMSAA = false;
+	/*
 	m_Device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_4xMSAAQuality);
 	ASSERT(m_4xMSAAQuality > 0, "4X MSAA not supported!");
+	*/
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = 0;
@@ -81,7 +91,7 @@ void DX11Context::CreateSwapChain()
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.Scaling = DXGI_SCALING_NONE;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 	swapChainDesc.Flags = 0;
 
@@ -140,13 +150,14 @@ void DX11Context::CreateDepthStencilBuffer()
 	ASSERT_HR(m_Device->CreateTexture2D(&depthStencilDesc, 0, &m_DepthStencilBuffer));
 	ASSERT_HR(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), 0, &m_DepthStencilView));
 
-	m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView.Get());
+	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 }
 
 void DX11Context::ClearBuffer(float r, float g, float b)
 {
 	const float color[] = { r, g, b, 1.0f };
 	m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), color);
+	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
 void DX11Context::SetRenderViewport(float x, float y, float width, float height)
@@ -178,7 +189,7 @@ void DX11Context::OnWindowResize()
 	m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
 	CreateRenderTargetView();
-	//CreateDepthStencilBuffer();
+	CreateDepthStencilBuffer();
 
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }
