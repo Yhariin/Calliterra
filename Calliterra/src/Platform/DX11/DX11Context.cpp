@@ -22,7 +22,6 @@ void DX11Context::Init()
 void DX11Context::SwapBuffers()
 {
 	const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
-	//ClearBuffer(1, 0, 1);
 	ClearBuffer(c, .5, c);
 	ASSERT_HR(m_SwapChain->Present(1, 0));
 }
@@ -60,16 +59,15 @@ void DX11Context::CreateSwapChain()
 {
 	// NOTE: If we want to change the multisampling settings at runtime,
 	// we would have to destroy and recreate the swap chain.
+	// https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-flush	
 	m_Device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_4xMSAAQuality);
 	ASSERT(m_4xMSAAQuality > 0, "4X MSAA not supported!");
 
-	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-	swapChainDesc.BufferDesc.Width = m_WindowProps.Width;
-	swapChainDesc.BufferDesc.Height = m_WindowProps.Height;
-	swapChainDesc.BufferDesc.RefreshRate = DXGI_RATIONAL{0, 0};
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+	swapChainDesc.Width = 0;
+	swapChainDesc.Height = 0;
+	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.Stereo = FALSE;
 	if (m_DX11ContextProps.Enabled4xMSAA)
 	{
 		swapChainDesc.SampleDesc.Count = 4;
@@ -81,12 +79,11 @@ void DX11Context::CreateSwapChain()
 		swapChainDesc.SampleDesc.Quality = 0;
 	}
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.BufferCount = 1;
-	swapChainDesc.OutputWindow = *m_Hwnd;
-	swapChainDesc.Windowed = true;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.BufferCount = 2;
+	swapChainDesc.Scaling = DXGI_SCALING_NONE;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 	swapChainDesc.Flags = 0;
-
 
 	ComPtr<IDXGIDevice2> dxgiDevice;
 	ASSERT_HR(m_Device->QueryInterface(__uuidof(IDXGIDevice2), (void**)&dxgiDevice));
@@ -97,11 +94,15 @@ void DX11Context::CreateSwapChain()
 	ComPtr<IDXGIFactory2> dxgiFactory;
 	ASSERT_HR(dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&dxgiFactory));
 
-	ASSERT_HR(dxgiFactory->CreateSwapChain(
+	ASSERT_HR(dxgiFactory->CreateSwapChainForHwnd(
 		m_Device.Get(),
+		*m_Hwnd,
 		&swapChainDesc,
+		nullptr,
+		nullptr,
 		&m_SwapChain
-	));
+		)
+	);
 
 }
 
