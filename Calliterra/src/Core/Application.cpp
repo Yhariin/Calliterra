@@ -48,6 +48,10 @@ void Application::Run()
 		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
 	};
 
+	uint32_t indices[] = {
+		0, 1, 2
+	};
+
 	std::shared_ptr<VertexBuffer> vertexBuffer = Renderer::CreateVertexBuffer(vertices, sizeof(vertices) / sizeof(float));
 	//vertexBuffer->CreateLayout({ 
 	//	{"Position", 0, ShaderDataType::Float3},
@@ -55,6 +59,9 @@ void Application::Run()
 	//});
 	//vertexBuffer->SetLayout();
 	//vertexBuffer->Bind();
+
+	std::shared_ptr<IndexBuffer> indexBuffer = Renderer::CreateIndexBuffer(indices, sizeof(indices) / sizeof(int));
+	indexBuffer->Bind();
 
 	while (m_Running)
 	{

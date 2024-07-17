@@ -20,7 +20,7 @@ DXGI_FORMAT ShaderDataTypeToD3D(ShaderDataType type)
 }
 
 // Constructor for creating single buffer
-DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float* vertices, size_t elementCount)
+DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float* vertices, uint32_t elementCount)
 	: m_DX11Context(context), m_VertexArrayList(&vertices), m_ElementCountList(&elementCount), m_BufferCount(1)
 {
 	//m_D3DVertexBufferList.reserve(m_BufferCount);
@@ -58,7 +58,7 @@ DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float* vertices, size_t
 // float** vertices: An array of arrays to vertices
 // size_t* count: An array of element counts corresponding to each vertex array
 // size_t bufferCount: Number of vertex buffers
-DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float** listOfVertexArrays, size_t* listOfElementCounts, size_t bufferCount)
+DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float** listOfVertexArrays, uint32_t* listOfElementCounts, uint32_t bufferCount)
 	: m_DX11Context(context), m_VertexArrayList(listOfVertexArrays), m_ElementCountList(listOfElementCounts), m_BufferCount(bufferCount)
 {
 	ASSERT(bufferCount < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Too many buffers are being bound!");
@@ -66,7 +66,7 @@ DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float** listOfVertexArr
 	//m_D3DBufferLayoutList.reserve(m_BufferCount);
 
 
-	for (int i = 0; i < bufferCount; i++)
+	for (uint32_t i = 0; i < bufferCount; i++)
 	{
 		//m_D3DVertexBufferList.push_back(nullptr);
 		//m_D3DBufferLayoutList.push_back(nullptr);
@@ -99,7 +99,7 @@ void DX11VertexBuffer::Bind()
 {
 	std::vector<UINT> strideList;
 	strideList.reserve(m_BufferCount);
-	for (int i = 0; i < m_BufferCount; i++)
+	for (uint32_t i = 0; i < m_BufferCount; i++)
 	{
 		//strideList.push_back(static_cast<UINT>(m_BufferLayoutList[i].GetStride()));
 		strideList.push_back(static_cast<UINT>(m_BufferLayoutArray[i].GetStride()));
@@ -136,7 +136,7 @@ void DX11VertexBuffer::CreateLayout(const VertexBufferLayout& layout)
 		tmp.SemanticIndex = layoutElements[i].NameIndex;
 		tmp.Format = ShaderDataTypeToD3D(layoutElements[i].Type);
 		tmp.InputSlot = 0;
-		tmp.AlignedByteOffset = layoutElements[i].Offset;
+		tmp.AlignedByteOffset = static_cast<UINT>(layoutElements[i].Offset);
 		tmp.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		tmp.InstanceDataStepRate = 0;
 
@@ -146,7 +146,7 @@ void DX11VertexBuffer::CreateLayout(const VertexBufferLayout& layout)
 	ASSERT_HR(
 		m_DX11Context.GetDevice().CreateInputLayout(
 			&desc[0],
-			desc.size(),
+			static_cast<UINT>(desc.size()),
 			nullptr, //TODO: ShaderByteCode
 			0, //TODO: ShaderByteCodeLength
 			//&m_D3DBufferLayoutList[0]
@@ -170,7 +170,7 @@ void DX11VertexBuffer::CreateLayoutList(const std::vector<VertexBufferLayout>& l
 			tmp.SemanticIndex = layoutElements[j].NameIndex;
 			tmp.Format = ShaderDataTypeToD3D(layoutElements[j].Type);
 			tmp.InputSlot = 0;
-			tmp.AlignedByteOffset = layoutElements[j].Offset;
+			tmp.AlignedByteOffset = static_cast<UINT>(layoutElements[j].Offset);
 			tmp.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			tmp.InstanceDataStepRate = 0;
 
@@ -180,7 +180,7 @@ void DX11VertexBuffer::CreateLayoutList(const std::vector<VertexBufferLayout>& l
 		ASSERT_HR(
 			m_DX11Context.GetDevice().CreateInputLayout(
 				&desc[0],
-				desc.size(),
+				static_cast<UINT>(desc.size()),
 				nullptr, //TODO: ShaderByteCode
 				0, //TODO: ShaderByteCodeLength
 				//&m_D3DBufferLayoutList[i]
