@@ -4,10 +4,11 @@
 #include "Platform/DX11/DX11IndexBuffer.h"
 #include "Platform/DX11/DX11Shader.h"
 
-void Renderer::Init(GraphicsContext& graphicsContext)
+void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 {
-	s_GraphicsContext = &graphicsContext;
-	s_RendererAPI->Init();
+	s_GraphicsContext = graphicsContext;
+
+	s_RendererAPI->Init(s_GraphicsContext);
 }
 
 void Renderer::Shutdown()
@@ -15,10 +16,35 @@ void Renderer::Shutdown()
 
 }
 
-void Renderer::Submit(const std::shared_ptr<VertexBuffer>& vertexBuffer)
+void Renderer::SetClearColor(float r, float g, float b, float a)
 {
-	vertexBuffer->Bind();
-	//s_RendererAPI->Draw();
+	s_GraphicsContext->SetClearColor(r, g, b, a);
+}
+
+void Renderer::Clear()
+{
+	s_GraphicsContext->Clear();
+}
+
+void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList, const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::shared_ptr<IndexBuffer>& indexBuffer)
+{
+	for (auto shader : shaderList)
+	{
+		shader->Bind();
+	}
+
+	if (vertexBuffer != nullptr) vertexBuffer->Bind();
+
+	if (indexBuffer != nullptr)
+	{
+		indexBuffer->Bind();
+		s_IndexCount = indexBuffer->GetCount();
+	}
+}
+
+void Renderer::Draw()
+{
+	s_RendererAPI->DrawIndexed(s_IndexCount);
 }
 
 std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(float* vertices, uint32_t elementCount, Shader* shader)
@@ -30,7 +56,7 @@ std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(float* vertices, uint
 		return nullptr;
 	case RendererAPI::DX11:
 		ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
-		return std::make_shared<DX11VertexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext), vertices, elementCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+		return std::make_shared<DX11VertexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), vertices, elementCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
@@ -47,7 +73,7 @@ std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(float** listOfVertexA
 		return nullptr;
 	case RendererAPI::DX11:
 		ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
-		return std::make_shared<DX11VertexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext), listOfVertexArrays, listOfElementCounts, bufferCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+		return std::make_shared<DX11VertexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), listOfVertexArrays, listOfElementCounts, bufferCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
@@ -63,7 +89,7 @@ std::shared_ptr<IndexBuffer> Renderer::CreateIndexBuffer(uint32_t* indices, uint
 		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case RendererAPI::DX11:
-		return std::make_shared<DX11IndexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext), indices, count);
+		return std::make_shared<DX11IndexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), indices, count);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
@@ -80,7 +106,7 @@ std::shared_ptr<Shader> Renderer::CreateShader(const std::string& filepath, Shad
 		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case RendererAPI::DX11:
-		return std::make_shared<DX11Shader>(*dynamic_cast<DX11Context*>(s_GraphicsContext), filepath, type);
+		return std::make_shared<DX11Shader>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), filepath, type);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");

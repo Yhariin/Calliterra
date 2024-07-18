@@ -9,9 +9,12 @@
 class Renderer
 {
 public:
-	static void Init(GraphicsContext& graphicsContext);
+	static void Init(std::shared_ptr<GraphicsContext> graphicsContext);
 	static void Shutdown();
-	static void Submit(const std::shared_ptr<VertexBuffer>& vertexBuffer);
+	static void SetClearColor(float r, float g, float b, float a = 1.f);
+	static void Clear();
+	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {}, const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr, const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr);
+	static void Draw();
 
 	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32_t elementCount, Shader* shader = nullptr);
 	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(float** listOfVertexArrays, uint32_t * listOfElementCounts, uint32_t bufferCount, Shader* shader = nullptr);
@@ -20,7 +23,8 @@ public:
 
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 private:
-	inline static std::unique_ptr<RendererAPI> s_RendererAPI = RendererAPI::Create();
-	inline static GraphicsContext* s_GraphicsContext = nullptr;
+	inline static std::shared_ptr<RendererAPI> s_RendererAPI = RendererAPI::Create();
+	inline static std::shared_ptr<GraphicsContext> s_GraphicsContext = nullptr;
+	inline static uint32_t s_IndexCount = 0;
 };
 

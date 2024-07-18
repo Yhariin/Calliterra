@@ -54,10 +54,11 @@ void Application::Run()
 		0, 1, 2
 	};
 
+	std::vector<std::shared_ptr<Shader>> shaderList;
 	std::shared_ptr<Shader> vertexShader = Renderer::CreateShader("src/assets/shaders/VertexShader.hlsl", Shader::VERTEX_SHADER);
-	vertexShader->Bind();
 	std::shared_ptr<Shader> pixelShader = Renderer::CreateShader("src/assets/shaders/PixelShader.hlsl", Shader::PIXEL_SHADER);
-	pixelShader->Bind();
+	shaderList.push_back(vertexShader);
+	shaderList.push_back(pixelShader);
 
 	std::shared_ptr<VertexBuffer> vertexBuffer = Renderer::CreateVertexBuffer(vertices, sizeof(vertices) / sizeof(float), vertexShader.get());
 	vertexBuffer->CreateLayout({
@@ -65,20 +66,22 @@ void Application::Run()
 		{"COLOR", 0, ShaderDataType::Float3 }
 		});
 	vertexBuffer->SetLayout();
-	vertexBuffer->Bind();
 
 	std::shared_ptr<IndexBuffer> indexBuffer = Renderer::CreateIndexBuffer(indices, sizeof(indices) / sizeof(int));
-	indexBuffer->Bind();
 
+	Renderer::Bind(shaderList, vertexBuffer, indexBuffer);
 	while (m_Running)
 	{
+		const float c = static_cast<float>(sin(m_ApplicationTimer.GetElapsedInSeconds()) / 2.0 + 0.5);
+		Renderer::SetClearColor(c * .5f, 0.5f, c);
+		Renderer::Clear();
 		// Calculate deltaTime
 		double time = DeltaTime::GetCurrentTimeMicroseconds();
 		m_DeltaTime = time - m_LastFrameTime;
 		m_LastFrameTime = time;
 
 		//LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
-
+		Renderer::Draw();
 		m_Window->OnUpdate();
 
 	}
