@@ -4,6 +4,10 @@
 	#define DEBUGBREAK() __debugbreak()
 	#define ENABLE_ASSERTS
 	#include <winerror.h>
+	#include <comdef.h>
+		//_com_error err(hr);
+		//LPCTSTR errMsg = err.ErrorMessage();
+		//LOG_ERROR(errMsg);
 #else
 	#define DEBUGBREAK()
 #endif
@@ -19,7 +23,7 @@
 	#define INTERNAL_ASSERT_GET_MACRO(...) EXPAND( INTERNAL_ASSERT_GET_MACRO_NAME(__VA_ARGS__, INTERNAL_ASSERT_WITH_MSG, INTERNAL_ASSERT_NO_MSG) )
 
 	// HRESULT specific macros
-	#define INTERNAL_ASSERT_HR_IMPL(condition, msg, ...) { if(!(SUCCEEDED(condition))) { LOG_ERROR(msg, __VA_ARGS__); DEBUGBREAK(); }}
+	#define INTERNAL_ASSERT_HR_IMPL(condition, msg, ...) { if(!(SUCCEEDED(condition))) { _com_error err(condition); LPCTSTR errMsg = err.ErrorMessage(); LOG_ERROR(msg, __VA_ARGS__); LOG_ERROR(errMsg); DEBUGBREAK(); }}
 	#define INTERNAL_ASSERT_HR_WITH_MSG(condition, ...) INTERNAL_ASSERT_HR_IMPL(condition, "HRESULT Assertion '{0}' failed at {1}:{2}", __VA_ARGS__, __FILE__, __LINE__)
 	#define INTERNAL_ASSERT_HR_NO_MSG(condition) INTERNAL_ASSERT_HR_IMPL(condition, "HRESULT Assertion '{0}' failed at {1}:{2}", #condition, __FILE__, __LINE__)
 
