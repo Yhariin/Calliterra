@@ -22,9 +22,12 @@ void DX11Context::Init()
 void DX11Context::SwapBuffers()
 {
 	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
 	ClearBuffer(c, .5, c);
+
+	m_DeviceContext->DrawIndexed(3, 0, 0);
 
 	ASSERT_HR(m_SwapChain->Present(1, 0));
 
@@ -41,21 +44,40 @@ void DX11Context::CreateDeviceContext()
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	ASSERT_HR(D3D11CreateDevice(
-		nullptr,
-		D3D_DRIVER_TYPE_HARDWARE,
-		nullptr,
-		createDeviceFlags,
-		featureLevelArray,
-		feautreLevelCount,
-		D3D11_SDK_VERSION,
-		&m_Device,
-		&featureLevel,
-		&m_DeviceContext
-	));
+	ASSERT_HR(
+		D3D11CreateDevice(
+			nullptr,
+			D3D_DRIVER_TYPE_HARDWARE,
+			nullptr,
+			createDeviceFlags,
+			featureLevelArray,
+			feautreLevelCount,
+			D3D11_SDK_VERSION,
+			&m_Device,
+			&featureLevel,
+			&m_DeviceContext
+		)
+	);
 
 	if(featureLevel == D3D_FEATURE_LEVEL_11_1)
 		LOG_INFO("DirectX 11.1 Context Initialized");
+
+#ifdef DEBUG
+	// Set up debug layer to break on D3D11 errors
+	ComPtr<ID3D11Debug> d3dDebug;
+	ASSERT_HR(
+		m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug)
+	);
+
+	ComPtr<ID3D11InfoQueue> d3dInfoQueue;
+	ASSERT_HR(
+		d3dDebug->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&d3dInfoQueue)
+	);
+
+	d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
+	d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
+
+#endif
 
 }
 

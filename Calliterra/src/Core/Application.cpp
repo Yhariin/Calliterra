@@ -4,6 +4,8 @@
 #include "Window.h"
 #include "Renderer/Renderer.h"
 
+#include "Platform/DX11/DX11Shader.h"
+
 Application::Application()
 {
 	ASSERT(!s_Instance, "Application already exists!");
@@ -52,13 +54,18 @@ void Application::Run()
 		0, 1, 2
 	};
 
-	std::shared_ptr<VertexBuffer> vertexBuffer = Renderer::CreateVertexBuffer(vertices, sizeof(vertices) / sizeof(float));
-	//vertexBuffer->CreateLayout({ 
-	//	{"Position", 0, ShaderDataType::Float3},
-	//	{"Color", 0, ShaderDataType::Float3 }
-	//});
-	//vertexBuffer->SetLayout();
-	//vertexBuffer->Bind();
+	std::shared_ptr<Shader> vertexShader = Renderer::CreateShader("src/assets/shaders/VertexShader.hlsl", Shader::VERTEX_SHADER);
+	vertexShader->Bind();
+	std::shared_ptr<Shader> pixelShader = Renderer::CreateShader("src/assets/shaders/PixelShader.hlsl", Shader::PIXEL_SHADER);
+	pixelShader->Bind();
+
+	std::shared_ptr<VertexBuffer> vertexBuffer = Renderer::CreateVertexBuffer(vertices, sizeof(vertices) / sizeof(float), vertexShader.get());
+	vertexBuffer->CreateLayout({
+		{"POSITION", 0, ShaderDataType::Float3},
+		{"COLOR", 0, ShaderDataType::Float3 }
+		});
+	vertexBuffer->SetLayout();
+	vertexBuffer->Bind();
 
 	std::shared_ptr<IndexBuffer> indexBuffer = Renderer::CreateIndexBuffer(indices, sizeof(indices) / sizeof(int));
 	indexBuffer->Bind();
