@@ -22,9 +22,13 @@ class DX11Context : public GraphicsContext
 public:
 	DX11Context(HWND* hWnd, WindowProps& windowProps);
 
-	virtual void Init() override;
-	virtual void SwapBuffers() override;
-	virtual void OnWindowResize() override;
+	void Init() override;
+	void SwapBuffers() override;
+	void OnWindowResize() override;
+	void Clear() override;
+	void SetClearColor(float r, float g, float b, float a) override;
+
+	void DrawIndexed(uint32_t indexCount);
 
 	ID3D11Device& GetDevice() { return *m_Device.Get(); }
 	ID3D11DeviceContext& GetDeviceContext() { return *m_DeviceContext.Get(); }
@@ -47,8 +51,9 @@ private:
 	ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
 	ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
 
-
+	float m_BufferClearColor[4];
 	UINT m_4xMSAAQuality;
+	bool m_VSyncEnabled = true;
 	DX11ContextProps m_DX11ContextProps;
 };
 

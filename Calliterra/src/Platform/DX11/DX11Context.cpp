@@ -21,16 +21,39 @@ void DX11Context::Init()
 
 void DX11Context::SwapBuffers()
 {
+	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	//m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
+	//ClearBuffer(c, .5, c);
+
+	//m_DeviceContext->DrawIndexed(3, 0, 0);
+
+	ASSERT_HR(m_SwapChain->Present(m_VSyncEnabled, 0));
+
+}
+
+void DX11Context::Clear()
+{
+	m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_BufferClearColor);
+	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+}
+
+void DX11Context::SetClearColor(float r, float g, float b, float a)
+{
+	m_BufferClearColor[0] = r;
+	m_BufferClearColor[1] = g;
+	m_BufferClearColor[2] = b;
+	m_BufferClearColor[3] = a;
+}
+
+void DX11Context::DrawIndexed(uint32_t indexCount)
+{
 	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
-	ClearBuffer(c, .5, c);
-
-	m_DeviceContext->DrawIndexed(3, 0, 0);
-
-	ASSERT_HR(m_SwapChain->Present(1, 0));
-
+	m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 }
 
 void DX11Context::CreateDeviceContext()
@@ -76,7 +99,7 @@ void DX11Context::CreateDeviceContext()
 
 	d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
 	d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
-
+	d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_WARNING, true);
 #endif
 
 }

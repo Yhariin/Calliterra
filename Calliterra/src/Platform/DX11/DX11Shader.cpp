@@ -13,24 +13,25 @@ DX11Shader::DX11Shader(DX11Context& context, const std::string& filepath, Shader
 	std::wstring filePathWide = std::wstring(m_Filepath.begin(), m_Filepath.end());
 	LPCWSTR filePathWideCString = filePathWide.c_str();
 
-	ASSERT_HR(
-		D3DCompileFromFile(
-			filePathWideCString,
-			nullptr,
-			nullptr,
-			"main",
-			ShaderTypeToCompilerTarget().c_str(),
-			shaderFlags,
-			0,
-			&m_CompiledShader,
-			&m_CompilationErrorMsgs
-		)
+
+	HRESULT hr = D3DCompileFromFile(
+		filePathWideCString,
+		nullptr,
+		nullptr,
+		"main",
+		ShaderTypeToCompilerTarget().c_str(),
+		shaderFlags,
+		0,
+		&m_CompiledShader,
+		&m_CompilationErrorMsgs
 	);
 
 	if (m_CompilationErrorMsgs != 0)
 	{
-		LOG_ERROR(static_cast<char*>(m_CompilationErrorMsgs->GetBufferPointer()));
+		LOG_ERROR("SHADER COMPILATION ERROR: {0}", static_cast<char*>(m_CompilationErrorMsgs->GetBufferPointer()));
 	}
+
+	ASSERT_HR(hr);
 
 	switch (m_ShaderType)
 	{

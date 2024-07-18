@@ -36,13 +36,13 @@ public:
 	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
 	HWND GetWindowHandle() const { return m_hWnd; }
 	void OnUpdate();
-	GraphicsContext& GetGraphicsContext() { return *m_GraphicsContext; }
+	std::shared_ptr<GraphicsContext> GetGraphicsContext() { return m_GraphicsContext; }
 
 private:
 	const wchar_t* m_CLASSNAME;
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
-	std::unique_ptr<GraphicsContext> m_GraphicsContext;
+	std::shared_ptr<GraphicsContext> m_GraphicsContext;
 	WindowProps m_WindowProps;
 	EventCallbackFn m_EventCallback;
 	bool m_Resizing = false;
