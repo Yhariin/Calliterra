@@ -5,7 +5,7 @@
 #include <dxgi1_2.h>
 
 DX11Context::DX11Context(HWND* hWnd, WindowProps& windowProps)
-	: m_Hwnd(hWnd), m_WindowProps(windowProps), m_4xMSAAQuality(0)
+	: m_Hwnd(hWnd), m_WindowProps(windowProps) 
 {
 	ASSERT(hWnd, "Window handle is null!");
 }
@@ -16,18 +16,12 @@ void DX11Context::Init()
 	CreateSwapChain();
 	CreateRenderTargetView();
 	CreateDepthStencilBuffer();
+	CreateRasterizerState();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }
 
 void DX11Context::SwapBuffers()
 {
-	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-	//m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	//const float c = static_cast<float>(sin(Timer::GetApplicationTimer().GetElapsedInSeconds()) / 2.0 + 0.5);
-	//ClearBuffer(c, .5, c);
-
-	//m_DeviceContext->DrawIndexed(3, 0, 0);
 
 	ASSERT_HR(m_SwapChain->Present(m_VSyncEnabled, 0));
 
@@ -52,6 +46,8 @@ void DX11Context::DrawIndexed(uint32_t indexCount)
 {
 	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_DeviceContext->RSSetState(m_RasterizerState.Get());
+	m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
 
 	m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 }
@@ -196,6 +192,13 @@ void DX11Context::CreateDepthStencilBuffer()
 	ASSERT_HR(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), 0, &m_DepthStencilView));
 
 	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+
+	D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc = {};
+	depthStencilStateDesc.DepthEnable = true;
+	depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+	ASSERT_HR(m_Device->CreateDepthStencilState(&depthStencilStateDesc, &m_DepthStencilState));
 }
 
 void DX11Context::ClearBuffer(float r, float g, float b)
@@ -238,3 +241,13 @@ void DX11Context::OnWindowResize()
 
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 }
+
+void DX11Context::CreateRasterizerState()
+{
+	D3D11_RASTERIZER_DESC rasterizerDesc = {};
+	rasterizerDesc.FillMode = m_DX11ContextProps.FillMode;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+
+	ASSERT_HR(m_Device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState));
+}
+
