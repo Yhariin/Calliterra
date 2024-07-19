@@ -106,4 +106,3 @@ private:
 	std::vector<BufferElement> m_Elements;
 	size_t m_Stride = 0;
 };
-

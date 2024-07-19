@@ -5,6 +5,8 @@
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/Shader.h"
+#include "Renderer/ConstantBuffer.h"
+#include "Platform/DX11/DX11ConstantBuffer.h"
 
 class Renderer
 {
@@ -20,6 +22,43 @@ public:
 	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(float** listOfVertexArrays, uint32_t * listOfElementCounts, uint32_t bufferCount, Shader* shader = nullptr);
 	static std::shared_ptr<IndexBuffer> CreateIndexBuffer(uint32_t* indices, uint32_t count);
 	static std::shared_ptr<Shader> CreateShader(const std::string& filepath, Shader::ShaderType type);
+
+	template<typename Type>
+	static std::shared_ptr<ConstantBuffer> CreateConstantBuffer(Shader::ShaderType shaderType, const Type& constants)
+	{
+		switch (GetAPI())
+		{
+		case RendererAPI::None:
+			ASSERT(false, "RendererAPI is set to None!");
+			return nullptr;
+		case RendererAPI::DX11:
+		{
+			switch (shaderType)
+			{
+			case Shader::UKNOWN:
+				ASSERT(false, "Shader type unknown!");
+				break;
+			case Shader::VERTEX_SHADER:
+				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+			case Shader::PIXEL_SHADER:
+				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+			case Shader::COMPUTE_SHADER:
+				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+			case Shader::GEOMETRY_SHADER:
+				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+			case Shader::HULL_SHADER:
+				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+			case Shader::DOMAIN_SHADER:
+				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+			}
+
+		}
+			
+		}
+
+		ASSERT(false, "ConstantBuffer creation is not supported for this API");
+		return nullptr;
+	}
 
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 private:

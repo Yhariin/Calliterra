@@ -1,7 +1,7 @@
 #pragma once
 #include "DX11Context.h"
 #include "Renderer/VertexBuffer.h"
-#include "Renderer/VertexBufferLayout.h"
+#include "Renderer/BufferLayout.h"
 #include "Platform/DX11/DX11Shader.h"
 
 class DX11VertexBuffer : public VertexBuffer

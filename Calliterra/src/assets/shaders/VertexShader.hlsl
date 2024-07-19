@@ -10,11 +10,16 @@ struct VSOut
     float4 Pos : SV_POSITION;
 };
 
+cbuffer CBuf
+{
+    matrix transform;
+};
+
 VSOut main( VSIn vertexIn)
 {
     VSOut vertexOut;
 
-    vertexOut.Pos = float4(vertexIn.Pos, 1.f);
+    vertexOut.Pos = mul(float4(vertexIn.Pos, 1.0f), transform);
     vertexOut.Color = vertexIn.Color;
 
     return vertexOut;
