@@ -54,6 +54,7 @@ void Application::Run()
 		0, 1, 2
 	};
 
+
 	std::vector<std::shared_ptr<Shader>> shaderList;
 	std::shared_ptr<Shader> vertexShader = Renderer::CreateShader("src/assets/shaders/VertexShader.hlsl", Shader::VERTEX_SHADER);
 	std::shared_ptr<Shader> pixelShader = Renderer::CreateShader("src/assets/shaders/PixelShader.hlsl", Shader::PIXEL_SHADER);
@@ -69,9 +70,32 @@ void Application::Run()
 
 	std::shared_ptr<IndexBuffer> indexBuffer = Renderer::CreateIndexBuffer(indices, sizeof(indices) / sizeof(int));
 
+	struct CBuff
+	{
+			float element[4][4];
+	};
+
+	//dynamic_cast<DX11Shader*>(vertexShader.get())->UploadConstantBuffer(5.f);
+
 	Renderer::Bind(shaderList, vertexBuffer, indexBuffer);
 	while (m_Running)
 	{
+
+		float angle = m_ApplicationTimer.GetElapsedInSeconds();
+		const CBuff cb =
+		{
+			{
+				std::cos(angle), std::sin(angle), 0.0f, 0.0f,
+				-std::sin(angle), std::cos(angle), 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			}
+		};
+
+
+		std::shared_ptr<ConstantBuffer> constantBuffer = Renderer::CreateConstantBuffer(Shader::VERTEX_SHADER, cb);
+		constantBuffer->Bind();
+
 		const float c = static_cast<float>(sin(m_ApplicationTimer.GetElapsedInSeconds()) / 2.0 + 0.5);
 		Renderer::SetClearColor(c * .5f, 0.5f, c);
 		Renderer::Clear();

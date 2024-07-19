@@ -28,7 +28,7 @@ void Renderer::Clear()
 
 void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList, const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::shared_ptr<IndexBuffer>& indexBuffer)
 {
-	for (auto shader : shaderList)
+	for (auto& shader : shaderList)
 	{
 		shader->Bind();
 	}
