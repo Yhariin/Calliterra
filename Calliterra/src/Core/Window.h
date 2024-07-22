@@ -10,11 +10,12 @@ struct WindowProps
 	std::string Title;
 	uint16_t Width;
 	uint16_t Height;
+	float AspectRatio;
 
 	WindowProps(const std::string& title = "Calliterra",
 		uint16_t width = 1600,
 		uint16_t height = 900)
-		: Title(title), Width(width), Height(height)
+		: Title(title), Width(width), Height(height), AspectRatio((float)width/(float)height)
 	{
 	}
 };
@@ -37,6 +38,7 @@ public:
 	HWND GetWindowHandle() const { return m_hWnd; }
 	void OnUpdate();
 	std::shared_ptr<GraphicsContext> GetGraphicsContext() { return m_GraphicsContext; }
+	const WindowProps& GetWindowProps() { return m_WindowProps; }
 
 private:
 	const wchar_t* m_CLASSNAME;

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DX11IndexBuffer.h"
 
-DX11IndexBuffer::DX11IndexBuffer(DX11Context& context, uint32_t* indices, uint32_t count)
+DX11IndexBuffer::DX11IndexBuffer(const DX11Context& context, const uint32_t* indices, uint32_t count)
 	: m_DX11Context(context), m_Count(count)
 {
 	D3D11_BUFFER_DESC indexBufferDesc = {};
@@ -22,6 +22,8 @@ DX11IndexBuffer::DX11IndexBuffer(DX11Context& context, uint32_t* indices, uint32
 			&m_IndexBuffer
 		)
 	);
+
+	LOG_INFO("Index Buffer Created");
 
 }
 

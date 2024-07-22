@@ -15,7 +15,7 @@ public:
 	};
 
 public:
-	~Shader() = default;
+	virtual ~Shader() = default;
 
 	virtual void Bind() = 0;
 	virtual void Unbind() = 0;

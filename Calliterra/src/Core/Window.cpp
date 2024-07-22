@@ -148,6 +148,7 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	{
 		m_WindowProps.Width = LOWORD(lParam);
 		m_WindowProps.Height = HIWORD(lParam);
+		m_WindowProps.AspectRatio = (float)m_WindowProps.Width / (float)m_WindowProps.Height;
 
 		// Upon window creation there is an initial WM_SIZE message.
 		// To prevent calling m_EventCallback before setup is complete
