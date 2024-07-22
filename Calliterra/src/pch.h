@@ -21,6 +21,8 @@ namespace DX = DirectX;
 #include <utility>
 #include <functional>
 #include <random>
+#include <numbers>
+#include <format>
 
 #include "Core/Assert.h"
 #include "Core/Log.h"

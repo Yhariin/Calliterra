@@ -7,7 +7,8 @@
 
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module
-	  m_CLASSNAME(L"Calliterra")
+	  m_CLASSNAME(L"Calliterra"),
+	  m_Timer(100)
 {
 	WNDCLASS wndClass = {};
 	wndClass.lpszClassName = m_CLASSNAME;
@@ -42,6 +43,14 @@ Window::Window(const WindowProps& windowProps)
 		m_hInstance,
 		this	
 	);
+
+	auto lambda = [this](float dt)
+		{
+			std::string title = std::format("Calliterra FPS: {0}", static_cast<int>(dt));
+			SetWindowTextA(m_hWnd, title.c_str());
+		};
+
+	m_Timer.SetCallback(lambda);
 
 	ShowWindow(m_hWnd, SW_SHOW);
 	m_GraphicsContext = GraphicsContext::Create(&m_hWnd, m_WindowProps);
@@ -386,8 +395,9 @@ bool Window::ProcessMessages()
 	return true;
 }
 
-void Window::OnUpdate()
+void Window::OnUpdate(float dt)
 {
+	m_Timer.Update(dt);
 	ProcessMessages();
 	m_GraphicsContext->SwapBuffers();
 }
