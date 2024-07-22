@@ -47,7 +47,7 @@ void Renderer::Draw()
 	s_RendererAPI->DrawIndexed(s_IndexCount);
 }
 
-std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(float* vertices, uint32_t elementCount, Shader* shader)
+std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(const float* vertices, uint32_t elementCount, Shader* shader)
 {
 	switch(GetAPI())
 	{
@@ -64,7 +64,7 @@ std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(float* vertices, uint
 
 }
 
-std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(float** listOfVertexArrays, uint32_t* listOfElementCounts, uint32_t bufferCount, Shader* shader)
+std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(const float** listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, Shader* shader)
 {
 	switch(GetAPI())
 	{
@@ -81,7 +81,7 @@ std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(float** listOfVertexA
 	
 }
 
-std::shared_ptr<IndexBuffer> Renderer::CreateIndexBuffer(uint32_t* indices, uint32_t count)
+std::shared_ptr<IndexBuffer> Renderer::CreateIndexBuffer(const uint32_t* indices, uint32_t count)
 {
 	switch(GetAPI())
 	{
@@ -113,3 +113,4 @@ std::shared_ptr<Shader> Renderer::CreateShader(const std::string& filepath, Shad
 	return nullptr;
 
 }
+

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DX11VertexBuffer.h"
 
-DXGI_FORMAT ShaderDataTypeToD3D(ShaderDataType type)
+static DXGI_FORMAT ShaderDataTypeToD3D(ShaderDataType type)
 {
 	switch (type)
 	{
@@ -20,7 +20,7 @@ DXGI_FORMAT ShaderDataTypeToD3D(ShaderDataType type)
 }
 
 // Constructor for creating single buffer
-DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float* vertices, uint32_t elementCount, ComPtr<ID3DBlob> shaderByteCode)
+DX11VertexBuffer::DX11VertexBuffer(const DX11Context& context, const float* vertices, uint32_t elementCount, ComPtr<ID3DBlob> shaderByteCode)
 	: m_DX11Context(context), m_VertexArrayList(&vertices), m_ElementCountList(&elementCount), m_BufferCount(1), m_ShaderByteCode(shaderByteCode)
 {
 	// TODO: Allow for construction of buffer with different flags
@@ -43,13 +43,14 @@ DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float* vertices, uint32
 		)
 	);
 
+	LOG_INFO("Vertex Buffer Created");
 }
 
 // Constructor for creating multiple vertex buffers. 
 // float** vertices: An array of arrays to vertices
 // size_t* count: An array of element counts corresponding to each vertex array
 // size_t bufferCount: Number of vertex buffers
-DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float** listOfVertexArrays, uint32_t* listOfElementCounts, uint32_t bufferCount, ComPtr<ID3DBlob> shaderByteCode)
+DX11VertexBuffer::DX11VertexBuffer(const DX11Context& context, const float** listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, ComPtr<ID3DBlob> shaderByteCode)
 	: m_DX11Context(context), m_VertexArrayList(listOfVertexArrays), m_ElementCountList(listOfElementCounts), m_BufferCount(bufferCount), m_ShaderByteCode(shaderByteCode)
 {
 	ASSERT(bufferCount < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Too many buffers are being bound!");
@@ -76,10 +77,12 @@ DX11VertexBuffer::DX11VertexBuffer(DX11Context& context, float** listOfVertexArr
 		);
 	}
 
+	LOG_INFO("Vertex Buffer(s) Created");
 }
 
 void DX11VertexBuffer::Bind()
 {
+	ASSERT(m_HasLayout, "Attempting to bind vertex buffer before a layout has been created.");
 	std::vector<UINT> strideList;
 	strideList.reserve(m_BufferCount);
 	for (uint32_t i = 0; i < m_BufferCount; i++)
@@ -113,7 +116,7 @@ void DX11VertexBuffer::CreateLayout(const VertexBufferLayout& layout)
 
 	for (int i = 0; i < layoutElements.size(); i++)
 	{
-		D3D11_INPUT_ELEMENT_DESC tmp;
+		D3D11_INPUT_ELEMENT_DESC tmp = {};
 		tmp.SemanticName = layoutElements[i].Name.c_str();
 		tmp.SemanticIndex = layoutElements[i].NameIndex;
 		tmp.Format = ShaderDataTypeToD3D(layoutElements[i].Type);
@@ -135,6 +138,9 @@ void DX11VertexBuffer::CreateLayout(const VertexBufferLayout& layout)
 		)
 	);
 
+	m_HasLayout = true;
+
+	LOG_INFO("Input Layout Created");
 }
 
 void DX11VertexBuffer::CreateLayoutList(const std::vector<VertexBufferLayout>& layoutList)
@@ -147,7 +153,7 @@ void DX11VertexBuffer::CreateLayoutList(const std::vector<VertexBufferLayout>& l
 
 		for (int j = 0; j < layoutElements.size(); j++)
 		{
-			D3D11_INPUT_ELEMENT_DESC tmp;
+			D3D11_INPUT_ELEMENT_DESC tmp = {};
 			tmp.SemanticName = layoutElements[j].Name.c_str();
 			tmp.SemanticIndex = layoutElements[j].NameIndex;
 			tmp.Format = ShaderDataTypeToD3D(layoutElements[j].Type);
@@ -170,6 +176,8 @@ void DX11VertexBuffer::CreateLayoutList(const std::vector<VertexBufferLayout>& l
 		);
 
 	}
+
+	m_HasLayout = true;
 
 }
 

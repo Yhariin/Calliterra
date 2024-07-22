@@ -7,8 +7,8 @@
 class DX11VertexBuffer : public VertexBuffer
 {
 public:
-	DX11VertexBuffer(DX11Context& context, float* vertices, uint32_t elementCount, ComPtr<ID3DBlob> shaderByteCode);
-	DX11VertexBuffer(DX11Context& context, float** listOfVertexArrays, uint32_t* listOfElementCounts, uint32_t bufferCount, ComPtr<ID3DBlob> vertexShader);
+	DX11VertexBuffer(const DX11Context& context, const float* vertices, uint32_t elementCount, ComPtr<ID3DBlob> shaderByteCode);
+	DX11VertexBuffer(const DX11Context& context, const float** listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, ComPtr<ID3DBlob> vertexShader);
 
 	void Bind() override;
 	void Unbind() override;
@@ -18,15 +18,17 @@ public:
 	void CreateLayoutList(const std::vector<VertexBufferLayout>& layoutList) override;
 
 private:
-	DX11Context& m_DX11Context;
+	const DX11Context& m_DX11Context;
 
-	float** m_VertexArrayList;
-	uint32_t * m_ElementCountList;
+	const float** m_VertexArrayList;
+	const uint32_t* m_ElementCountList;
 	uint32_t m_BufferCount;
 
 	ComPtr<ID3D11Buffer> m_D3DVertexBufferArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 	ComPtr<ID3D11InputLayout> m_D3DBufferLayoutArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 	VertexBufferLayout m_BufferLayoutArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+
+	bool m_HasLayout = false;
 
 	ComPtr<ID3DBlob> m_ShaderByteCode;
 };

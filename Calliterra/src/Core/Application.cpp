@@ -3,6 +3,7 @@
 
 #include "Window.h"
 #include "Renderer/Renderer.h"
+#include "Sandbox/Sandbox.h"
 
 #include "Platform/DX11/DX11Shader.h"
 
@@ -44,68 +45,30 @@ void Application::OnEvent(Event& e)
 
 void Application::Run()
 {
-	float vertices[] = {
-		 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	uint32_t indices[] = {
-		0, 1, 2
-	};
-
-
-	std::vector<std::shared_ptr<Shader>> shaderList;
-	std::shared_ptr<Shader> vertexShader = Renderer::CreateShader("src/assets/shaders/VertexShader.hlsl", Shader::VERTEX_SHADER);
-	std::shared_ptr<Shader> pixelShader = Renderer::CreateShader("src/assets/shaders/PixelShader.hlsl", Shader::PIXEL_SHADER);
-	shaderList.push_back(vertexShader);
-	shaderList.push_back(pixelShader);
-
-	std::shared_ptr<VertexBuffer> vertexBuffer = Renderer::CreateVertexBuffer(vertices, sizeof(vertices) / sizeof(float), vertexShader.get());
-	vertexBuffer->CreateLayout({
-		{"POSITION", 0, ShaderDataType::Float3},
-		{"COLOR", 0, ShaderDataType::Float3 }
-		});
-	vertexBuffer->SetLayout();
-
-	std::shared_ptr<IndexBuffer> indexBuffer = Renderer::CreateIndexBuffer(indices, sizeof(indices) / sizeof(int));
-
-	struct CBuff
+	Sandbox sandbox = Sandbox();
+	for(int i = 0; i < 500; i++)
 	{
-			float element[4][4];
-	};
+		sandbox.CreateCube();
+	}
 
-	//dynamic_cast<DX11Shader*>(vertexShader.get())->UploadConstantBuffer(5.f);
-
-	Renderer::Bind(shaderList, vertexBuffer, indexBuffer);
 	while (m_Running)
 	{
-
-		float angle = m_ApplicationTimer.GetElapsedInSeconds();
-		const CBuff cb =
-		{
-			{
-				std::cos(angle), std::sin(angle), 0.0f, 0.0f,
-				-std::sin(angle), std::cos(angle), 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f
-			}
-		};
-
-
-		std::shared_ptr<ConstantBuffer> constantBuffer = Renderer::CreateConstantBuffer(Shader::VERTEX_SHADER, cb);
-		constantBuffer->Bind();
-
-		const float c = static_cast<float>(sin(m_ApplicationTimer.GetElapsedInSeconds()) / 2.0 + 0.5);
-		Renderer::SetClearColor(c * .5f, 0.5f, c);
-		Renderer::Clear();
 		// Calculate deltaTime
 		double time = DeltaTime::GetCurrentTimeMicroseconds();
 		m_DeltaTime = time - m_LastFrameTime;
 		m_LastFrameTime = time;
 
-		//LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
-		Renderer::Draw();
+		// Clear previous frame
+		float angle = static_cast<float>(m_ApplicationTimer.GetElapsedInSeconds());
+		const float c = static_cast<float>(sin(m_ApplicationTimer.GetElapsedInSeconds()) / 2.0 + 0.5);
+		Renderer::SetClearColor(c * .5f, 0.5f, c);
+		Renderer::Clear();
+
+
+		// Draw new frame
+		sandbox.OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
+		LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
+
 		m_Window->OnUpdate();
 
 	}

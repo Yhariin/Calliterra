@@ -6,6 +6,8 @@
 #endif
 
 #include <Windows.h>
+#include <DirectXMath.h>
+namespace DX = DirectX;
 
 #include <iostream>
 #include <memory>
@@ -18,6 +20,7 @@
 #include <bitset>
 #include <utility>
 #include <functional>
+#include <random>
 
 #include "Core/Assert.h"
 #include "Core/Log.h"
