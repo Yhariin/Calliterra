@@ -46,7 +46,7 @@ void Application::OnEvent(Event& e)
 void Application::Run()
 {
 	Sandbox sandbox = Sandbox();
-	for(int i = 0; i < 500; i++)
+	for(int i = 0; i < 100; i++)
 	{
 		sandbox.CreateCube();
 	}
@@ -67,9 +67,9 @@ void Application::Run()
 
 		// Draw new frame
 		sandbox.OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
-		LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
+		//LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
 
-		m_Window->OnUpdate();
+		m_Window->OnUpdate(1.f / static_cast<float>(m_DeltaTime.GetSeconds()));
 
 	}
 }

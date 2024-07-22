@@ -4,6 +4,7 @@
 #include "Events/Event.h"
 #include "Input.h"
 #include "Renderer/GraphicsContext.h"
+#include "Timer.h"
 
 struct WindowProps
 {
@@ -36,7 +37,7 @@ public:
 	bool ProcessMessages();
 	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
 	HWND GetWindowHandle() const { return m_hWnd; }
-	void OnUpdate();
+	void OnUpdate(float dt);
 	std::shared_ptr<GraphicsContext> GetGraphicsContext() { return m_GraphicsContext; }
 	const WindowProps& GetWindowProps() { return m_WindowProps; }
 
@@ -50,5 +51,6 @@ private:
 	bool m_Resizing = false;
 	bool m_Active = true;
 	bool m_Minimized = false;
+	CountdownTimer<float> m_Timer;
 };
 
