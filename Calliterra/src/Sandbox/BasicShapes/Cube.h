@@ -33,7 +33,8 @@ private:
 	inline static const uint32_t m_VERTEXCOUNT= 8 * 3 * 3;
 	inline static const uint32_t m_INDEXCOUNT = 36;
 
-	inline static const float m_CubeVertices[m_VERTEXCOUNT] =
+	//inline static const float m_CubeVertices[m_VERTEXCOUNT] =
+	inline static const std::vector<float> m_CubeVertices =
 	{
 		-1.0f, -1.0f, -1.0f, 
 		 1.0f, -1.0f, -1.0f, 
@@ -63,18 +64,20 @@ private:
 			float g;
 			float b;
 			float a;
-		} faceColors[6];
+		} faceColors[8];
 	};
 
 	inline static const FaceColorsBuffer m_ColorsBuffer =
 	{
 		{
-			{1.0f, 0.0f, 1.0f},
+			{1.0f, 1.0f, 1.0f},
 			{1.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
-			{0.0f, 0.0f, 1.0f},
 			{1.0f, 1.0f, 0.0f},
-			{0.0f, 1.0f, 1.0f}
+			{0.0f, 0.0f, 1.0f},
+			{1.0f, 0.0f, 1.0f},
+			{0.0f, 1.0f, 1.0f},
+			{0.0f, 0.0f, 0.0f},
 
 		}
 	};

@@ -46,9 +46,10 @@ void Application::OnEvent(Event& e)
 void Application::Run()
 {
 	Sandbox sandbox = Sandbox();
-	for(int i = 0; i < 100; i++)
+	for(int i = 0; i < 1; i++)
 	{
-		sandbox.CreateCube();
+		//sandbox.CreateCube();
+		sandbox.CreateRadialSphere();
 	}
 
 	while (m_Running)
