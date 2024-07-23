@@ -13,30 +13,6 @@ public:
 	virtual void Update(float dt) override;
 
 private:
-	struct FaceColorsBuffer
-	{
-		struct
-		{
-			float r;
-			float g;
-			float b;
-			float a;
-		} faceColors[8];
-	};
-
-	const FaceColorsBuffer m_ColorsBuffer =
-	{
-		{
-			{ 1.f, 1.f, 1.f },
-			{ 1.f, 0.f, 0.f },
-			{ 0.f, 1.f, 0.f },
-			{ 1.f, 1.f, 0.f },
-			{ 0.f, 0.f, 1.f },
-			{ 1.f, 0.f, 1.f },
-			{ 0.f, 1.f, 1.f },
-			{ 0.f, 0.f, 0.f }
-		}
-	};
 
 	void CalculateSphere(const int latDiv, const int longDiv);
 	void InitBuffers();

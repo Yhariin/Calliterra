@@ -9,6 +9,7 @@ public:
 	void OnUpdate(float dt);
 	void CreateCube();
 	void CreateRadialSphere();
+	void CreateIcoSphere();
 private:
 	std::vector<std::unique_ptr<Drawable>> m_Drawables;
 };

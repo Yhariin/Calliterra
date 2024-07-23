@@ -3,6 +3,7 @@
 
 #ifndef NOMINMAX
 	#define NOMINMAX
+	#define _CRT_DECLARE_NONSTDC_NAMES 0
 #endif
 
 #include <Windows.h>
@@ -23,6 +24,7 @@ namespace DX = DirectX;
 #include <random>
 #include <numbers>
 #include <format>
+#include <cmath>
 
 #include "Core/Assert.h"
 #include "Core/Log.h"

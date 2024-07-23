@@ -2,6 +2,7 @@
 #include "Sandbox.h"
 #include "Sandbox/BasicShapes/Cube.h"
 #include "Sandbox/BasicShapes/RadialSphere.h"
+#include "Sandbox/BasicShapes/IcoSphere.h"
 
 Sandbox::Sandbox()
 {
@@ -36,4 +37,9 @@ void Sandbox::CreateCube()
 void Sandbox::CreateRadialSphere()
 {
 	m_Drawables.emplace_back( std::make_unique<RadialSphere>() );
+}
+
+void Sandbox::CreateIcoSphere()
+{
+	m_Drawables.emplace_back(std::make_unique<IcoSphere>(7));
 }
