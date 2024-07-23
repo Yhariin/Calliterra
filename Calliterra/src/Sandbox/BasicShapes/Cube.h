@@ -56,32 +56,6 @@ private:
 		0,1,4, 1,5,4
 	};
 
-	struct FaceColorsBuffer
-	{
-		struct
-		{
-			float r;
-			float g;
-			float b;
-			float a;
-		} faceColors[8];
-	};
-
-	inline static const FaceColorsBuffer m_ColorsBuffer =
-	{
-		{
-			{1.0f, 1.0f, 1.0f},
-			{1.0f, 0.0f, 0.0f},
-			{0.0f, 1.0f, 0.0f},
-			{1.0f, 1.0f, 0.0f},
-			{0.0f, 0.0f, 1.0f},
-			{1.0f, 0.0f, 1.0f},
-			{0.0f, 1.0f, 1.0f},
-			{0.0f, 0.0f, 0.0f},
-
-		}
-	};
-
 	inline static std::shared_ptr<Shader> s_VertexShader = nullptr;
 	inline static std::shared_ptr<Shader> s_PixelShader = nullptr;
 	inline static std::shared_ptr<VertexBuffer> s_VertexBuffer = nullptr;

@@ -49,7 +49,7 @@ void Application::Run()
 	for(int i = 0; i < 1; i++)
 	{
 		//sandbox.CreateCube();
-		sandbox.CreateRadialSphere();
+		sandbox.CreateIcoSphere();
 	}
 
 	while (m_Running)
