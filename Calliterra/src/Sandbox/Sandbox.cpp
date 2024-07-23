@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Sandbox.h"
 #include "Sandbox/BasicShapes/Cube.h"
+#include "Sandbox/BasicShapes/RadialSphere.h"
 
 Sandbox::Sandbox()
 {
@@ -29,8 +30,10 @@ void Sandbox::OnUpdate(float dt)
 
 void Sandbox::CreateCube()
 {
-
 	m_Drawables.emplace_back(std::make_unique<Cube>());
-
 }
 
+void Sandbox::CreateRadialSphere()
+{
+	m_Drawables.emplace_back( std::make_unique<RadialSphere>() );
+}

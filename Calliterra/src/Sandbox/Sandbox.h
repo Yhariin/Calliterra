@@ -8,6 +8,7 @@ public:
 
 	void OnUpdate(float dt);
 	void CreateCube();
+	void CreateRadialSphere();
 private:
 	std::vector<std::unique_ptr<Drawable>> m_Drawables;
 };

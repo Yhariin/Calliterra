@@ -7,6 +7,7 @@
 #include "Renderer/Shader.h"
 #include "Renderer/ConstantBuffer.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
+#include "Platform/DX11/DX11VertexBuffer.h"
 
 class Renderer
 {
@@ -18,8 +19,41 @@ public:
 	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {}, const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr, const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr);
 	static void Draw();
 
-	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const float* vertices, uint32_t elementCount, Shader* shader = nullptr);
-	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const float** listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, Shader* shader = nullptr);
+	template<typename Type>
+	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<Type>& vertices, uint32_t elementCount, Shader* shader = nullptr)
+	{
+		switch(GetAPI())
+		{
+		case RendererAPI::None: 
+			ASSERT(false, "RendererAPI is set to None!");
+			return nullptr;
+		case RendererAPI::DX11:
+			ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
+			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), vertices, elementCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+		}
+
+		LOG_ERROR("Unknown RendererAPI");
+		return nullptr;
+	}
+
+	template<typename Type>
+	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<std::vector<Type>>& listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, Shader* shader = nullptr)
+	{
+		switch(GetAPI())
+		{
+		case RendererAPI::None: 
+			ASSERT(false, "RendererAPI is set to None!");
+			return nullptr;
+		case RendererAPI::DX11:
+			ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
+			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), listOfVertexArrays, listOfElementCounts, bufferCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+		}
+
+		LOG_ERROR("Unknown RendererAPI");
+		return nullptr;
+	}
+	//static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const float* vertices, uint32_t elementCount, Shader* shader = nullptr);
+	//static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const float** listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, Shader* shader = nullptr);
 	static std::shared_ptr<IndexBuffer> CreateIndexBuffer(const uint32_t* indices, uint32_t count);
 	static std::shared_ptr<Shader> CreateShader(const std::string& filepath, Shader::ShaderType type);
 

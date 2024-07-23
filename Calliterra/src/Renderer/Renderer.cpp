@@ -47,6 +47,7 @@ void Renderer::Draw()
 	s_RendererAPI->DrawIndexed(s_IndexCount);
 }
 
+/*
 std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(const float* vertices, uint32_t elementCount, Shader* shader)
 {
 	switch(GetAPI())
@@ -80,6 +81,7 @@ std::shared_ptr<VertexBuffer> Renderer::CreateVertexBuffer(const float** listOfV
 	return nullptr;
 	
 }
+*/
 
 std::shared_ptr<IndexBuffer> Renderer::CreateIndexBuffer(const uint32_t* indices, uint32_t count)
 {

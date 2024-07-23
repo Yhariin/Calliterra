@@ -1,24 +1,8 @@
 #include "pch.h"
 #include "DX11VertexBuffer.h"
 
-static DXGI_FORMAT ShaderDataTypeToD3D(ShaderDataType type)
-{
-	switch (type)
-	{
-	case ShaderDataType::Float:		return DXGI_FORMAT_R32_FLOAT;
-	case ShaderDataType::Float2:	return DXGI_FORMAT_R32G32_FLOAT;
-	case ShaderDataType::Float3:	return DXGI_FORMAT_R32G32B32_FLOAT;
-	case ShaderDataType::Float4:	return DXGI_FORMAT_R32G32B32A32_FLOAT;
-	case ShaderDataType::Int:		return DXGI_FORMAT_R32_SINT;
-	case ShaderDataType::Int2:		return DXGI_FORMAT_R32G32_SINT;
-	case ShaderDataType::Int3:		return DXGI_FORMAT_R32G32B32_SINT;
-	case ShaderDataType::Int4:		return DXGI_FORMAT_R32G32B32A32_SINT;
-	}
 
-	ASSERT(false, "ShaderType Conversion not supported yet.");
-	return DXGI_FORMAT_UNKNOWN;
-}
-
+/*
 // Constructor for creating single buffer
 DX11VertexBuffer::DX11VertexBuffer(const DX11Context& context, const float* vertices, uint32_t elementCount, ComPtr<ID3DBlob> shaderByteCode)
 	: m_DX11Context(context), m_VertexArrayList(&vertices), m_ElementCountList(&elementCount), m_BufferCount(1), m_ShaderByteCode(shaderByteCode)
@@ -79,107 +63,7 @@ DX11VertexBuffer::DX11VertexBuffer(const DX11Context& context, const float** lis
 
 	LOG_INFO("Vertex Buffer(s) Created");
 }
-
-void DX11VertexBuffer::Bind()
-{
-	ASSERT(m_HasLayout, "Attempting to bind vertex buffer before a layout has been created.");
-	std::vector<UINT> strideList;
-	strideList.reserve(m_BufferCount);
-	for (uint32_t i = 0; i < m_BufferCount; i++)
-	{
-		size_t strd = m_BufferLayoutArray[i].GetStride();
-		strideList.push_back(static_cast<UINT>(m_BufferLayoutArray[i].GetStride()));
-	}
-
-	UINT offset = 0;
-	m_DX11Context.GetDeviceContext().IASetVertexBuffers(0, static_cast<UINT>(m_BufferCount), m_D3DVertexBufferArray[0].GetAddressOf(), &strideList[0], &offset);
-	
-}
-
-void DX11VertexBuffer::Unbind()
-{
-	m_DX11Context.GetDeviceContext().IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
-}
-
-void DX11VertexBuffer::SetLayout(int index = 0) 
-{
-	ASSERT(index < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Layout Index out of bounds!");
-	m_DX11Context.GetDeviceContext().IASetInputLayout(m_D3DBufferLayoutArray[index].Get());
-}
-
-void DX11VertexBuffer::CreateLayout(const VertexBufferLayout& layout)
-{
-	m_BufferLayoutArray[0] = layout;
-	std::vector<D3D11_INPUT_ELEMENT_DESC> desc;
-	std::vector<BufferElement> layoutElements = layout.GetElements();
-
-
-	for (int i = 0; i < layoutElements.size(); i++)
-	{
-		D3D11_INPUT_ELEMENT_DESC tmp = {};
-		tmp.SemanticName = layoutElements[i].Name.c_str();
-		tmp.SemanticIndex = layoutElements[i].NameIndex;
-		tmp.Format = ShaderDataTypeToD3D(layoutElements[i].Type);
-		tmp.InputSlot = 0;
-		tmp.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-		tmp.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		tmp.InstanceDataStepRate = 0;
-
-		desc.push_back(tmp);
-	}
-
-	ASSERT_HR(
-		m_DX11Context.GetDevice().CreateInputLayout(
-			&desc[0],
-			static_cast<UINT>(desc.size()),
-			m_ShaderByteCode->GetBufferPointer(),
-			m_ShaderByteCode->GetBufferSize(),
-			&m_D3DBufferLayoutArray[0]
-		)
-	);
-
-	m_HasLayout = true;
-
-	LOG_INFO("Input Layout Created");
-}
-
-void DX11VertexBuffer::CreateLayoutList(const std::vector<VertexBufferLayout>& layoutList)
-{
-	for (int i = 0; i < layoutList.size(); i++)
-	{
-		m_BufferLayoutArray[i] = layoutList[i];
-		std::vector<D3D11_INPUT_ELEMENT_DESC> desc;
-		std::vector<BufferElement> layoutElements = layoutList[i].GetElements();
-
-		for (int j = 0; j < layoutElements.size(); j++)
-		{
-			D3D11_INPUT_ELEMENT_DESC tmp = {};
-			tmp.SemanticName = layoutElements[j].Name.c_str();
-			tmp.SemanticIndex = layoutElements[j].NameIndex;
-			tmp.Format = ShaderDataTypeToD3D(layoutElements[j].Type);
-			tmp.InputSlot = 0;
-			tmp.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			tmp.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-			tmp.InstanceDataStepRate = 0;
-
-			desc.push_back(tmp);
-		}
-
-		ASSERT_HR(
-			m_DX11Context.GetDevice().CreateInputLayout(
-				&desc[0],
-				static_cast<UINT>(desc.size()),
-				m_ShaderByteCode->GetBufferPointer(),
-				m_ShaderByteCode->GetBufferSize(),
-				&m_D3DBufferLayoutArray[i]
-			)
-		);
-
-	}
-
-	m_HasLayout = true;
-
-}
+*/
 
 
 

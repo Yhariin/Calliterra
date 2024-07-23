@@ -9,7 +9,7 @@ public:
 	DX11ConstantBuffer(DX11Context& context, const Type& constants)
 		: m_Context(context)
 	{
-		D3D11_BUFFER_DESC bufferDesc;
+		D3D11_BUFFER_DESC bufferDesc = {};
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -31,7 +31,7 @@ public:
 	DX11ConstantBuffer(DX11Context& context)
 		: m_Context(context)
 	{
-		D3D11_BUFFER_DESC bufferDesc;
+		D3D11_BUFFER_DESC bufferDesc = {};
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
