@@ -16,7 +16,7 @@ RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX tra
 
 void RadialSphere::Draw()
 {
-	Renderer::UpdateConstantBuffer(m_ConstantBuffer, m_Transform);
+	Renderer::UpdateConstantBuffer(m_ConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
 	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer);
 	Renderer::Draw();
 }
@@ -29,11 +29,9 @@ void RadialSphere::Update(DX::XMMATRIX transform)
 void RadialSphere::Update(float dt)
 {
 	m_Delta += 2.f * dt;
-	m_Transform = DX::XMMatrixTranspose(
+	m_Transform = 
 		DX::XMMatrixRotationRollPitchYaw(m_Delta, m_Delta, m_Delta) *
-		DX::XMMatrixTranslation(0.f, 0.f, 2.f) *
-		DX::XMMatrixPerspectiveFovLH(90.f, 16.f/9.f, 0.1f, 10.f)
-	);
+		DX::XMMatrixTranslation(0.f, 0.f, 2.f);
 }
 
 void RadialSphere::CalculateSphere(const int longDiv, const int latDiv)

@@ -17,6 +17,10 @@ public:
 	virtual void Update(DX::XMMATRIX transform) = 0;
 	virtual void Update(float dt) = 0;
 
+	void SetViewProjectionMatrix(DX::XMMATRIX transform) { m_ViewProjectionMatrix = transform; }
+
+	DX::XMMATRIX GetTransform() { return m_Transform; }
+
 	void Bind()
 	{
 
@@ -49,4 +53,5 @@ protected:
 	};
 
 	DX::XMMATRIX m_Transform;
+	DX::XMMATRIX m_ViewProjectionMatrix;
 };

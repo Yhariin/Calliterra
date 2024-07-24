@@ -30,6 +30,7 @@ private:
 	int AddVertex(DX::XMFLOAT3 point);
 	void InitBuffers();
 
+private:
 	std::vector<DX::XMFLOAT3> m_SphereVertices;
 	std::vector<uint32_t> m_SphereIndices;
 	std::vector<TriangleIndices> m_TriangleIndices;

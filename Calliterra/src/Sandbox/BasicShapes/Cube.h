@@ -12,6 +12,7 @@ public:
 
 	void Update(DX::XMMATRIX transform) override;
 	void Update(float dt) override;
+
 	void Draw() override;
 private:
 	// Positional
