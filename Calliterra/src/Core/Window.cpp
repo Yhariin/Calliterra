@@ -44,15 +44,24 @@ Window::Window(const WindowProps& windowProps)
 		this	
 	);
 
+	// Register mouse raw input device
+	RAWINPUTDEVICE rawInputDevice;
+	rawInputDevice.usUsagePage = 0x01; // Mouse page
+	rawInputDevice.usUsage = 0x02; // Mouse usage
+	rawInputDevice.dwFlags = 0;
+	rawInputDevice.hwndTarget = m_hWnd;
+	ASSERT_VERIFY(RegisterRawInputDevices(&rawInputDevice, 1, sizeof(rawInputDevice)));
+
 	auto lambda = [this](float dt)
 		{
-			std::string title = std::format("Calliterra FPS: {0}", static_cast<int>(dt));
+			std::string title = std::format("Calliterra  FPS: {0}", static_cast<int>(dt));
 			SetWindowTextA(m_hWnd, title.c_str());
 		};
 
 	m_Timer.SetCallback(lambda);
 
 	ShowWindow(m_hWnd, SW_SHOW);
+	//DisableCursor();
 	m_GraphicsContext = GraphicsContext::Create(&m_hWnd, m_WindowProps);
 	m_GraphicsContext->Init();
 }
@@ -143,13 +152,16 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_ACTIVATE:
 	{
-		if (LOWORD(wParam) == WA_INACTIVE)
+
+		if (LOWORD(wParam) == WA_ACTIVE)
 		{
-			m_Active = false;
+			m_Active = true;
 		}
 		else
 		{
-			m_Active = true;
+			m_Active = false;
+			FreeCursor();
+			ShowCursor();
 		}
 		break;
 	}
@@ -224,6 +236,24 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 360;
 		break;
 	}
+	case WM_INPUT:
+	{
+		UINT size = 0;
+
+		// Get size of input data
+		ASSERT_VERIFY(GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != -1);
+		m_RawBuffer.resize(size);
+		ASSERT_VERIFY(GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, m_RawBuffer.data(), &size, sizeof(RAWINPUTHEADER)) == size);
+
+		auto& rawInput = reinterpret_cast<const RAWINPUT&>(*m_RawBuffer.data());
+		if (rawInput.header.dwType == RIM_TYPEMOUSE &&
+			(rawInput.data.mouse.lLastX != 0 || rawInput.data.mouse.lLastY != 0))
+		{
+			Input::OnMouseDelta(rawInput.data.mouse.lLastX, rawInput.data.mouse.lLastY);
+			//LOG_DEBUG("{}, {}", Input::GetMouseDelta().first, Input::GetMouseDelta().second);
+		}
+		break;
+	}
 	// --------------- Keyboard Messages -------------- //
 	case WM_KEYDOWN:
 	{
@@ -271,6 +301,13 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_LBUTTONDOWN:
 	{
+		SetForegroundWindow(m_hWnd);
+		if (!m_CursorEnabled)
+		{
+			ConfineCursor();
+			HideCursor();
+		}
+
 		MouseButtonPressedEvent event(VK_LBUTTON);
 		m_EventCallback(event);
 
@@ -393,6 +430,55 @@ bool Window::ProcessMessages()
 	}
 
 	return true;
+}
+
+void Window::EnableCursor()
+{
+	m_CursorEnabled = true;
+	ShowCursor();
+	FreeCursor();
+}
+
+void Window::DisableCursor()
+{
+	m_CursorEnabled = false;
+	HideCursor();
+	ConfineCursor();
+}
+
+void Window::ToggleCursor()
+{
+	if (m_CursorEnabled)
+	{
+		DisableCursor();
+	}
+	else
+	{
+		EnableCursor();
+	}
+}
+
+void Window::ShowCursor()
+{
+	while (::ShowCursor(true) < 0);
+}
+
+void Window::HideCursor()
+{
+	while (::ShowCursor(false) >= 0);
+}
+
+void Window::ConfineCursor()
+{
+	RECT rect;
+	GetClientRect(m_hWnd, &rect);
+	MapWindowPoints(m_hWnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
+	ClipCursor(&rect);
+}
+
+void Window::FreeCursor()
+{
+	ClipCursor(nullptr);
 }
 
 void Window::OnUpdate(float dt)
