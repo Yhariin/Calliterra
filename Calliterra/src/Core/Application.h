@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
+#include "Events/KeyEvents.h"
 #include "DeltaTime.h"
 #include "Timer.h"
 
@@ -19,6 +20,7 @@ public:
 	Window& GetWindow() { return *m_Window; }
 
 	bool OnWindowClose(WindowCloseEvent& e);
+	bool OnKeyPressed(KeyPressedEvent& e);
 
 	static Application& Get() { return *s_Instance; }
 	static DeltaTime GetDeltaTime() { return m_DeltaTime; }

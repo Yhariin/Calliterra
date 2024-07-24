@@ -40,6 +40,8 @@ void Application::OnEvent(Event& e)
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent& e) { return this->OnWindowClose(e); });
 
+	dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { return this->OnKeyPressed(e); });
+
 	//LOG_INFO(e.ToString());
 }
 
@@ -49,7 +51,8 @@ void Application::Run()
 	for(int i = 0; i < 1; i++)
 	{
 		//sandbox.CreateCube();
-		sandbox.CreateIcoSphere();
+		//sandbox.CreateIcoSphere();
+		//sandbox.CreatePlane();
 	}
 
 	while (m_Running)
@@ -80,4 +83,14 @@ bool Application::OnWindowClose(WindowCloseEvent& e)
 	m_Running = false;
 	return true;
 }
+
+bool Application::OnKeyPressed(KeyPressedEvent& e)
+{
+	if (e.GetKeyCode() == VK_ESCAPE)
+	{
+		m_Window->ToggleCursor();
+	}
+	return true;
+}
+
 

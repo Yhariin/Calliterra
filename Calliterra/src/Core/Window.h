@@ -31,15 +31,25 @@ public:
 	Window& operator =(const Window&) = delete;
 	~Window();
 
+	void OnUpdate(float dt);
+	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
+	std::shared_ptr<GraphicsContext> GetGraphicsContext() { return m_GraphicsContext; }
+	const WindowProps& GetWindowProps() { return m_WindowProps; }
+
+	void EnableCursor();
+	void DisableCursor();
+	void ToggleCursor();
+
+private:
 	static LRESULT CALLBACK MessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
 	static LRESULT WINAPI MessageRedirect(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
 	LRESULT MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM);
 	bool ProcessMessages();
-	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
 	HWND GetWindowHandle() const { return m_hWnd; }
-	void OnUpdate(float dt);
-	std::shared_ptr<GraphicsContext> GetGraphicsContext() { return m_GraphicsContext; }
-	const WindowProps& GetWindowProps() { return m_WindowProps; }
+	void ShowCursor();
+	void HideCursor();
+	void ConfineCursor();
+	void FreeCursor();
 
 private:
 	const wchar_t* m_CLASSNAME;
@@ -51,6 +61,8 @@ private:
 	bool m_Resizing = false;
 	bool m_Active = true;
 	bool m_Minimized = false;
+	bool m_CursorEnabled = false;
 	CountdownTimer<float> m_Timer;
+	std::vector<char> m_RawBuffer;
 };
 
