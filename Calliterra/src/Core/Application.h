@@ -5,6 +5,7 @@
 #include "Events/KeyEvents.h"
 #include "DeltaTime.h"
 #include "Timer.h"
+#include "Sandbox/Sandbox.h"
 
 class Application
 {
@@ -34,6 +35,7 @@ private:
 	double m_LastFrameTime = 0.0;
 	inline static DeltaTime m_DeltaTime = DeltaTime();
 	inline static Timer m_ApplicationTimer = Timer();
+	std::unique_ptr<Sandbox> m_Sandbox;
 };
 
 

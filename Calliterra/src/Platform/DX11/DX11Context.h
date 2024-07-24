@@ -16,6 +16,7 @@ struct DX11ContextProps
 {
 	bool Enabled4xMSAA = false;
 	D3D11_FILL_MODE FillMode = D3D11_FILL_SOLID;
+	
 };
 
 class DX11Context : public GraphicsContext
@@ -28,6 +29,8 @@ public:
 	void OnWindowResize() override;
 	void Clear() override;
 	void SetClearColor(float r, float g, float b, float a) override;
+
+	void ToggleWireFrame() override;
 
 	void DrawIndexed(uint32_t indexCount);
 

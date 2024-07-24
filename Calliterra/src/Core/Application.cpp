@@ -3,7 +3,6 @@
 
 #include "Window.h"
 #include "Renderer/Renderer.h"
-#include "Sandbox/Sandbox.h"
 
 #include "Platform/DX11/DX11Shader.h"
 
@@ -28,6 +27,7 @@ Application::Application()
 
 	Renderer::Init(m_Window->GetGraphicsContext());
 
+	m_Sandbox = std::make_unique<Sandbox>(m_Window->GetWindowProps().AspectRatio);
 }
 
 Application::~Application()
@@ -42,17 +42,18 @@ void Application::OnEvent(Event& e)
 
 	dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { return this->OnKeyPressed(e); });
 
+	m_Sandbox->OnEvent(e);
 	//LOG_INFO(e.ToString());
 }
 
 void Application::Run()
 {
-	Sandbox sandbox = Sandbox();
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 55; i++)
 	{
-		//sandbox.CreateCube();
-		//sandbox.CreateIcoSphere();
-		//sandbox.CreatePlane();
+		m_Sandbox->CreateCube();
+		//m_Sandbox->CreateRadialSphere();
+		//m_Sandbox->CreateIcoSphere();
+		//m_Sandbox->CreatePlane();
 	}
 
 	while (m_Running)
@@ -70,7 +71,7 @@ void Application::Run()
 
 
 		// Draw new frame
-		sandbox.OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
+		m_Sandbox->OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
 		//LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
 
 		m_Window->OnUpdate(1.f / static_cast<float>(m_DeltaTime.GetSeconds()));
@@ -89,6 +90,10 @@ bool Application::OnKeyPressed(KeyPressedEvent& e)
 	if (e.GetKeyCode() == VK_ESCAPE)
 	{
 		m_Window->ToggleCursor();
+	}
+	if (e.GetKeyCode() == VK_F1)
+	{
+		m_Window->GetGraphicsContext()->ToggleWireFrame();
 	}
 	return true;
 }
