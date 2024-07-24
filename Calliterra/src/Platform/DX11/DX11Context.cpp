@@ -246,8 +246,23 @@ void DX11Context::CreateRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = m_DX11ContextProps.FillMode;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 
 	ASSERT_HR(m_Device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState));
+}
+
+void DX11Context::ToggleWireFrame()
+{
+	if (m_DX11ContextProps.FillMode == D3D11_FILL_SOLID)
+	{
+		m_DX11ContextProps.FillMode = D3D11_FILL_WIREFRAME;
+		CreateRasterizerState();
+	}
+	else
+	{
+		m_DX11ContextProps.FillMode = D3D11_FILL_SOLID;
+		CreateRasterizerState();
+	}
+
 }
 
