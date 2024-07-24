@@ -25,6 +25,7 @@ namespace DX = DirectX;
 #include <numbers>
 #include <format>
 #include <cmath>
+#include <algorithm>
 
 #include "Core/Assert.h"
 #include "Core/Log.h"
