@@ -16,7 +16,7 @@ IcoSphere::IcoSphere(const int resolution, DX::XMMATRIX transform)
 
 void IcoSphere::Draw()
 {
-	Renderer::UpdateConstantBuffer(m_ConstantBuffer, m_Transform);
+	Renderer::UpdateConstantBuffer(m_ConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
 	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer);
 	Renderer::Draw();
 }
@@ -24,10 +24,9 @@ void IcoSphere::Draw()
 void IcoSphere::Update(float dt)
 {
 	m_Delta += 0.1f * dt;
-	m_Transform = DX::XMMatrixTranspose(
+	m_Transform = (
 		DX::XMMatrixRotationRollPitchYaw(m_Delta, m_Delta, m_Delta) *
-		DX::XMMatrixTranslation(0.f, 0.f, 1.5f) *
-		DX::XMMatrixPerspectiveFovLH(90.f, 16.f/9.f, 0.1f, 10.f)
+		DX::XMMatrixTranslation(0.f, 0.f, 1.5f) 
 	);
 }
 

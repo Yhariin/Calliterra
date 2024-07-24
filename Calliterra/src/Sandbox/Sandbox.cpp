@@ -3,15 +3,18 @@
 #include "Sandbox/BasicShapes/Cube.h"
 #include "Sandbox/BasicShapes/RadialSphere.h"
 #include "Sandbox/BasicShapes/IcoSphere.h"
+#include "Sandbox/BasicShapes/Plane.h"
 
-Sandbox::Sandbox()
+Sandbox::Sandbox(float aspectRatio)
+	: m_Camera(aspectRatio, 90.f)
 {
 	Cube::InitBuffers();
+		
 }
 
 void Sandbox::OnUpdate(float dt)
 {
-
+	m_Camera.OnUpdate(dt);
 	for (auto& drawable : m_Drawables)
 	{
 		//DX::XMMATRIX transform = DX::XMMatrixTranspose(
@@ -24,9 +27,18 @@ void Sandbox::OnUpdate(float dt)
 		//);
 
 		//drawable->Update(transform);
+		DX::XMMATRIX objTransform = drawable->GetTransform();
 		drawable->Update(dt);
+		drawable->SetViewProjectionMatrix(m_Camera.GetViewProjectionMatrix());
 		drawable->Draw();
 	}
+
+
+}
+
+void Sandbox::OnEvent(Event& e)
+{
+	m_Camera.OnEvent(e);
 }
 
 void Sandbox::CreateCube()
@@ -42,4 +54,14 @@ void Sandbox::CreateRadialSphere()
 void Sandbox::CreateIcoSphere()
 {
 	m_Drawables.emplace_back(std::make_unique<IcoSphere>(7));
+}
+
+void Sandbox::CreatePlane()
+{
+	m_Drawables.emplace_back(std::make_unique<Plane>(1));
+
+	m_Drawables.back()->Update(
+		DX::XMMatrixScaling(40.f, 1.f, 40.f) * 
+		DX::XMMatrixTranslation(0.f, 0.0f, 0.f) 
+	);
 }
