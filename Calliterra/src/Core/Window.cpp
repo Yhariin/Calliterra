@@ -61,7 +61,7 @@ Window::Window(const WindowProps& windowProps)
 	m_Timer.SetCallback(lambda);
 
 	ShowWindow(m_hWnd, SW_SHOW);
-	//DisableCursor();
+	DisableCursor();
 	m_GraphicsContext = GraphicsContext::Create(&m_hWnd, m_WindowProps);
 	m_GraphicsContext->Init();
 }
@@ -246,11 +246,9 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		ASSERT_VERIFY(GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, m_RawBuffer.data(), &size, sizeof(RAWINPUTHEADER)) == size);
 
 		auto& rawInput = reinterpret_cast<const RAWINPUT&>(*m_RawBuffer.data());
-		if (rawInput.header.dwType == RIM_TYPEMOUSE &&
-			(rawInput.data.mouse.lLastX != 0 || rawInput.data.mouse.lLastY != 0))
+		if (rawInput.header.dwType == RIM_TYPEMOUSE) 
 		{
-			Input::OnMouseDelta(rawInput.data.mouse.lLastX, rawInput.data.mouse.lLastY);
-			//LOG_DEBUG("{}, {}", Input::GetMouseDelta().first, Input::GetMouseDelta().second);
+			Input::OnRawMouseDelta(rawInput.data.mouse.lLastX, rawInput.data.mouse.lLastY);
 		}
 		break;
 	}
@@ -437,6 +435,7 @@ void Window::EnableCursor()
 	m_CursorEnabled = true;
 	ShowCursor();
 	FreeCursor();
+	Input::OnCursorVisibility(m_CursorEnabled);
 }
 
 void Window::DisableCursor()
@@ -444,6 +443,7 @@ void Window::DisableCursor()
 	m_CursorEnabled = false;
 	HideCursor();
 	ConfineCursor();
+	Input::OnCursorVisibility(m_CursorEnabled);
 }
 
 void Window::ToggleCursor()

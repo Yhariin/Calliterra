@@ -26,19 +26,15 @@ std::pair<int, int> Input::GetMousePos()
 	return { m_MouseX, m_MouseY };
 }
 
-int Input::GetMouseDeltaX()
+std::optional<std::pair<int, int>> Input::ReadRawDelta()
 {
-	return m_MouseDeltaX;
-}
-
-int Input::GetMouseDeltaY()
-{
-	return m_MouseDeltaY;
-}
-
-std::pair<int, int> Input::GetMouseDelta()
-{
-	return { m_MouseDeltaX, m_MouseDeltaY };
+	if (m_MouseRawDeltaBuffer.empty())
+	{
+		return std::nullopt;
+	}
+	const std::pair<int, int> d = m_MouseRawDeltaBuffer.front();
+	m_MouseRawDeltaBuffer.pop();
+	return d;
 }
 
 void Input::OnKeyPressed(KeyCode key)
@@ -57,10 +53,9 @@ void Input::OnMouseMove(int x, int y)
 	m_MouseY = y;
 }
 
-void Input::OnMouseDelta(int x, int y)
+void Input::OnRawMouseDelta(int dx, int dy)
 {
-	m_MouseDeltaX = x;
-	m_MouseDeltaY = y;
+	m_MouseRawDeltaBuffer.push({ dx, dy });
 }
 
 void Input::OnMouseButtonPressed(KeyCode key)
@@ -71,4 +66,9 @@ void Input::OnMouseButtonPressed(KeyCode key)
 void Input::OnMouseButtonReleased(KeyCode key)
 {
 	m_KeyStates[key] = false;
+}
+
+void Input::OnCursorVisibility(bool isVisible)
+{
+	m_IsCursorVisible = isVisible;
 }
