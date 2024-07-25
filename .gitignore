@@ -3,6 +3,8 @@ bin/
 obj/
 
 *.log
+imgui.ini
+imgui*.ini
 
 # Visual Studio
 .vs/
