@@ -7,6 +7,8 @@ public:
 	~ImGuiManager();
 
 	static void Begin();
+	static void SettingsGui();
+	static void DemoWindow();
 	static void End();
 
 	static void EnableImGui();

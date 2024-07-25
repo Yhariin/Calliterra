@@ -22,7 +22,6 @@ Camera::Camera(float aspectRatio, float fov)
 	  m_Fov(fov),
 	  m_ProjectionMatrix(DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(fov), aspectRatio, m_Near, m_Far))
 {
-	GlobalSettings::Camera::Fov = m_Fov;
 	ComputeViewMatrix();
 	m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
 
@@ -30,7 +29,7 @@ Camera::Camera(float aspectRatio, float fov)
 }
 void Camera::OnSettingsUpdate(SettingsType type)
 {
-	m_Fov = GlobalSettings::Camera::Fov;
+	m_Fov = GlobalSettings::Camera::Fov();
 	SetProjection();
 	RecalculateViewProjectionMatrix();
 }

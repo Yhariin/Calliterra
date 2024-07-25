@@ -130,6 +130,7 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	{
 		return true;
 	}
+	const auto& imIO = ImGui::GetIO();
 
 	switch (uMsg)
 	{
@@ -270,7 +271,13 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	// --------------- Keyboard Messages -------------- //
 	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
 	{
+		if (imIO.WantCaptureKeyboard)
+		{
+			break;
+		}
+
 		KeyCode keycode = static_cast<KeyCode>(wParam);
 
 		KeyPressedEvent	event(keycode, Input::m_KeyRepeatCount[keycode]);
@@ -280,10 +287,18 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		Input::m_KeyRepeatCount[keycode]++;
 
+		LOG_DEBUG(KeyCodeToString(keycode));
+
 		break;
 	}
 	case WM_KEYUP:
+	case WM_SYSKEYUP:
 	{
+		if (imIO.WantCaptureKeyboard)
+		{
+			break;
+		}
+
 		KeyCode keycode = static_cast<KeyCode>(wParam);
 		KeyReleasedEvent event(keycode);
 		m_EventCallback(event);
@@ -309,6 +324,12 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		{
 			break;
 		}
+		
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		POINT lpt = POINT(pt.x, pt.y);
 
@@ -329,6 +350,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 			HideCursor();
 		}
 
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		MouseButtonPressedEvent event(VK_LBUTTON);
 		m_EventCallback(event);
 
@@ -337,6 +363,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_LBUTTONUP:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		MouseButtonReleased event(VK_LBUTTON);
 		m_EventCallback(event);
 
@@ -345,6 +376,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_RBUTTONDOWN:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		MouseButtonPressedEvent event(VK_RBUTTON);
 		m_EventCallback(event);
 
@@ -353,6 +389,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_RBUTTONUP:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		MouseButtonReleased event(VK_RBUTTON);
 		m_EventCallback(event);
 
@@ -361,6 +402,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_MBUTTONDOWN:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		MouseButtonPressedEvent event(VK_MBUTTON);
 		m_EventCallback(event);
 
@@ -369,6 +415,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_MBUTTONUP:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		MouseButtonReleased event(VK_MBUTTON);
 		m_EventCallback(event);
 
@@ -378,6 +429,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 	case WM_XBUTTONDOWN:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		WORD xButton = GET_XBUTTON_WPARAM(wParam);
 		if (xButton == 1)
 		{
@@ -397,6 +453,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_XBUTTONUP:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		WORD xButton = GET_XBUTTON_WPARAM(wParam);
 		if (xButton == 1)
 		{
@@ -416,6 +477,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_MOUSEWHEEL:
 	{
+		if (imIO.WantCaptureMouse)
+		{
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		Input::m_WheelDeltaCarry += delta;
