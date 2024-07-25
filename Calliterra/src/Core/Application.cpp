@@ -74,23 +74,12 @@ void Application::Run()
 		// Draw new frame
 		m_Sandbox->OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
 
+
 		ImGuiManager::Begin();
-
-		if (ImGuiManager::IsImGuiEnabled())
-		{
-
-			ImGui::Begin("Camera Settings");
-			GlobalSettings::Notify(ImGui::SliderInt("Fov", &GlobalSettings::Camera::Fov, 45, 120), SettingsType::Fov);
-			ImGui::End();
-			ImGui::Begin("Render Settings");
-			GlobalSettings::Notify(ImGui::Checkbox("Enable Wireframe", &GlobalSettings::Rendering::IsWireFrame), SettingsType::IsWireFrame);
-			GlobalSettings::Notify(ImGui::RadioButton("None", &GlobalSettings::Rendering::CullType, 0), SettingsType::CullMode);
-			GlobalSettings::Notify(ImGui::RadioButton("Front", &GlobalSettings::Rendering::CullType, 1), SettingsType::CullMode);
-			GlobalSettings::Notify(ImGui::RadioButton("Back", &GlobalSettings::Rendering::CullType, 2), SettingsType::CullMode);
-			ImGui::End();
-		}
-
+		//ImGuiManager::DemoWindow();
+		ImGuiManager::SettingsGui();
 		ImGuiManager::End();
+
 
 		m_Window->OnUpdate(m_DeltaTime);
 

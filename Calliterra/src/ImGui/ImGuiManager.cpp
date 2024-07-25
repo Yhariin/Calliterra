@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
+#include "Core/GlobalSettings.h"
 
 ImGuiManager::ImGuiManager()
 {
@@ -25,6 +26,37 @@ void ImGuiManager::Begin()
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+	}
+}
+
+void ImGuiManager::SettingsGui()
+{
+	if (m_IsImGuiEnabled)
+	{
+		ImGui::Begin("Settings");
+		if (ImGui::CollapsingHeader("Camera"))
+		{
+			GlobalSettings::Notify(ImGui::SliderInt("Fov", &GlobalSettings::Camera::m_Fov, 45, 120), SettingsType::Fov);
+		}
+		if (ImGui::CollapsingHeader("Renderer"))
+		{
+			GlobalSettings::Notify(ImGui::Checkbox("Enable Wireframe", &GlobalSettings::Rendering::m_IsWireFrame), SettingsType::IsWireFrame);
+			ImGui::SeparatorText("Cull Mode");
+			GlobalSettings::Notify(ImGui::RadioButton("None", &GlobalSettings::Rendering::m_CullType, 0), SettingsType::CullMode); ImGui::SameLine();
+			GlobalSettings::Notify(ImGui::RadioButton("Front", &GlobalSettings::Rendering::m_CullType, 1), SettingsType::CullMode); ImGui::SameLine();
+			GlobalSettings::Notify(ImGui::RadioButton("Back", &GlobalSettings::Rendering::m_CullType, 2), SettingsType::CullMode);
+
+		}
+		ImGui::End();
+	}
+}
+
+void ImGuiManager::DemoWindow()
+{
+	if (m_IsImGuiEnabled)
+	{
+		ImGui::ShowDemoWindow();
+
 	}
 }
 

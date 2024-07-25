@@ -23,10 +23,6 @@ void DX11Context::Init()
 
 	ImGui_ImplDX11_Init(m_Device.Get(), m_DeviceContext.Get());
 
-	// TODO: fix the default values so the ui reflects them appropriately
-	GlobalSettings::Rendering::IsWireFrame = static_cast<bool>(m_DX11ContextProps.FillMode-2);
-	GlobalSettings::Rendering::CullType = (int)m_DX11ContextProps.CullMode;
-
 	std::vector<SettingsType> settings = { SettingsType::IsWireFrame, SettingsType::CullMode };
 	GlobalSettings::Register(settings, this);
 }
@@ -59,7 +55,7 @@ void DX11Context::OnSettingsUpdate(SettingsType type)
 	{
 	case SettingsType::IsWireFrame:
 	{
-		if (GlobalSettings::Rendering::IsWireFrame)
+		if (GlobalSettings::Rendering::IsWireFrame())
 		{
 			m_DX11ContextProps.FillMode = D3D11_FILL_WIREFRAME;
 			CreateRasterizerState();
@@ -69,15 +65,16 @@ void DX11Context::OnSettingsUpdate(SettingsType type)
 			m_DX11ContextProps.FillMode = D3D11_FILL_SOLID;
 			CreateRasterizerState();
 		}
+		break;
 	}
 	case SettingsType::CullMode:
 	{
-		if (GlobalSettings::Rendering::CullType == GlobalSettings::Rendering::CullNone)
+		if (GlobalSettings::Rendering::CullType() == GlobalSettings::Rendering::CullNone)
 		{
 			m_DX11ContextProps.CullMode = D3D11_CULL_NONE;
 			CreateRasterizerState();
 		}
-		else if (GlobalSettings::Rendering::CullType == GlobalSettings::Rendering::CullFront)
+		else if (GlobalSettings::Rendering::CullType() == GlobalSettings::Rendering::CullFront)
 		{
 			m_DX11ContextProps.CullMode = D3D11_CULL_FRONT;
 			CreateRasterizerState();
@@ -87,6 +84,7 @@ void DX11Context::OnSettingsUpdate(SettingsType type)
 			m_DX11ContextProps.CullMode = D3D11_CULL_BACK;
 			CreateRasterizerState();
 		}
+		break;
 	}
 	}
 }

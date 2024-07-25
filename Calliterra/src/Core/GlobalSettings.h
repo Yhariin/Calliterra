@@ -9,14 +9,6 @@ enum class SettingsType
 
 };
 
-class SettingsSubscriber
-{
-public:
-	virtual ~SettingsSubscriber() = default;
-	virtual void OnSettingsUpdate(SettingsType) = 0;
-};
-
-
 enum class SettingsCategory
 {
 	None = 0,
@@ -24,12 +16,21 @@ enum class SettingsCategory
 	Camera
 };
 
+class SettingsSubscriber
+{
+public:
+	virtual ~SettingsSubscriber() = default;
+	virtual void OnSettingsUpdate(SettingsType) = 0;
+};
 
 class GlobalSettings
 {
+//============================= Define settings here ============================================
 public:
 	struct Rendering
 	{
+		friend class GlobalSettings;
+		friend class ImGuiManager;
 		enum CullMode
 		{
 			CullNone = 0,
@@ -37,15 +38,25 @@ public:
 			CullBack = 2
 		};
 
-		inline static bool IsWireFrame;
-		inline static int CullType;
+		static bool IsWireFrame() { return m_IsWireFrame; }
+		static bool CullType() { return m_CullType; }
+	private:
+		inline static bool m_IsWireFrame = false;
+		inline static int m_CullType = CullBack;
 	};
 
 	struct Camera
 	{
-		inline static int Fov;
+		friend class GlobalSettings;
+		friend class ImGuiManager;
+
+		static int Fov() { return m_Fov; }
+	private:
+		inline static int m_Fov = 90;
 	};
 
+//============================= Static methods here ============================================
+public:
 	static void Notify(bool hasChanged, SettingsType setting)
 	{
 		if (hasChanged)
@@ -76,6 +87,10 @@ public:
 			m_SubscriberMap[setting].push_back(subscriber);
 		}
 	}
+
+	//static bool IsWireFrame() { return Rendering::m_IsWireFrame; }
+	//static bool CullType() { return Rendering::m_CullType; }
+	//static int Fov() { return Camera::m_Fov; }
 
 private:
 	inline static std::unordered_map<SettingsType, std::list<SettingsSubscriber*>> m_SubscriberMap;
