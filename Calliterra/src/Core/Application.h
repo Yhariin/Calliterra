@@ -6,6 +6,7 @@
 #include "DeltaTime.h"
 #include "Timer.h"
 #include "Sandbox/Sandbox.h"
+#include "ImGui/ImGuiManager.h"
 
 class Application
 {
@@ -36,6 +37,7 @@ private:
 	inline static DeltaTime m_DeltaTime = DeltaTime();
 	inline static Timer m_ApplicationTimer = Timer();
 	std::unique_ptr<Sandbox> m_Sandbox;
+	ImGuiManager m_ImGui;
 };
 
 

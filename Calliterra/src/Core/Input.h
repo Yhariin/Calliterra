@@ -13,7 +13,15 @@ public:
 	static int GetMouseY();
 	static std::pair<int, int> GetMousePos();
 
+	static void EnableMousePositionInput();
+	static void DisableMousePositionInput();
+	static bool IsMousePositionInputEnabled();
+
 	static std::optional<std::pair<int, int>> ReadRawDelta();
+
+	static void EnableMouseRawInput();
+	static void DisableMouseRawInput();
+	static bool IsMouseRawInputEnabled();
 
 	static bool IsCursorEnabled() { return m_IsCursorVisible; }
 public:
@@ -36,6 +44,8 @@ private:
 	inline static int m_WheelDeltaCarry = 0;
 	inline static std::queue<std::pair<int,int>> m_MouseRawDeltaBuffer;
 	inline static uint32_t m_KeyRepeatCount[Input::NUM_KEY_CODES] = {};
+	inline static bool m_IsMousePositionInputEnabled = false;
+	inline static bool m_IsMouseRawInputEnabled = true;
 	inline static bool m_IsCursorVisible;
 
 };

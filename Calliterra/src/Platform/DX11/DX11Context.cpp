@@ -4,6 +4,8 @@
 #include "DX11Context.h"
 #include <dxgi1_2.h>
 
+#include <backends/imgui_impl_dx11.cpp>
+
 DX11Context::DX11Context(HWND* hWnd, WindowProps& windowProps)
 	: m_Hwnd(hWnd), m_WindowProps(windowProps) 
 {
@@ -18,6 +20,8 @@ void DX11Context::Init()
 	CreateDepthStencilBuffer();
 	CreateRasterizerState();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
+
+	ImGui_ImplDX11_Init(m_Device.Get(), m_DeviceContext.Get());
 }
 
 void DX11Context::SwapBuffers()

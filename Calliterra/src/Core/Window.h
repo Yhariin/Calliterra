@@ -5,6 +5,7 @@
 #include "Input.h"
 #include "Renderer/GraphicsContext.h"
 #include "Timer.h"
+#include "DeltaTime.h"
 
 struct WindowProps
 {
@@ -31,7 +32,7 @@ public:
 	Window& operator =(const Window&) = delete;
 	~Window();
 
-	void OnUpdate(float dt);
+	void OnUpdate(DeltaTime dt);
 	void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
 	std::shared_ptr<GraphicsContext> GetGraphicsContext() { return m_GraphicsContext; }
 	const WindowProps& GetWindowProps() { return m_WindowProps; }
@@ -48,6 +49,8 @@ private:
 	HWND GetWindowHandle() const { return m_hWnd; }
 	void ShowCursor();
 	void HideCursor();
+	void EnableImGuiMouse();
+	void DisableImGuiMouse();
 	void ConfineCursor();
 	void FreeCursor();
 
@@ -62,7 +65,8 @@ private:
 	bool m_Active = true;
 	bool m_Minimized = false;
 	bool m_CursorEnabled = false;
-	CountdownTimer<float> m_Timer;
+	CountdownTimer<DeltaTime> m_Timer;
 	std::vector<char> m_RawBuffer;
+	std::pair<int, int> m_LastCursorPos;
 };
 
