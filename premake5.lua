@@ -1,17 +1,24 @@
-workspace "Calliterra"
+PROJECT_NAME = "Calliterra"
+
+workspace (PROJECT_NAME)
     architecture "x64"
 
     configurations
     {
         "Debug",
-        "Release"
+        "Release",
+        "Distribution"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
-project "Calliterra"
+IncludeDir = {}
+IncludeDir["ImGui"] = PROJECT_NAME .. "/vendor/imgui"
+
+include (PROJECT_NAME .. "/vendor/imgui")
+
+project (PROJECT_NAME)
     location "Calliterra"
-    kind "ConsoleApp"
     language "C++"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -35,10 +42,12 @@ project "Calliterra"
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
+        "%{IncludeDir.ImGui}"
     }
 
     links
     {
+        "ImGui"
     }
 
     filter "system:windows"
@@ -49,10 +58,24 @@ project "Calliterra"
 
     filter "configurations:Debug"
         defines { "_DEBUG", "DEBUG" }
+        kind "ConsoleApp"
         runtime "Debug"
+        symbols "On"
+        optimize "Debug"
+
 
     filter "configurations:Release"
         defines { "NDEBUG" }
         kind "WindowedApp"
         entrypoint "mainCRTStartup"
         runtime "Release"
+        symbols "On"
+        optimize "On"
+
+    filter "configurations:Distribution"
+        defines { "NDEBUG" }
+        kind "WindowedApp"
+        entrypoint "mainCRTStartup"
+        runtime "Release"
+        symbols "Off"
+        optimize "Full"
