@@ -9,6 +9,7 @@
 
 #include "Core/Window.h"
 #include "Renderer/GraphicsContext.h"
+#include "Core/GlobalSettings.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -16,10 +17,11 @@ struct DX11ContextProps
 {
 	bool Enabled4xMSAA = false;
 	D3D11_FILL_MODE FillMode = D3D11_FILL_SOLID;
+	D3D11_CULL_MODE CullMode = D3D11_CULL_BACK;
 	
 };
 
-class DX11Context : public GraphicsContext
+class DX11Context : public GraphicsContext, public SettingsSubscriber
 {
 public:
 	DX11Context(HWND* hWnd, WindowProps& windowProps);
@@ -29,6 +31,8 @@ public:
 	void OnWindowResize() override;
 	void Clear() override;
 	void SetClearColor(float r, float g, float b, float a) override;
+
+	void OnSettingsUpdate(SettingsType type) override;
 
 	void ToggleWireFrame() override;
 

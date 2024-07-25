@@ -17,21 +17,22 @@ static float wrapAngle(float theta)
 	return mod;
 }
 
-static void swap(float& a, float& b)
-{
-	float tmp = a;
-	a = b;
-	b = tmp;
-}
-
 Camera::Camera(float aspectRatio, float fov)
 	: m_AspectRatio(aspectRatio), 
-	  m_Fov(fov) 
-	  //m_ProjectionMatrix(DX::XMMatrixPerspectiveFovLH(fov, aspectRatio, 0.1f, 10.f))
+	  m_Fov(fov),
+	  m_ProjectionMatrix(DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(fov), aspectRatio, m_Near, m_Far))
 {
-	SetProjection(0.1f, 10.f);
+	GlobalSettings::Camera::Fov = m_Fov;
 	ComputeViewMatrix();
 	m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
+
+	GlobalSettings::Register(SettingsType::Fov, this);
+}
+void Camera::OnSettingsUpdate(SettingsType type)
+{
+	m_Fov = GlobalSettings::Camera::Fov;
+	SetProjection();
+	RecalculateViewProjectionMatrix();
 }
 
 void Camera::OnUpdate(float dt)
@@ -41,32 +42,26 @@ void Camera::OnUpdate(float dt)
 		if (Input::IsKeyPressed('W'))
 		{
 			Translate(DX::XMFLOAT3(0.f, 0.f, dt));
-			//m_Position.z += m_MoveSpeed * dt;
 		}
 		if (Input::IsKeyPressed('A'))
 		{
 			Translate({-dt, 0.f, 0.f});
-			//m_Position.x -= m_MoveSpeed * dt;
 		}
 		if (Input::IsKeyPressed('S'))
 		{
 			Translate({0.f, 0.f, -dt});
-			//m_Position.z -= m_MoveSpeed * dt;
 		}
 		if (Input::IsKeyPressed('D'))
 		{
 			Translate({dt, 0.f, 0.f});
-			//m_Position.x += m_MoveSpeed * dt;
 		}
 		if (Input::IsKeyPressed(VK_SPACE))
 		{
 			Translate({0.f, dt, 0.f});
-			//m_Position.y += m_MoveSpeed * dt;
 		}
 		if (Input::IsKeyPressed(VK_SHIFT))
 		{
 			Translate({0.f, -dt, 0.f});
-			//m_Position.y -= m_MoveSpeed * dt;
 		}
 
 		while (const auto delta = Input::ReadRawDelta())
@@ -88,21 +83,12 @@ void Camera::OnEvent(Event& e)
 void Camera::OnResize(float width, float height)
 {
 	m_AspectRatio = width / height;
-	SetProjection(0.1f, 10.f);
+	SetProjection();
 }
 
-void Camera::SetProjection(float zNear, float zFar)
+void Camera::SetProjection()
 {
-	// https://community.khronos.org/t/horizontal-vertical-fov-glm-projection-matrix/73854
-	//float f = std::tan(DX::XMConvertToRadians(m_Fov) / 2.f);
-	float a = 1.f / m_AspectRatio;
-	m_ProjectionMatrix = DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(m_Fov), m_AspectRatio, zNear, zFar);
-	//m_ProjectionMatrix = DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(m_Fov), a, zNear, zFar);
-	//DX::XMFLOAT4X4 m;
-	//DX::XMStoreFloat4x4(&m, m_ProjectionMatrix);
-	//swap(m._11, m._22);
-
-	//m_ProjectionMatrix = DX::XMLoadFloat4x4(&m);
+	m_ProjectionMatrix = DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(m_Fov), m_AspectRatio, m_Near, m_Far);
 }
 
 bool Camera::OnWindowResize(WindowResizeEvent e)

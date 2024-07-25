@@ -22,6 +22,13 @@ void DX11Context::Init()
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 
 	ImGui_ImplDX11_Init(m_Device.Get(), m_DeviceContext.Get());
+
+	// TODO: fix the default values so the ui reflects them appropriately
+	GlobalSettings::Rendering::IsWireFrame = static_cast<bool>(m_DX11ContextProps.FillMode-2);
+	GlobalSettings::Rendering::CullType = (int)m_DX11ContextProps.CullMode;
+
+	std::vector<SettingsType> settings = { SettingsType::IsWireFrame, SettingsType::CullMode };
+	GlobalSettings::Register(settings, this);
 }
 
 void DX11Context::SwapBuffers()
@@ -44,6 +51,44 @@ void DX11Context::SetClearColor(float r, float g, float b, float a)
 	m_BufferClearColor[1] = g;
 	m_BufferClearColor[2] = b;
 	m_BufferClearColor[3] = a;
+}
+
+void DX11Context::OnSettingsUpdate(SettingsType type)
+{
+	switch (type)
+	{
+	case SettingsType::IsWireFrame:
+	{
+		if (GlobalSettings::Rendering::IsWireFrame)
+		{
+			m_DX11ContextProps.FillMode = D3D11_FILL_WIREFRAME;
+			CreateRasterizerState();
+		}
+		else
+		{
+			m_DX11ContextProps.FillMode = D3D11_FILL_SOLID;
+			CreateRasterizerState();
+		}
+	}
+	case SettingsType::CullMode:
+	{
+		if (GlobalSettings::Rendering::CullType == GlobalSettings::Rendering::CullNone)
+		{
+			m_DX11ContextProps.CullMode = D3D11_CULL_NONE;
+			CreateRasterizerState();
+		}
+		else if (GlobalSettings::Rendering::CullType == GlobalSettings::Rendering::CullFront)
+		{
+			m_DX11ContextProps.CullMode = D3D11_CULL_FRONT;
+			CreateRasterizerState();
+		}
+		else
+		{
+			m_DX11ContextProps.CullMode = D3D11_CULL_BACK;
+			CreateRasterizerState();
+		}
+	}
+	}
 }
 
 void DX11Context::DrawIndexed(uint32_t indexCount)
@@ -250,7 +295,7 @@ void DX11Context::CreateRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = m_DX11ContextProps.FillMode;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.CullMode = m_DX11ContextProps.CullMode;
 
 	ASSERT_HR(m_Device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState));
 }

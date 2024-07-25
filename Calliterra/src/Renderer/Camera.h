@@ -1,18 +1,20 @@
 #pragma once
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
+#include "Core/GlobalSettings.h"
 
-class Camera
+class Camera : public SettingsSubscriber
 {
 public:
 	Camera(float aspectRatio, float fov);
 
+	void OnSettingsUpdate(SettingsType type) override;
 	void OnUpdate(float dt);
 	void OnEvent(Event& e);
 
 	void OnResize(float width, float height);
 
-	void SetProjection(float zNear, float zFar);
+	void SetProjection();
 
 	const DX::XMMATRIX& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 	const DX::XMMATRIX& GetViewMatrix() const { return m_ViewMatrix; }
@@ -40,5 +42,7 @@ private:
 
 	static constexpr float m_MoveSpeed = 10.f;
 	static constexpr float m_Sensitivity = 0.001f;
+	static constexpr float m_Near = 0.1f;
+	static constexpr float m_Far = 10.f;
 };
 
