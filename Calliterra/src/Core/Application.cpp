@@ -3,7 +3,6 @@
 
 #include "Window.h"
 #include "Renderer/Renderer.h"
-
 #include "Platform/DX11/DX11Shader.h"
 
 #include "imgui.h"
@@ -79,12 +78,16 @@ void Application::Run()
 
 		if (ImGuiManager::IsImGuiEnabled())
 		{
-			static bool showDemoWindow = true;
-			if (showDemoWindow)
-			{
-				ImGui::ShowDemoWindow(&showDemoWindow);
-			}
 
+			ImGui::Begin("Camera Settings");
+			GlobalSettings::Notify(ImGui::SliderInt("Fov", &GlobalSettings::Camera::Fov, 45, 120), SettingsType::Fov);
+			ImGui::End();
+			ImGui::Begin("Render Settings");
+			GlobalSettings::Notify(ImGui::Checkbox("Enable Wireframe", &GlobalSettings::Rendering::IsWireFrame), SettingsType::IsWireFrame);
+			GlobalSettings::Notify(ImGui::RadioButton("None", &GlobalSettings::Rendering::CullType, 0), SettingsType::CullMode);
+			GlobalSettings::Notify(ImGui::RadioButton("Front", &GlobalSettings::Rendering::CullType, 1), SettingsType::CullMode);
+			GlobalSettings::Notify(ImGui::RadioButton("Back", &GlobalSettings::Rendering::CullType, 2), SettingsType::CullMode);
+			ImGui::End();
 		}
 
 		ImGuiManager::End();
