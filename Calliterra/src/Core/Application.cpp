@@ -6,6 +6,8 @@
 
 #include "Platform/DX11/DX11Shader.h"
 
+#include "imgui.h"
+
 Application::Application()
 {
 	ASSERT(!s_Instance, "Application already exists!");
@@ -72,9 +74,22 @@ void Application::Run()
 
 		// Draw new frame
 		m_Sandbox->OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
-		//LOG_INFO("{0}ms : {1:.2f} FPS", m_DeltaTime.GetMilliseconds(), 1.f / m_DeltaTime.GetSeconds());
 
-		m_Window->OnUpdate(1.f / static_cast<float>(m_DeltaTime.GetSeconds()));
+		ImGuiManager::Begin();
+
+		if (ImGuiManager::IsImGuiEnabled())
+		{
+			static bool showDemoWindow = true;
+			if (showDemoWindow)
+			{
+				ImGui::ShowDemoWindow(&showDemoWindow);
+			}
+
+		}
+
+		ImGuiManager::End();
+
+		m_Window->OnUpdate(m_DeltaTime);
 
 	}
 }
@@ -90,6 +105,19 @@ bool Application::OnKeyPressed(KeyPressedEvent& e)
 	if (e.GetKeyCode() == VK_ESCAPE)
 	{
 		m_Window->ToggleCursor();
+		if (Input::IsMouseRawInputEnabled())
+		{
+			Input::DisableMouseRawInput();
+			Input::EnableMousePositionInput();
+			ImGuiManager::EnableImGui();
+		}
+		else
+		{
+			Input::EnableMouseRawInput();
+			Input::DisableMousePositionInput();
+			ImGuiManager::DisableImGui();
+		}
+		
 	}
 	if (e.GetKeyCode() == VK_F1)
 	{

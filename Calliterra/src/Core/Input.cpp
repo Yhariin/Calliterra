@@ -26,6 +26,21 @@ std::pair<int, int> Input::GetMousePos()
 	return { m_MouseX, m_MouseY };
 }
 
+void Input::EnableMousePositionInput()
+{
+	m_IsMousePositionInputEnabled = true;
+}
+
+void Input::DisableMousePositionInput()
+{
+	m_IsMousePositionInputEnabled = false;
+}
+
+bool Input::IsMousePositionInputEnabled()
+{
+	return m_IsMousePositionInputEnabled;
+}
+
 std::optional<std::pair<int, int>> Input::ReadRawDelta()
 {
 	if (m_MouseRawDeltaBuffer.empty())
@@ -35,6 +50,21 @@ std::optional<std::pair<int, int>> Input::ReadRawDelta()
 	const std::pair<int, int> d = m_MouseRawDeltaBuffer.front();
 	m_MouseRawDeltaBuffer.pop();
 	return d;
+}
+
+void Input::EnableMouseRawInput()
+{
+	m_IsMouseRawInputEnabled = true;
+}
+
+void Input::DisableMouseRawInput()
+{
+	m_IsMouseRawInputEnabled = false;
+}
+
+bool Input::IsMouseRawInputEnabled()
+{
+	return m_IsMouseRawInputEnabled;
 }
 
 void Input::OnKeyPressed(KeyCode key)

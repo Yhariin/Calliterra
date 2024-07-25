@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Window.h"
+#include <backends/imgui_impl_win32.cpp>
 #include "Input.h"
 #include "Events/ApplicationEvents.h"
 #include "Events/KeyEvents.h"
@@ -8,7 +9,8 @@
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module
 	  m_CLASSNAME(L"Calliterra"),
-	  m_Timer(100)
+	  m_Timer(50),
+	  m_WindowProps(windowProps)
 {
 	WNDCLASS wndClass = {};
 	wndClass.lpszClassName = m_CLASSNAME;
@@ -44,6 +46,8 @@ Window::Window(const WindowProps& windowProps)
 		this	
 	);
 
+	m_LastCursorPos = { centerScreenX + windowProps.Width / 2, centerScreenY + windowProps.Height / 2};
+
 	// Register mouse raw input device
 	RAWINPUTDEVICE rawInputDevice;
 	rawInputDevice.usUsagePage = 0x01; // Mouse page
@@ -52,25 +56,28 @@ Window::Window(const WindowProps& windowProps)
 	rawInputDevice.hwndTarget = m_hWnd;
 	ASSERT_VERIFY(RegisterRawInputDevices(&rawInputDevice, 1, sizeof(rawInputDevice)));
 
-	auto lambda = [this](float dt)
+	auto lambda = [this](DeltaTime dt)
 		{
-			std::string title = std::format("Calliterra  FPS: {0}", static_cast<int>(dt));
+			std::string title = std::format("Calliterra  FPS: {0:4}  Frame Time: {1:.2f}ms", static_cast<int>(1 / dt.GetSeconds()), dt.GetMilliseconds());
 			SetWindowTextA(m_hWnd, title.c_str());
 		};
 
 	m_Timer.SetCallback(lambda);
 
 	ShowWindow(m_hWnd, SW_SHOW);
+
+	ImGui_ImplWin32_Init(m_hWnd);
+
 	DisableCursor();
 	m_GraphicsContext = GraphicsContext::Create(&m_hWnd, m_WindowProps);
 	m_GraphicsContext->Init();
+
 }
 
 Window::~Window()
 {
 	UnregisterClass(m_CLASSNAME, m_hInstance);
 }
-
 
 LRESULT CALLBACK Window::MessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPARAM)
 {
@@ -118,6 +125,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	static int wmMoveMessageCount = 0;
 	static uint16_t oldWindowWidth = m_WindowProps.Width;
 	static uint16_t oldWindowHeight = m_WindowProps.Height;
+
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
+	{
+		return true;
+	}
 
 	switch (uMsg)
 	{
@@ -238,6 +250,10 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	}
 	case WM_INPUT:
 	{
+		if (!Input::IsMouseRawInputEnabled())
+		{
+			break;
+		}
 		UINT size = 0;
 
 		// Get size of input data
@@ -289,12 +305,19 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	// ---------------- Mouse Messages ---------------- //
 	case WM_MOUSEMOVE:
 	{
+		if (!Input::IsMousePositionInputEnabled())
+		{
+			break;
+		}
 		POINTS pt = MAKEPOINTS(lParam);
+		POINT lpt = POINT(pt.x, pt.y);
 
 		MouseMovedEvent event(pt.x, pt.y);
 		m_EventCallback(event);
 
 		Input::OnMouseMove(pt.x, pt.y);
+		ClientToScreen(m_hWnd, &lpt);
+		m_LastCursorPos = { lpt.x, lpt.y };
 		break;
 	}
 	case WM_LBUTTONDOWN:
@@ -434,7 +457,9 @@ void Window::EnableCursor()
 {
 	m_CursorEnabled = true;
 	ShowCursor();
+	EnableImGuiMouse();
 	FreeCursor();
+	SetCursorPos(m_LastCursorPos.first, m_LastCursorPos.second);
 	Input::OnCursorVisibility(m_CursorEnabled);
 }
 
@@ -442,6 +467,7 @@ void Window::DisableCursor()
 {
 	m_CursorEnabled = false;
 	HideCursor();
+	DisableImGuiMouse();
 	ConfineCursor();
 	Input::OnCursorVisibility(m_CursorEnabled);
 }
@@ -468,6 +494,16 @@ void Window::HideCursor()
 	while (::ShowCursor(false) >= 0);
 }
 
+void Window::EnableImGuiMouse()
+{
+	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+}
+
+void Window::DisableImGuiMouse()
+{
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
+}
+
 void Window::ConfineCursor()
 {
 	RECT rect;
@@ -481,7 +517,7 @@ void Window::FreeCursor()
 	ClipCursor(nullptr);
 }
 
-void Window::OnUpdate(float dt)
+void Window::OnUpdate(DeltaTime dt)
 {
 	m_Timer.Update(dt);
 	ProcessMessages();
