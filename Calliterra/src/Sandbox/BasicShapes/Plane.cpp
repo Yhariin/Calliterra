@@ -16,8 +16,8 @@ Plane::Plane(uint32_t resolution, DX::XMMATRIX transform)
 
 void Plane::Draw()
 {
-	Renderer::UpdateConstantBuffer(m_ConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer);
+	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, { m_TransformConstantBuffer, m_ColorConstantBuffer });
 	Renderer::Draw();
 }
 
@@ -42,22 +42,24 @@ void Plane::CalculatePlane(uint32_t resolution)
 			m_PlaneVertices.emplace_back(DX::XMFLOAT3(x * div, 0.f, z * div));
 		}
 	}
-
-	m_PlaneIndices.push_back(0);
-	m_PlaneIndices.push_back(1);
-	m_PlaneIndices.push_back(3);
-
-	m_PlaneIndices.push_back(3);
-	m_PlaneIndices.push_back(2);
-	m_PlaneIndices.push_back(0);
+	
+	const auto calculateIndex = [resolution](auto x, auto z)
+		{ return x * (resolution+1) + z; };
 
 	for (uint32_t x = 0; x < resolution; x++)
 	{
 		for (uint32_t z = 0; z < resolution; z++)
 		{
+			m_PlaneIndices.push_back(calculateIndex(x, z));
+			m_PlaneIndices.push_back(calculateIndex(x, z+1));
+			m_PlaneIndices.push_back(calculateIndex(x+1, z));
 
+			m_PlaneIndices.push_back(calculateIndex(x, z+1));
+			m_PlaneIndices.push_back(calculateIndex(x+1, z+1));
+			m_PlaneIndices.push_back(calculateIndex(x+1, z));
 		}
 	}
+
 }
 
 void Plane::InitBuffers()
@@ -75,10 +77,9 @@ void Plane::InitBuffers()
 		});
 	m_VertexBuffer->SetLayout();
 
-	m_ConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
-	m_ConstantBuffer2 = Renderer::CreateConstantBuffer<DX::XMVECTOR>(Shader::PIXEL_SHADER);
-	m_ConstantBuffer->Bind();
-	m_ConstantBuffer2->Bind();
-	Renderer::UpdateConstantBuffer(m_ConstantBuffer2, DX::XMVECTOR({ 0.3f, 0.3f, 0.3f, 1.f }));
+	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
+	m_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMVECTOR>(Shader::PIXEL_SHADER, DX::XMVECTOR({0.3f, 0.3f, 0.3f, 1.f}));
+	//m_TransformConstantBuffer->Bind();
+	//m_ColorConstantBuffer->Bind();
 
 }

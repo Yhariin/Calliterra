@@ -49,14 +49,7 @@ void Application::OnEvent(Event& e)
 
 void Application::Run()
 {
-	for(int i = 0; i < 55; i++)
-	{
-		m_Sandbox->CreateCube();
-		//m_Sandbox->CreateRadialSphere();
-		//m_Sandbox->CreateIcoSphere();
-		//m_Sandbox->CreatePlane();
-	}
-
+	m_Sandbox->LoadSandboxPreset();
 	while (m_Running)
 	{
 		// Calculate deltaTime

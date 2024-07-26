@@ -15,10 +15,10 @@ Cube::Cube(DX::XMMATRIX transform)
 void Cube::InitRNG()
 {
 	std::mt19937 rng(std::random_device{}());
-	std::uniform_real_distribution<float> aDist(0.0f, 3.1415f * 2.f);
-	std::uniform_real_distribution<float> dDist(0.0f, 3.1415f * 2.f);
-	std::uniform_real_distribution<float> oDist(0.0f, 3.1415f * 0.3f);
-	std::uniform_real_distribution<float> rDist(6.0f, 20.f);
+	std::uniform_real_distribution<float> aDist(0.0f, std::numbers::pi_v<float> * 2.f);
+	std::uniform_real_distribution<float> dDist(0.0f, std::numbers::pi_v<float> * 2.f);
+	std::uniform_real_distribution<float> oDist(0.0f, std::numbers::pi_v<float> * 0.3f);
+	std::uniform_real_distribution<float> rDist(6.0f, 19.f);
 
 	m_R = rDist(rng);
 	m_Roll = 0.f;
@@ -52,10 +52,8 @@ void Cube::InitBuffers()
 		});
 	s_VertexBuffer->SetLayout();
 		
-	s_ConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
-	s_ConstantBuffer2 = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
-	s_ConstantBuffer->Bind();
-	s_ConstantBuffer2->Bind();
+	s_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
+	s_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
 
 }
 
@@ -73,19 +71,18 @@ void Cube::Update(float dt)
 	m_Phi += m_dPhi * dt;
 	m_Chi += m_dChi * dt;
 
-	//m_Transform = DX::XMMatrixIdentity();
-	//m_Transform = DX::XMMatrixTranspose(
-	m_Transform = 
+	m_Transform =
+		//DX::XMMatrixTranslation(0.f, 20.f, 0.f) *
 		DX::XMMatrixRotationRollPitchYaw(m_Pitch, m_Yaw, m_Roll) *
 		DX::XMMatrixTranslation(m_R, 0.f, 0.f) *
-		DX::XMMatrixRotationRollPitchYaw(m_Theta, m_Phi, m_Chi) *
-		DX::XMMatrixTranslation(0.f, 0.f, 20.f);
-		//DX::XMMatrixPerspectiveFovLH(90.f, 16.f/9.f, 0.1f, 10.f));
+		DX::XMMatrixRotationRollPitchYaw(m_Theta, m_Phi, m_Chi) * 
+		DX::XMMatrixTranslation(0.f, 20.f, 10.f);
 }
 
 void Cube::Draw()
 {
-	Renderer::UpdateConstantBuffer(s_ConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
-	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer);
+	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
+	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_TransformConstantBuffer, s_ColorConstantBuffer });
 	Renderer::Draw();
+
 }
