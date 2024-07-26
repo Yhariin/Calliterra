@@ -8,7 +8,6 @@ public:
 	DX11IndexBuffer(const DX11Context& context, const uint32_t* indices, uint32_t count);
 
 	void Bind() override;
-	void Unbind() override;
 
 	uint32_t GetCount() const { return m_Count; }
 

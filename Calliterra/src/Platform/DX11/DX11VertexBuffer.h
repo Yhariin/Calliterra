@@ -105,11 +105,6 @@ public:
 		
 	}
 
-	void DX11VertexBuffer<Type>::Unbind() override
-	{
-		m_DX11Context.GetDeviceContext().IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
-	}
-
 	void DX11VertexBuffer<Type>::SetLayout(int index) override
 	{
 		ASSERT(index < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Layout Index out of bounds!");

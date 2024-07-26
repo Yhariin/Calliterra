@@ -31,8 +31,3 @@ void DX11IndexBuffer::Bind()
 {
 	m_DX11Context.GetDeviceContext().IASetIndexBuffer(m_IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }
-
-void DX11IndexBuffer::Unbind()
-{
-	m_DX11Context.GetDeviceContext().IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0);
-}

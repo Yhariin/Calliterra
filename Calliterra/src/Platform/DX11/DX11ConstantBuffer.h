@@ -80,7 +80,7 @@ public:
 	{
 		m_Context.GetDeviceContext().VSSetConstantBuffers(0, 1, m_ConstantBuffer.GetAddressOf());
 	}
-
+	
 };
 
 template<typename Type>

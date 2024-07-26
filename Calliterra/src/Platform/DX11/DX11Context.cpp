@@ -69,20 +69,26 @@ void DX11Context::OnSettingsUpdate(SettingsType type)
 	}
 	case SettingsType::CullMode:
 	{
-		if (GlobalSettings::Rendering::CullType() == GlobalSettings::Rendering::CullNone)
+		switch (GlobalSettings::Rendering::CullType())
+		{
+		case GlobalSettings::Rendering::CullNone:
 		{
 			m_DX11ContextProps.CullMode = D3D11_CULL_NONE;
 			CreateRasterizerState();
+			break;
 		}
-		else if (GlobalSettings::Rendering::CullType() == GlobalSettings::Rendering::CullFront)
+		case GlobalSettings::Rendering::CullFront:
 		{
 			m_DX11ContextProps.CullMode = D3D11_CULL_FRONT;
 			CreateRasterizerState();
+			break;
 		}
-		else
+		case GlobalSettings::Rendering::CullBack:
 		{
 			m_DX11ContextProps.CullMode = D3D11_CULL_BACK;
 			CreateRasterizerState();
+			break;
+		}
 		}
 		break;
 	}

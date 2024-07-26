@@ -39,7 +39,7 @@ public:
 		};
 
 		static bool IsWireFrame() { return m_IsWireFrame; }
-		static bool CullType() { return m_CullType; }
+		static int CullType() { return m_CullType; }
 	private:
 		inline static bool m_IsWireFrame = false;
 		inline static int m_CullType = CullBack;

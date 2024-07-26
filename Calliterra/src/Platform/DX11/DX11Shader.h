@@ -8,7 +8,6 @@ public:
 	DX11Shader(DX11Context& context, const std::string& filepath, Shader::ShaderType type);
 
 	void Bind() override;
-	void Unbind() override;
 
 	ComPtr<ID3DBlob> GetCompiledShaderByteCode() { return m_CompiledShader; }
 private:
