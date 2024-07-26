@@ -7,7 +7,6 @@ public:
 	virtual ~VertexBuffer() = default;
 
 	virtual void Bind() = 0;
-	virtual void Unbind() = 0;
 
 	virtual void SetLayout(int index = 0) = 0;
 	virtual void CreateLayout(const VertexBufferLayout& layout) = 0;

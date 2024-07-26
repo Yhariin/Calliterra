@@ -31,7 +31,7 @@ private:
 	DX::XMMATRIX m_ViewMatrix;
 	DX::XMMATRIX m_ViewProjectionMatrix;
 
-	DX::XMFLOAT3 m_Position = { 0.f, 0.f, 0.f };
+	DX::XMFLOAT3 m_Position = { 0.f, 2.f, 0.f };
 	DX::XMFLOAT3 m_LookAt = { 0.f, 0.f, 1.f };
 	DX::XMFLOAT3 m_WorldUp = { 0.f, 1.f, 0.f };
 

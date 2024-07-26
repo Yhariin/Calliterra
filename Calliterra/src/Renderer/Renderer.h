@@ -16,7 +16,11 @@ public:
 	static void Shutdown();
 	static void SetClearColor(float r, float g, float b, float a = 1.f);
 	static void Clear();
-	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {}, const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr, const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr);
+	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {}, 
+					 const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr, 
+					 const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr, 
+					 const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList = {}
+	);
 	static void Draw();
 
 	template<typename Type>
