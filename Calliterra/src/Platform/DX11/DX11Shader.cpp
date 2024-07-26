@@ -92,34 +92,6 @@ void DX11Shader::Bind()
 	}
 }
 
-void DX11Shader::Unbind()
-{
-	switch (m_ShaderType)
-	{
-	case VERTEX_SHADER:
-		m_DX11Context.GetDeviceContext().VSSetShader(nullptr, nullptr, 0);
-		break;
-	case PIXEL_SHADER:
-		m_DX11Context.GetDeviceContext().PSSetShader(nullptr, nullptr, 0);
-		break;
-	case COMPUTE_SHADER:
-		m_DX11Context.GetDeviceContext().CSSetShader(nullptr, nullptr, 0);
-		break;
-	case GEOMETRY_SHADER:
-		m_DX11Context.GetDeviceContext().GSSetShader(nullptr, nullptr, 0);
-		break;
-	case HULL_SHADER:
-		m_DX11Context.GetDeviceContext().HSSetShader(nullptr, nullptr, 0);
-		break;
-	case DOMAIN_SHADER:
-		m_DX11Context.GetDeviceContext().DSSetShader(nullptr, nullptr, 0);
-		break;
-	default:
-		ASSERT(false, "Unknown shader type");
-	}
-
-}
-
 const std::string DX11Shader::ShaderTypeToCompilerTarget()
 {
 	switch (m_ShaderType)

@@ -287,8 +287,6 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		Input::m_KeyRepeatCount[keycode]++;
 
-		LOG_DEBUG(KeyCodeToString(keycode));
-
 		break;
 	}
 	case WM_KEYUP:
