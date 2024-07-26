@@ -17,28 +17,26 @@ void Sandbox::OnUpdate(float dt)
 	m_Camera.OnUpdate(dt);
 	for (auto& drawable : m_Drawables)
 	{
-		//DX::XMMATRIX transform = DX::XMMatrixTranspose(
-		//	DX::XMMatrixRotationZ(dt) *
-		//	DX::XMMatrixRotationY(dt) *
-		//	DX::XMMatrixRotationX(dt) *
-		//	DX::XMMatrixScaling(0.5f, 0.5f, 0.5f) *
-		//	DX::XMMatrixTranslation(i, 0.0f, 2.f)*
-		//	DX::XMMatrixPerspectiveFovLH(90.f, 16.f/9.f, 0.05f, 10.f)
-		//);
-
-		//drawable->Update(transform);
-		DX::XMMATRIX objTransform = drawable->GetTransform();
 		drawable->Update(dt);
 		drawable->SetViewProjectionMatrix(m_Camera.GetViewProjectionMatrix());
 		drawable->Draw();
 	}
-
 
 }
 
 void Sandbox::OnEvent(Event& e)
 {
 	m_Camera.OnEvent(e);
+}
+
+void Sandbox::LoadSandboxPreset()
+{
+	CreatePlane();
+	for(int i = 0; i < 50; i++)
+	{ 
+		CreateCube();
+	}
+	CreateIcoSphere();
 }
 
 void Sandbox::CreateCube()
@@ -53,7 +51,7 @@ void Sandbox::CreateRadialSphere()
 
 void Sandbox::CreateIcoSphere()
 {
-	m_Drawables.emplace_back(std::make_unique<IcoSphere>(7));
+	m_Drawables.emplace_back(std::make_unique<IcoSphere>(4, DX::XMMatrixTranslation(0.f, 20.f, 10.f)));
 }
 
 void Sandbox::CreatePlane()
@@ -61,7 +59,7 @@ void Sandbox::CreatePlane()
 	m_Drawables.emplace_back(std::make_unique<Plane>(1));
 
 	m_Drawables.back()->Update(
-		DX::XMMatrixScaling(40.f, 1.f, 40.f) * 
-		DX::XMMatrixTranslation(0.f, 0.0f, 0.f) 
+		DX::XMMatrixTranslation(-0.5f, 0.0f, -0.5f) *
+		DX::XMMatrixScaling(100.f, 1.f, 100.f)
 	);
 }

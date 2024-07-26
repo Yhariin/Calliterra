@@ -16,18 +16,14 @@ IcoSphere::IcoSphere(const int resolution, DX::XMMATRIX transform)
 
 void IcoSphere::Draw()
 {
-	Renderer::UpdateConstantBuffer(m_ConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer);
+	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, { m_TransformConstantBuffer, m_ColorConstantBuffer });
 	Renderer::Draw();
 }
 
 void IcoSphere::Update(float dt)
 {
-	m_Delta += 0.1f * dt;
-	m_Transform = (
-		DX::XMMatrixRotationRollPitchYaw(m_Delta, m_Delta, m_Delta) *
-		DX::XMMatrixTranslation(0.f, 0.f, 1.5f) 
-	);
+
 }
 
 void IcoSphere::Update(DX::XMMATRIX transform)
@@ -42,8 +38,6 @@ void IcoSphere::CalculateSphere(const int resolution)
 	// Create vertices of Icosahedron
 	float t = (1.0f + sqrt(5.0)) / 2.0;
 
-	//m_SphereVertices = 
-	//{
 	AddVertex(DX::XMFLOAT3(-1, t, 0));
 	AddVertex(DX::XMFLOAT3(1, t, 0));
 	AddVertex(DX::XMFLOAT3(-1, -t, 0));
@@ -58,7 +52,6 @@ void IcoSphere::CalculateSphere(const int resolution)
 	AddVertex(DX::XMFLOAT3(t, 0, 1));
 	AddVertex(DX::XMFLOAT3(-t, 0, -1));
 	AddVertex(DX::XMFLOAT3(-t, 0, 1));
-	//};
 
 	// Create the triangle faces of Icosahedron
 	std::vector<TriangleIndices> faces =
@@ -137,10 +130,8 @@ void IcoSphere::InitBuffers()
 		});
 	m_VertexBuffer->SetLayout();
 
-	m_ConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
-	m_ConstantBuffer2 = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
-	m_ConstantBuffer->Bind();
-	m_ConstantBuffer2->Bind();
+	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
+	m_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
 }
 
 int IcoSphere::AddVertex(DX::XMFLOAT3 point)

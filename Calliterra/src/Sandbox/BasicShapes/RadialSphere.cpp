@@ -16,8 +16,8 @@ RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX tra
 
 void RadialSphere::Draw()
 {
-	Renderer::UpdateConstantBuffer(m_ConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer);
+	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, { m_TransformConstantBuffer, m_ColorConstantBuffer });
 	Renderer::Draw();
 }
 
@@ -40,8 +40,8 @@ void RadialSphere::CalculateSphere(const int longDiv, const int latDiv)
 	ASSERT(latDiv >= 3);
 	constexpr float radius = 1.f;
 	constexpr DX::XMVECTORF32 base = { 0.f, 0.f, radius, 0.f };
-	const float lattitudeAngle = static_cast<float>(2.0f * std::numbers::pi) / latDiv;
-	const float longitudeAngle = static_cast<float>(std::numbers::pi) / longDiv;
+	const float lattitudeAngle = 2.0f * std::numbers::pi_v<float> / latDiv;
+	const float longitudeAngle = std::numbers::pi_v<float> / longDiv;
 
 	for (int iLong = 1; iLong < longDiv; iLong++)
 	{
@@ -124,9 +124,7 @@ void RadialSphere::InitBuffers()
 		});
 	m_VertexBuffer->SetLayout();
 
-	m_ConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
-	m_ConstantBuffer2 = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
-	m_ConstantBuffer->Bind();
-	m_ConstantBuffer2->Bind();
+	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
+	m_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
 }
 

@@ -12,6 +12,8 @@ public:
 	void OnUpdate(float dt);
 	void OnEvent(Event& e);
 
+	void LoadSandboxPreset();
+
 	void CreateCube();
 	void CreateRadialSphere();
 	void CreateIcoSphere();

@@ -61,8 +61,8 @@ private:
 	inline static std::shared_ptr<Shader> s_PixelShader = nullptr;
 	inline static std::shared_ptr<VertexBuffer> s_VertexBuffer = nullptr;
 	inline static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
-	inline static std::shared_ptr<ConstantBuffer> s_ConstantBuffer = nullptr;
-	inline static std::shared_ptr<ConstantBuffer> s_ConstantBuffer2 = nullptr;
+	inline static std::shared_ptr<ConstantBuffer> s_TransformConstantBuffer = nullptr;
+	inline static std::shared_ptr<ConstantBuffer> s_ColorConstantBuffer = nullptr;
 
 };
 
