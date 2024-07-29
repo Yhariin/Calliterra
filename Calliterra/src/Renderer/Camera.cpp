@@ -29,7 +29,7 @@ Camera::Camera(float aspectRatio, float fov)
 }
 void Camera::OnSettingsUpdate(SettingsType type)
 {
-	m_Fov = GlobalSettings::Camera::Fov();
+	m_Fov = static_cast<float>(GlobalSettings::Camera::Fov());
 	SetProjection();
 	RecalculateViewProjectionMatrix();
 }

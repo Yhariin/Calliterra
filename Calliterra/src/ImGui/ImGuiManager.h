@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/DeltaTime.h"
 
 class ImGuiManager
 {
@@ -8,6 +9,7 @@ public:
 
 	static void Begin();
 	static void SettingsGui();
+	static void DebugGui(DeltaTime dt);
 	static void DemoWindow();
 	static void End();
 

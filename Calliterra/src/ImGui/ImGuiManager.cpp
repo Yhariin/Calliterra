@@ -51,6 +51,20 @@ void ImGuiManager::SettingsGui()
 	}
 }
 
+void ImGuiManager::DebugGui(DeltaTime dt)
+{
+	if (m_IsImGuiEnabled)
+	{
+		ImGui::SetNextWindowBgAlpha(0.35f);
+		ImGui::Begin("Debug Info");
+
+		ImGui::Text("FPS: %d", static_cast<int>(1 / dt.GetSeconds()));
+		ImGui::Text("Frame Time: %.3lf ms", dt.GetMilliseconds());
+
+		ImGui::End();
+	}
+}
+
 void ImGuiManager::DemoWindow()
 {
 	if (m_IsImGuiEnabled)
