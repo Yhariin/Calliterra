@@ -39,8 +39,8 @@ void Cube::InitRNG()
 
 void Cube::InitBuffers()
 {
-	s_VertexShader = Renderer::CreateShader("src/assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
-	s_PixelShader = Renderer::CreateShader("src/assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
+	s_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
+	s_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
 	s_VertexBuffer = Renderer::CreateVertexBuffer(m_CubeVertices, m_VERTEXCOUNT, s_VertexShader.get());
 	s_IndexBuffer = Renderer::CreateIndexBuffer(m_CubeIndices, m_INDEXCOUNT);
 

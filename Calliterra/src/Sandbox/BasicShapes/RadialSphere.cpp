@@ -111,8 +111,8 @@ void RadialSphere::CalculateSphere(const int longDiv, const int latDiv)
 
 void RadialSphere::InitBuffers()
 {
-	m_VertexShader = Renderer::CreateShader("src/assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
-	m_PixelShader = Renderer::CreateShader("src/assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
+	m_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
+	m_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
 	m_VertexBuffer = Renderer::CreateVertexBuffer(m_SphereVertices, static_cast<uint32_t>(m_SphereVertices.size()), m_VertexShader.get());
 	m_IndexBuffer = Renderer::CreateIndexBuffer(&m_SphereIndices[0], static_cast<uint32_t>(m_SphereIndices.size()));
 

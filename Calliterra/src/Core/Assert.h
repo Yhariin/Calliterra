@@ -5,12 +5,18 @@
 	#define ENABLE_ASSERTS
 	#include <winerror.h>
 	#include <comdef.h>
-		//_com_error err(hr);
-		//LPCTSTR errMsg = err.ErrorMessage();
-		//LOG_ERROR(errMsg);
+
 #else
 	#define DEBUGBREAK()
 #endif
+
+#if defined DEBUG || RELEASE
+	// Strips the function from non-debug builds
+	#define STRIP_DEBUG(x) x
+#else
+	#define STRIP_DEBUG(x)
+#endif
+
 
 #ifdef ENABLE_ASSERTS
 	#define EXPAND(x) x
@@ -30,7 +36,7 @@
 	#define INTERNAL_ASSERT_HR_GET_MACRO_NAME(arg1, arg2, macro, ...) macro
 	#define INTERNAL_ASSERT_HR_GET_MACRO(...) EXPAND( INTERNAL_ASSERT_HR_GET_MACRO_NAME(__VA_ARGS__, INTERNAL_ASSERT_HR_WITH_MSG, INTERNAL_ASSERT_HR_NO_MSG) )
 
-	// These are the assert macros you should be using
+	// =======================These are the assert macros you should be using==================================
 	#define ASSERT(...) EXPAND( INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__)(__VA_ARGS__) )
 
 	// Use ASSERT_VERIFY if you want to test a function inside the assert

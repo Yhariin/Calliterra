@@ -64,8 +64,8 @@ void Plane::CalculatePlane(uint32_t resolution)
 
 void Plane::InitBuffers()
 {
-	m_VertexShader = Renderer::CreateShader("src/assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
-	m_PixelShader = Renderer::CreateShader("src/assets/shaders/PlaneFlatPS.hlsl", Shader::PIXEL_SHADER);
+	m_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
+	m_PixelShader = Renderer::CreateShader("assets/shaders/PlaneFlatPS.hlsl", Shader::PIXEL_SHADER);
 	m_VertexBuffer = Renderer::CreateVertexBuffer(m_PlaneVertices, static_cast<uint32_t>(m_PlaneVertices.size()), m_VertexShader.get());
 	m_IndexBuffer = Renderer::CreateIndexBuffer(&m_PlaneIndices[0], static_cast<uint32_t>(m_PlaneIndices.size()));
 

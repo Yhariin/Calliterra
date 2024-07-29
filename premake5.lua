@@ -65,17 +65,17 @@ project (PROJECT_NAME)
 
 
     filter "configurations:Release"
-        defines { "NDEBUG" }
-        kind "WindowedApp"
-        entrypoint "mainCRTStartup"
-        runtime "Release"
+        defines { "RELEASE" }
+        kind "ConsoleApp"
+        runtime "Debug"
         symbols "On"
         optimize "On"
 
     filter "configurations:Distribution"
-        defines { "NDEBUG" }
+        defines { "NDEBUG", "DISTRIBUTION" }
         kind "WindowedApp"
         entrypoint "mainCRTStartup"
         runtime "Release"
         symbols "Off"
         optimize "Full"
+        postbuildcommands { "{COPYDIR} %[%{prj.location}/assets] %[bin/%{outputdir}/%{PROJECT_NAME}/assets]" }
