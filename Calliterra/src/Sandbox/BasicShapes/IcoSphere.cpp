@@ -34,9 +34,8 @@ void IcoSphere::Update(DX::XMMATRIX transform)
 // http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 void IcoSphere::CalculateSphere(const int resolution)
 {
-
 	// Create vertices of Icosahedron
-	float t = (1.0f + sqrt(5.0)) / 2.0;
+	float t = (1.0f + sqrt(5.0f)) / 2.0f;
 
 	AddVertex(DX::XMFLOAT3(-1, t, 0));
 	AddVertex(DX::XMFLOAT3(1, t, 0));
@@ -141,6 +140,6 @@ int IcoSphere::AddVertex(DX::XMFLOAT3 point)
 		point.x / length,
 		point.y / length,
 		point.z / length));
-	return m_SphereVertices.size()-1;
+	return static_cast<int>(m_SphereVertices.size()-1);
 
 }

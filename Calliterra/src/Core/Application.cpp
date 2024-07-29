@@ -69,8 +69,9 @@ void Application::Run()
 
 
 		ImGuiManager::Begin();
-		//ImGuiManager::DemoWindow();
-		ImGuiManager::SettingsGui();
+		ImGuiManager::DemoWindow();
+		//ImGuiManager::SettingsGui();
+		//ImGuiManager::DebugGui(m_DeltaTime);
 		ImGuiManager::End();
 
 

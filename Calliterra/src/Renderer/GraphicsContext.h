@@ -13,6 +13,7 @@ public:
 	virtual void Clear() = 0;
 	virtual void SetClearColor(float r, float g, float b, float a = 1.f) = 0;
 
+	virtual void ToggleFullscreen() = 0;
 	virtual void ToggleWireFrame() = 0;
 	static std::shared_ptr<GraphicsContext> Create(void* window, WindowProps& windowProps);
 };

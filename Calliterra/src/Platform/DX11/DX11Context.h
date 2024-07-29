@@ -34,6 +34,7 @@ public:
 
 	void OnSettingsUpdate(SettingsType type) override;
 
+	void ToggleFullscreen() override;
 	void ToggleWireFrame() override;
 
 	void DrawIndexed(uint32_t indexCount);

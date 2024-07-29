@@ -5,6 +5,7 @@
 #include "Events/ApplicationEvents.h"
 #include "Events/KeyEvents.h"
 #include "Events/MouseEvents.h"
+#include <comdef.h>
 
 Window::Window(const WindowProps& windowProps)
 	: m_hInstance(GetModuleHandle(nullptr)), // Gets the instance handle of the current module
@@ -21,21 +22,24 @@ Window::Window(const WindowProps& windowProps)
 
 	RegisterClass(&wndClass);
 
-	DWORD style = WS_CAPTION | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+	DWORD style = WS_SYSMENU | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_VISIBLE;
 
 	// Calculate center of screen to place window
 	int centerScreenX = GetSystemMetrics(SM_CXSCREEN) / 2 - windowProps.Width / 2;
 	int centerScreenY = GetSystemMetrics(SM_CYSCREEN) / 2 - windowProps.Height / 2;
 
+	m_WindowProps.PosX = centerScreenX;
+	m_WindowProps.PosY = centerScreenY;
+
 	// Calculate the required size of the window rectangle based on desired client area size
 	RECT windowRegion = { centerScreenX, centerScreenY, centerScreenX + windowProps.Width, centerScreenY + windowProps.Height };
-	AdjustWindowRectEx(&windowRegion, style, FALSE, 0);
+	AdjustWindowRectEx(&windowRegion, WINDOWED_STYLE, FALSE, 0);
 
 	m_hWnd = CreateWindowEx(
 		0,
 		m_CLASSNAME,
 		m_CLASSNAME,
-		style,
+		WINDOWED_STYLE,
 		windowRegion.left,
 		windowRegion.top,
 		windowRegion.right - windowRegion.left, // Adjusted width
@@ -64,7 +68,7 @@ Window::Window(const WindowProps& windowProps)
 
 	m_Timer.SetCallback(lambda);
 
-	ShowWindow(m_hWnd, SW_SHOW);
+	//ShowWindow(m_hWnd, SW_SHOW);
 
 	ImGui_ImplWin32_Init(m_hWnd);
 
@@ -125,6 +129,8 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	static int wmMoveMessageCount = 0;
 	static uint16_t oldWindowWidth = m_WindowProps.Width;
 	static uint16_t oldWindowHeight = m_WindowProps.Height;
+	static uint16_t oldWindowPosX = m_WindowProps.PosX;
+	static uint16_t oldWindowPosY = m_WindowProps.PosY;
 
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
 	{
@@ -209,6 +215,12 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		}
 		else
 		{
+			RECT windowRect;
+			GetWindowRect(m_hWnd, &windowRect);
+
+			m_WindowProps.PosX = windowRect.left;
+			m_WindowProps.PosY = windowRect.top;
+
 			WindowResizeEvent event(m_WindowProps.Width, m_WindowProps.Height);
 			m_EventCallback(event);
 
@@ -225,20 +237,27 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		oldWindowHeight = m_WindowProps.Height;
 		break;
 	}
-	// Sent when the user releases the resize bars
+	// Sent when the user releases the resize bars or releases the title bar
 	case WM_EXITSIZEMOVE:
 	{
 		m_Resizing = false;
 
+		RECT windowRect;
+		GetWindowRect(m_hWnd, &windowRect);
+
+		m_WindowProps.PosX = windowRect.left;
+		m_WindowProps.PosY = windowRect.top;
+
 		// Only create a window resize event when the window size is different from when
 		// the user first grabbed the resize bars
-		if (oldWindowWidth == m_WindowProps.Width && oldWindowHeight == m_WindowProps.Height)
-			break;
+		if (oldWindowWidth != m_WindowProps.Width || oldWindowHeight != m_WindowProps.Height)
+		{
+			WindowResizeEvent event(m_WindowProps.Width, m_WindowProps.Height);
+			m_EventCallback(event);
 
-		WindowResizeEvent event(m_WindowProps.Width, m_WindowProps.Height);
-		m_EventCallback(event);
+			m_GraphicsContext->OnWindowResize();
 
-		m_GraphicsContext->OnWindowResize();
+		}
 
 		break;
 	}
@@ -270,6 +289,16 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		break;
 	}
 	// --------------- Keyboard Messages -------------- //
+	case WM_SYSCOMMAND:
+	{
+		// Disable the windows menu when pressing the alt key
+		if ((wParam & 0xFFF0) == SC_KEYMENU)
+		{
+			return S_OK;
+		}
+		
+		break;
+	}
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
 	{
@@ -286,6 +315,12 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		Input::OnKeyPressed(keycode);
 
 		Input::m_KeyRepeatCount[keycode]++;
+
+		if (Input::IsKeyPressed(VK_MENU) && Input::IsKeyPressed(VK_RETURN))
+		{
+			LOG_DEBUG("ALT ENTER");
+			ToggleFullscreen();
+		}
 
 		break;
 	}
@@ -581,9 +616,79 @@ void Window::FreeCursor()
 	ClipCursor(nullptr);
 }
 
+void Window::ToggleFullscreen()
+{
+	WindowState& state = m_WindowProps.WindowState;
+
+	if (state == WindowState::Fullscreen || state == WindowState::Borderless)
+	{
+		// In fullscreen mode, switch to windowed
+		if (state == WindowState::Fullscreen)
+		{
+			m_GraphicsContext->ToggleFullscreen();
+		}
+
+		// In Borderless mode, switch to windowed
+		SetWindowedState();
+
+		// Set state before calling SetWindowedState();
+	}
+	else // In windowed mode, switch to borderless
+	{
+
+			//m_GraphicsContext->ToggleFullscreen(); // Exclusive fullscreen
+			m_OldWindowProps = m_WindowProps;
+			SetBorderlessState(); // Borderless fullscreen
+	}
+}
+
+void Window::SetWindowedState()
+{
+	m_WindowProps.WindowState = WindowState::Windowed;
+	m_WindowProps.WindowStyle = WINDOWED_STYLE;
+
+	SetLastError(0);
+
+	SetWindowPos(m_hWnd, HWND_TOP, m_OldWindowProps.PosX, m_OldWindowProps.PosY, m_OldWindowProps.Width, m_OldWindowProps.Height, SWP_FRAMECHANGED);
+	SetWindowLongPtr(m_hWnd, GWL_STYLE, m_WindowProps.WindowStyle);
+}
+
+void Window::SetBorderlessState()
+{
+	m_WindowProps.WindowState = WindowState::Borderless;
+	m_WindowProps.WindowStyle = BORDERLESS_STYLE;
+
+	int width, height;
+	RECT monitorRect = {};
+	HMONITOR monitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+	for (int i = 0; i < m_MonitorRects.Monitors.size(); i++)
+	{
+		if (monitor == m_MonitorRects.Monitors[i].hMonitor)
+		{
+			monitorRect = m_MonitorRects.Monitors[i].MonitorRect;
+		}
+	}
+	GetMonitorRealResolution(monitor, &width, &height);
+
+	SetLastError(0);
+	SetWindowLongPtr(m_hWnd, GWL_STYLE, BORDERLESS_STYLE);
+	SetWindowPos(m_hWnd, HWND_TOP, monitorRect.left, monitorRect.top, width, height, SWP_FRAMECHANGED);
+}
+
 void Window::OnUpdate(DeltaTime dt)
 {
 	m_Timer.Update(dt);
 	ProcessMessages();
 	m_GraphicsContext->SwapBuffers();
+}
+// https://stackoverflow.com/a/74035135 
+void Window::GetMonitorRealResolution(HMONITOR monitor, int* pixelsWidth, int* pixelsHeight)
+{
+    MONITORINFOEX info = { sizeof(MONITORINFOEX) };
+    GetMonitorInfo(monitor, &info);
+    DEVMODE devmode = {};
+    devmode.dmSize = sizeof(DEVMODE);
+    EnumDisplaySettings(info.szDevice, ENUM_CURRENT_SETTINGS, &devmode);
+    *pixelsWidth = devmode.dmPelsWidth;
+    *pixelsHeight = devmode.dmPelsHeight;
 }

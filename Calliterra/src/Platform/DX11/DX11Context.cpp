@@ -187,7 +187,7 @@ void DX11Context::CreateSwapChain()
 	swapChainDesc.Scaling = DXGI_SCALING_NONE;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-	swapChainDesc.Flags = 0;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	ComPtr<IDXGIDevice2> dxgiDevice;
 	ASSERT_HR(m_Device->QueryInterface(__uuidof(IDXGIDevice2), (void**)&dxgiDevice));
@@ -205,6 +205,12 @@ void DX11Context::CreateSwapChain()
 		nullptr,
 		nullptr,
 		&m_SwapChain
+		)
+	);
+
+	ASSERT_HR(dxgiFactory->MakeWindowAssociation(
+		*m_Hwnd,
+		DXGI_MWA_NO_ALT_ENTER
 		)
 	);
 
@@ -277,7 +283,6 @@ void DX11Context::SetRenderViewport(float x, float y, float width, float height)
 void DX11Context::OnWindowResize() 
 {
 	//LOG_DEBUG("{0}, {1}", m_WindowProps.Width, m_WindowProps.Height);
-
 	ASSERT(m_DeviceContext);
 	ASSERT(m_Device);
 	ASSERT(m_SwapChain);
@@ -287,7 +292,7 @@ void DX11Context::OnWindowResize()
 	m_DepthStencilView.Reset();
 	m_DepthStencilBuffer.Reset();
 
-	m_SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	m_SwapChain->ResizeBuffers(2, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
 	CreateRenderTargetView();
 	CreateDepthStencilBuffer();
@@ -304,6 +309,34 @@ void DX11Context::CreateRasterizerState()
 	ASSERT_HR(m_Device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState));
 }
 
+void DX11Context::ToggleFullscreen()
+{
+	BOOL fullscreen;
+	ASSERT_HR(m_SwapChain->GetFullscreenState(&fullscreen, nullptr));
+
+	if (fullscreen)
+	{
+		ASSERT_HR(m_SwapChain->SetFullscreenState(FALSE, nullptr));
+	}
+	else
+	{
+		DXGI_MODE_DESC modeDesc;
+		ASSERT_HR(m_SwapChain->ResizeTarget(&modeDesc));
+
+		ASSERT_HR(m_SwapChain->SetFullscreenState(TRUE, nullptr));
+
+		ASSERT_HR(m_SwapChain->ResizeBuffers(
+			0, // 0 preserves the existing number of buffers
+			0,
+			0,
+			DXGI_FORMAT_UNKNOWN, // Preserves the existing format
+			DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+			)
+		);
+
+	}
+}
+
 void DX11Context::ToggleWireFrame()
 {
 	if (m_DX11ContextProps.FillMode == D3D11_FILL_SOLID)
@@ -318,4 +351,3 @@ void DX11Context::ToggleWireFrame()
 	}
 
 }
-
