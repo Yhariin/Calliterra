@@ -3,11 +3,9 @@
 
 int main(int argc, char** argv)
 {
-	Log::Init();
+	STRIP_DEBUG(Log::Init());
 
-	auto app = new Application();
+	Application app;
 
-	app->Run();
-
-	delete app;
+	app.Run();
 }
