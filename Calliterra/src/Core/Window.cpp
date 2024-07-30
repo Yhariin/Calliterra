@@ -180,6 +180,9 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		if (wmSizeMessageCount == 1)
 			break;
 
+		if (m_Resizing)
+			break;
+
 		if (wParam == SIZE_MINIMIZED)
 		{
 			m_Minimized = true;
