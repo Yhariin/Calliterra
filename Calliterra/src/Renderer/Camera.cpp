@@ -79,12 +79,6 @@ void Camera::OnEvent(Event& e)
 	dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent& e) { return this->OnWindowResize(e); });
 }
 
-void Camera::OnResize(float width, float height)
-{
-	m_AspectRatio = width / height;
-	SetProjection();
-}
-
 void Camera::SetProjection()
 {
 	m_ProjectionMatrix = DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(m_Fov), m_AspectRatio, m_Near, m_Far);
@@ -93,6 +87,8 @@ void Camera::SetProjection()
 bool Camera::OnWindowResize(WindowResizeEvent e)
 {
 	m_AspectRatio = static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight());
+	SetProjection();
+	RecalculateViewProjectionMatrix();
 	return true;
 }
 

@@ -12,8 +12,6 @@ public:
 	void OnUpdate(float dt);
 	void OnEvent(Event& e);
 
-	void OnResize(float width, float height);
-
 	void SetProjection();
 
 	const DX::XMMATRIX& GetProjectionMatrix() const { return m_ProjectionMatrix; }

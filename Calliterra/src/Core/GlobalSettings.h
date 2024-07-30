@@ -88,10 +88,6 @@ public:
 		}
 	}
 
-	//static bool IsWireFrame() { return Rendering::m_IsWireFrame; }
-	//static bool CullType() { return Rendering::m_CullType; }
-	//static int Fov() { return Camera::m_Fov; }
-
 private:
 	inline static std::unordered_map<SettingsType, std::list<SettingsSubscriber*>> m_SubscriberMap;
 };
