@@ -18,7 +18,7 @@ public:
 	const DX::XMMATRIX& GetViewMatrix() const { return m_ViewMatrix; }
 	const DX::XMMATRIX& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 private:
-	bool OnWindowResize(WindowResizeEvent e);
+	bool OnWindowResize(WindowResizeEvent& e);
 	void Translate(DX::XMFLOAT3 translation);
 	void Rotate(float dx, float dy);
 	void RecalculateViewProjectionMatrix();
