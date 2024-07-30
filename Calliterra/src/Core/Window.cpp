@@ -127,10 +127,8 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 {
 	static int wmSizeMessageCount = 0;
 	static int wmMoveMessageCount = 0;
-	static uint16_t oldWindowWidth = m_WindowProps.Width;
-	static uint16_t oldWindowHeight = m_WindowProps.Height;
-	static uint16_t oldWindowPosX = m_WindowProps.PosX;
-	static uint16_t oldWindowPosY = m_WindowProps.PosY;
+	static uint16_t oldWindowWidth;
+	static uint16_t oldWindowHeight;
 
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
 	{
@@ -154,21 +152,6 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		return 0;
 
 	// --------------- Window Events ---------------- //
-	case WM_MOVE:
-	{
-		// Upon window creation there is an initial WM_MOVE message.
-		// To prevent calling SwapBuffers() before our graphics context 
-		// is initialized we will break early if it's the frist WM_MOVE message.
-		wmMoveMessageCount++;
-		if (wmMoveMessageCount == 1)
-			break;
-
-		// Because Windows places the application into a different "mode" when
-		// the window is being moved, our renderer no longer updates during
-		// window movement. We'll defer the rendering here until control is given back.
-		m_GraphicsContext->SwapBuffers();
-		break;
-	}
 	case WM_ACTIVATE:
 	{
 
@@ -196,18 +179,6 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		wmSizeMessageCount++;
 		if (wmSizeMessageCount == 1)
 			break;
-
-		// Because Windows places the application into a different "mode" when
-		// the window is being resized, our renderer no longer updates during
-		// resizing. We'll defer the rendering here until control is given back.
-		// Additionally, if user is dragging the resize bars, then continuous WM_SIZE
-		// messages are sent. Resizing on each WM_SIZE is too slow so we will
-		// only resize once the user has let go of the resize bar
-		if (m_Resizing)
-		{
-			m_GraphicsContext->SwapBuffers();
-			break;
-		}
 
 		if (wParam == SIZE_MINIMIZED)
 		{
@@ -318,7 +289,6 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		if (Input::IsKeyPressed(VK_MENU) && Input::IsKeyPressed(VK_RETURN))
 		{
-			LOG_DEBUG("ALT ENTER");
 			ToggleFullscreen();
 		}
 
@@ -631,14 +601,14 @@ void Window::ToggleFullscreen()
 		// In Borderless mode, switch to windowed
 		SetWindowedState();
 
-		// Set state before calling SetWindowedState();
 	}
 	else // In windowed mode, switch to borderless
 	{
 
-			//m_GraphicsContext->ToggleFullscreen(); // Exclusive fullscreen
+			state = WindowState::Fullscreen;
 			m_OldWindowProps = m_WindowProps;
-			SetBorderlessState(); // Borderless fullscreen
+			m_GraphicsContext->ToggleFullscreen(); // Exclusive fullscreen
+			//SetBorderlessState(); // Borderless fullscreen
 	}
 }
 
@@ -681,6 +651,7 @@ void Window::OnUpdate(DeltaTime dt)
 	ProcessMessages();
 	m_GraphicsContext->SwapBuffers();
 }
+
 // https://stackoverflow.com/a/74035135 
 void Window::GetMonitorRealResolution(HMONITOR monitor, int* pixelsWidth, int* pixelsHeight)
 {

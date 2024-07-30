@@ -58,9 +58,7 @@ void Application::Run()
 		m_LastFrameTime = time;
 
 		// Clear previous frame
-		float angle = static_cast<float>(m_ApplicationTimer.GetElapsedInSeconds());
-		const float c = static_cast<float>(sin(m_ApplicationTimer.GetElapsedInSeconds()) / 2.0 + 0.5);
-		Renderer::SetClearColor(c * .5f, 0.5f, c);
+		Renderer::SetClearColor(0.7f, 0.7f, 1.0f);
 		Renderer::Clear();
 
 
@@ -69,9 +67,9 @@ void Application::Run()
 
 
 		ImGuiManager::Begin();
-		ImGuiManager::DemoWindow();
-		//ImGuiManager::SettingsGui();
-		//ImGuiManager::DebugGui(m_DeltaTime);
+		//ImGuiManager::DemoWindow();
+		ImGuiManager::SettingsGui();
+		ImGuiManager::DebugGui(m_DeltaTime);
 		ImGuiManager::End();
 
 

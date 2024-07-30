@@ -32,7 +32,7 @@ void Sandbox::OnEvent(Event& e)
 void Sandbox::LoadSandboxPreset()
 {
 	CreatePlane();
-	for(int i = 0; i < 20000; i++)
+	for(int i = 0; i < 50; i++)
 	{ 
 		CreateCube();
 	}

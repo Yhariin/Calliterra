@@ -1,17 +1,15 @@
 #pragma once
 #include <d3d11.h>
 #include <dxgi1_2.h>
-#include <wrl.h>
 #include <d3dcompiler.h>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
 
-#include "Core/Window.h"
 #include "Renderer/GraphicsContext.h"
+#include "Core/Window.h"
 #include "Core/GlobalSettings.h"
-
-using Microsoft::WRL::ComPtr;
+#include "DX11OutputDevices.h"
 
 struct DX11ContextProps
 {
@@ -53,6 +51,7 @@ private:
 private:
 	HWND* m_Hwnd;
 	WindowProps& m_WindowProps;
+	DX11OutputDevices m_OutputDevices;
 	ComPtr<ID3D11Device> m_Device;
 	ComPtr<IDXGISwapChain1> m_SwapChain;
 	ComPtr<ID3D11DeviceContext> m_DeviceContext;
