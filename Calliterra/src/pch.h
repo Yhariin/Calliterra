@@ -8,7 +8,9 @@
 
 #include <Windows.h>
 #include <DirectXMath.h>
+#include <wrl.h>
 namespace DX = DirectX;
+using Microsoft::WRL::ComPtr;
 
 #include <iostream>
 #include <memory>

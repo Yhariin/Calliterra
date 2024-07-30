@@ -7,7 +7,7 @@
 #include <backends/imgui_impl_dx11.cpp>
 
 DX11Context::DX11Context(HWND* hWnd, WindowProps& windowProps)
-	: m_Hwnd(hWnd), m_WindowProps(windowProps) 
+	: m_Hwnd(hWnd), m_WindowProps(windowProps)
 {
 	ASSERT(hWnd, "Window handle is null!");
 }
@@ -20,6 +20,8 @@ void DX11Context::Init()
 	CreateDepthStencilBuffer();
 	CreateRasterizerState();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
+
+	m_OutputDevices = DX11OutputDevices(m_Device);
 
 	ImGui_ImplDX11_Init(m_Device.Get(), m_DeviceContext.Get());
 
@@ -282,17 +284,15 @@ void DX11Context::SetRenderViewport(float x, float y, float width, float height)
 
 void DX11Context::OnWindowResize() 
 {
-	//LOG_DEBUG("{0}, {1}", m_WindowProps.Width, m_WindowProps.Height);
 	ASSERT(m_DeviceContext);
 	ASSERT(m_Device);
 	ASSERT(m_SwapChain);
 
-	//m_DeviceContext->OMSetRenderTargets(0, 0, 0);
 	m_RenderTargetView.Reset();
 	m_DepthStencilView.Reset();
 	m_DepthStencilBuffer.Reset();
 
-	m_SwapChain->ResizeBuffers(2, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	m_SwapChain->ResizeBuffers(2, 0, 0, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
 	CreateRenderTargetView();
 	CreateDepthStencilBuffer();
@@ -320,11 +320,25 @@ void DX11Context::ToggleFullscreen()
 	}
 	else
 	{
-		DXGI_MODE_DESC modeDesc;
+
+		DX11OutputDevice monitor = m_OutputDevices.GetCurrentWindowOutputDevice(*m_Hwnd);
+		ComPtr<IDXGIOutput> device = monitor.GetDevice();
+
+		DXGI_MODE_DESC modeDesc = {};
+		RECT desktopArea = monitor.GetDesktopArea();
+
+		modeDesc.Width = desktopArea.right - desktopArea.left;
+		modeDesc.Height = desktopArea.bottom - desktopArea.top;
+
+		ASSERT_HR(m_SwapChain->ResizeTarget(&modeDesc));
+	
+		ASSERT_HR(m_SwapChain->SetFullscreenState(TRUE, device.Get()));
+
 		ASSERT_HR(m_SwapChain->ResizeTarget(&modeDesc));
 
-		ASSERT_HR(m_SwapChain->SetFullscreenState(TRUE, nullptr));
-
+		m_RenderTargetView.Reset();
+		m_DepthStencilView.Reset();
+		m_DepthStencilBuffer.Reset();
 		ASSERT_HR(m_SwapChain->ResizeBuffers(
 			0, // 0 preserves the existing number of buffers
 			0,
@@ -334,6 +348,10 @@ void DX11Context::ToggleFullscreen()
 			)
 		);
 
+		CreateRenderTargetView();
+		CreateDepthStencilBuffer();
+
+		SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 	}
 }
 
