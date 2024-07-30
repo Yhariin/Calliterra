@@ -610,8 +610,8 @@ void Window::ToggleFullscreen()
 
 			state = WindowState::Fullscreen;
 			m_OldWindowProps = m_WindowProps;
-			m_GraphicsContext->ToggleFullscreen(); // Exclusive fullscreen
-			//SetBorderlessState(); // Borderless fullscreen
+			//m_GraphicsContext->ToggleFullscreen(); // Exclusive fullscreen
+			SetBorderlessState(); // Borderless fullscreen
 	}
 }
 

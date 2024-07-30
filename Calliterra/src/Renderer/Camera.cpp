@@ -84,7 +84,7 @@ void Camera::SetProjection()
 	m_ProjectionMatrix = DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(m_Fov), m_AspectRatio, m_Near, m_Far);
 }
 
-bool Camera::OnWindowResize(WindowResizeEvent e)
+bool Camera::OnWindowResize(WindowResizeEvent& e)
 {
 	m_AspectRatio = static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight());
 	SetProjection();

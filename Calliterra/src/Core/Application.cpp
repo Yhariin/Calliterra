@@ -29,6 +29,7 @@ Application::Application()
 	Renderer::Init(m_Window->GetGraphicsContext());
 
 	m_Sandbox = std::make_unique<Sandbox>(m_Window->GetWindowProps().AspectRatio);
+	m_ImGui.SetWindowSize(static_cast<float>(m_Window->GetWindowProps().Width), static_cast<float>(m_Window->GetWindowProps().Height));
 }
 
 Application::~Application()
@@ -44,6 +45,7 @@ void Application::OnEvent(Event& e)
 	dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { return this->OnKeyPressed(e); });
 
 	m_Sandbox->OnEvent(e);
+	m_ImGui.OnEvent(e);
 	//LOG_INFO(e.ToString());
 }
 
@@ -66,11 +68,11 @@ void Application::Run()
 		m_Sandbox->OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
 
 
-		ImGuiManager::Begin();
-		//ImGuiManager::DemoWindow();
-		ImGuiManager::SettingsGui();
-		ImGuiManager::DebugGui(m_DeltaTime);
-		ImGuiManager::End();
+		m_ImGui.Begin();
+		//m_ImGui.DemoWindow();
+		m_ImGui.SettingsGui();
+		m_ImGui.DebugGui(m_DeltaTime);
+		m_ImGui.End();
 
 
 		m_Window->OnUpdate(m_DeltaTime);
@@ -93,13 +95,13 @@ bool Application::OnKeyPressed(KeyPressedEvent& e)
 		{
 			Input::DisableMouseRawInput();
 			Input::EnableMousePositionInput();
-			ImGuiManager::EnableImGui();
+			m_ImGui.EnableImGui();
 		}
 		else
 		{
 			Input::EnableMouseRawInput();
 			Input::DisableMousePositionInput();
-			ImGuiManager::DisableImGui();
+			m_ImGui.DisableImGui();
 		}
 		
 	}

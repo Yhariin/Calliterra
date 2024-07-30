@@ -1,5 +1,7 @@
 #pragma once
 #include "Core/DeltaTime.h"
+#include "Events/Event.h"
+#include "Events/ApplicationEvents.h"
 
 class ImGuiManager
 {
@@ -7,17 +9,23 @@ public:
 	ImGuiManager();
 	~ImGuiManager();
 
-	static void Begin();
-	static void SettingsGui();
-	static void DebugGui(DeltaTime dt);
-	static void DemoWindow();
-	static void End();
+	void Begin();
+	void SettingsGui();
+	void DebugGui(DeltaTime dt);
+	void DemoWindow();
+	void End();
 
-	static void EnableImGui();
-	static void DisableImGui();
-	static bool IsImGuiEnabled();
+	void OnEvent(Event& e);
+	bool OnWindowResize(WindowResizeEvent& e);
+
+	void SetWindowSize(float width, float height);
+	void EnableImGui();
+	void DisableImGui();
+	bool IsImGuiEnabled();
 
 private:
-	inline static bool m_IsImGuiEnabled = false;
+	bool m_IsImGuiEnabled = false;
+	float m_WindowWidth;
+	float m_WindowHeight;
 };
 
