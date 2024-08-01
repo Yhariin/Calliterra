@@ -4,6 +4,7 @@
 #include "Sandbox/BasicShapes/RadialSphere.h"
 #include "Sandbox/BasicShapes/IcoSphere.h"
 #include "Sandbox/BasicShapes/Plane.h"
+#include "Sandbox/Components/PointLight.h"
 
 Sandbox::Sandbox(float aspectRatio)
 	: m_Camera(aspectRatio, 90.f)
@@ -32,11 +33,11 @@ void Sandbox::OnEvent(Event& e)
 void Sandbox::LoadSandboxPreset()
 {
 	CreatePlane();
-	for(int i = 0; i < 50; i++)
+	for(int i = 0; i < 300; i++)
 	{ 
 		CreateCube();
 	}
-	CreateIcoSphere();
+	CreatePointLight();
 }
 
 void Sandbox::CreateCube()
@@ -62,4 +63,9 @@ void Sandbox::CreatePlane()
 		DX::XMMatrixTranslation(-0.5f, 0.0f, -0.5f) *
 		DX::XMMatrixScaling(100.f, 1.f, 100.f)
 	);
+}
+
+void Sandbox::CreatePointLight()
+{
+	m_Drawables.emplace_back(std::make_unique<PointLight>(DX::XMMatrixTranslation(0.f, 20.f, 10.f), DX::XMFLOAT3(1.f, 1.f, 1.f) ));
 }

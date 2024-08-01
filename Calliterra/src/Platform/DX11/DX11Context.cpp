@@ -257,7 +257,7 @@ void DX11Context::CreateDepthStencilBuffer()
 	D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc = {};
 	depthStencilStateDesc.DepthEnable = true;
 	depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
 	ASSERT_HR(m_Device->CreateDepthStencilState(&depthStencilStateDesc, &m_DepthStencilState));
 }
@@ -321,11 +321,11 @@ void DX11Context::ToggleFullscreen()
 	else
 	{
 
-		DX11OutputDevice monitor = m_OutputDevices.GetCurrentWindowOutputDevice(*m_Hwnd);
-		ComPtr<IDXGIOutput> device = monitor.GetDevice();
+		DX11OutputDevice* monitor = m_OutputDevices.GetCurrentWindowOutputDevice(*m_Hwnd);
+		ComPtr<IDXGIOutput> device = monitor->GetDevice();
 
 		DXGI_MODE_DESC modeDesc = {};
-		RECT desktopArea = monitor.GetDesktopArea();
+		RECT desktopArea = monitor->GetDesktopArea();
 
 		modeDesc.Width = desktopArea.right - desktopArea.left;
 		modeDesc.Height = desktopArea.bottom - desktopArea.top;

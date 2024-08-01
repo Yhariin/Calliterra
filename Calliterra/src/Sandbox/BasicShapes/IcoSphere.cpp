@@ -1,14 +1,8 @@
 #include "pch.h"
 #include "IcoSphere.h"
 
-IcoSphere::IcoSphere(const int resolution)
-{
-	CalculateSphere(resolution);
-	InitBuffers();
-}
-
-IcoSphere::IcoSphere(const int resolution, DX::XMMATRIX transform)
-	: Drawable(transform)
+IcoSphere::IcoSphere(const int resolution, DX::XMMATRIX transform, DX::XMFLOAT3 color)
+	: Drawable(transform, color)
 {
 	CalculateSphere(resolution);
 	InitBuffers();
@@ -116,8 +110,27 @@ int IcoSphere::GetMidPoint(uint32_t p1, uint32_t p2)
 
 void IcoSphere::InitBuffers()
 {
-	m_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
-	m_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
+	if(DX::XMVector3Equal(DX::XMLoadFloat3(&m_FlatColor), {-1.f, -1.f, -1.f}))
+	{ 
+		m_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
+		m_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
+
+		m_VertexShader->Bind();
+		m_PixelShader->Bind();
+
+		m_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
+	}
+	else
+	{
+		m_VertexShader = Renderer::CreateShader("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
+		m_PixelShader = Renderer::CreateShader("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
+
+		m_VertexShader->Bind();
+		m_PixelShader->Bind();
+
+		m_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, DX::XMFLOAT4(m_FlatColor.x, m_FlatColor.y, m_FlatColor.z, 1.f));
+	}
+
 	m_VertexBuffer = Renderer::CreateVertexBuffer(m_SphereVertices, static_cast<uint32_t>(m_SphereVertices.size()), m_VertexShader.get());
 	m_IndexBuffer = Renderer::CreateIndexBuffer(&m_SphereIndices[0], static_cast<uint32_t>(m_SphereIndices.size()));
 
@@ -130,7 +143,6 @@ void IcoSphere::InitBuffers()
 	m_VertexBuffer->SetLayout();
 
 	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
-	m_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
 }
 
 int IcoSphere::AddVertex(DX::XMFLOAT3 point)

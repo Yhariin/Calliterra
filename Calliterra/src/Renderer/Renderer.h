@@ -62,7 +62,7 @@ public:
 	static std::shared_ptr<Shader> CreateShader(const std::string& filepath, Shader::ShaderType type);
 
 	template<typename Type>
-	static std::shared_ptr<ConstantBuffer> CreateConstantBuffer(Shader::ShaderType shaderType, const Type& constants)
+	static std::shared_ptr<ConstantBuffer> CreateConstantBuffer(Shader::ShaderType shaderType, const Type& constants, uint32_t slot = 0)
 	{
 		switch (GetAPI())
 		{
@@ -77,17 +77,17 @@ public:
 				ASSERT(false, "Shader type unknown!");
 				break;
 			case Shader::VERTEX_SHADER:
-				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
 			case Shader::PIXEL_SHADER:
-				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
 			case Shader::COMPUTE_SHADER:
-				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
 			case Shader::GEOMETRY_SHADER:
-				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
 			case Shader::HULL_SHADER:
-				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
 			case Shader::DOMAIN_SHADER:
-				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants);
+				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
 			}
 
 		}
@@ -99,7 +99,7 @@ public:
 	}
 
 	template<typename Type>
-	static std::shared_ptr<ConstantBuffer> CreateConstantBuffer(Shader::ShaderType shaderType)
+	static std::shared_ptr<ConstantBuffer> CreateConstantBuffer(Shader::ShaderType shaderType, uint32_t slot = 0)
 	{
 		switch (GetAPI())
 		{
@@ -114,17 +114,17 @@ public:
 				ASSERT(false, "Shader type unknown!");
 				break;
 			case Shader::VERTEX_SHADER:
-				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()));
+				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
 			case Shader::PIXEL_SHADER:
-				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()));
+				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
 			case Shader::COMPUTE_SHADER:
-				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()));
+				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
 			case Shader::GEOMETRY_SHADER:
-				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()));
+				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
 			case Shader::HULL_SHADER:
-				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()));
+				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
 			case Shader::DOMAIN_SHADER:
-				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()));
+				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
 			}
 		}
 

@@ -23,7 +23,6 @@ DX11IndexBuffer::DX11IndexBuffer(const DX11Context& context, const uint32_t* ind
 		)
 	);
 
-	LOG_INFO("Index Buffer Created");
 
 }
 

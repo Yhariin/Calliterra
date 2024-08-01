@@ -4,8 +4,7 @@
 class IcoSphere : public Drawable
 {
 public:
-	IcoSphere(const int resolution);
-	IcoSphere(const int resolution, DX::XMMATRIX transform);
+	IcoSphere(const int resolution, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = DX::XMFLOAT3(-1.f, -1.f, -1.f));
 	
 	void Draw() override;
 

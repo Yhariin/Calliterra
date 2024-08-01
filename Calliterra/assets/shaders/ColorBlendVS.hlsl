@@ -13,12 +13,13 @@ struct VSOut
 cbuffer CBuf
 {
     matrix transform;
+    matrix modelViewProj;
 };
 
 VSOut main( VSIn vIn )
 {
     VSOut vOut;
-    vOut.Pos = mul(float4(vIn.Position, 1.0f), transform);
+    vOut.Pos = mul(float4(vIn.Position, 1.0f), modelViewProj);
     vOut.Color = vIn.Color;
 	return vOut;
 }

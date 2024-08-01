@@ -18,6 +18,7 @@ public:
 	void CreateRadialSphere();
 	void CreateIcoSphere();
 	void CreatePlane();
+	void CreatePointLight();
 
 private:
 	std::vector<std::unique_ptr<Drawable>> m_Drawables;

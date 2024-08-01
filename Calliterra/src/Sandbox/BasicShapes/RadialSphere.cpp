@@ -1,14 +1,8 @@
 #include "pch.h"
 #include "RadialSphere.h"
 
-RadialSphere::RadialSphere(const int latDiv, const int longDiv)
-{
-	CalculateSphere(latDiv, longDiv);
-	InitBuffers();
-}
-
-RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX transform)
-	: Drawable(transform)
+RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX transform, DX::XMFLOAT3 color)
+	: Drawable(transform, color)
 {
 	CalculateSphere(latDiv, longDiv);
 	InitBuffers();

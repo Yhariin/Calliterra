@@ -5,7 +5,8 @@ enum class SettingsType
 	None = 0,
 	IsWireFrame,
 	CullMode,
-	Fov
+	Fov,
+	PointLightPosition
 
 };
 
@@ -40,9 +41,11 @@ public:
 
 		static bool IsWireFrame() { return m_IsWireFrame; }
 		static int CullType() { return m_CullType; }
+		static DX::XMFLOAT3 LightPos() { return DX::XMFLOAT3(m_LightPos[0], m_LightPos[1], m_LightPos[2]); }
 	private:
 		inline static bool m_IsWireFrame = false;
 		inline static int m_CullType = CullBack;
+		inline static float m_LightPos[3] = {0.f, 20.f, 10.f};
 	};
 
 	struct Camera

@@ -50,6 +50,7 @@ void ImGuiManager::SettingsGui()
 			GlobalSettings::Notify(ImGui::RadioButton("None", &GlobalSettings::Rendering::m_CullType, 0), SettingsType::CullMode); ImGui::SameLine();
 			GlobalSettings::Notify(ImGui::RadioButton("Front", &GlobalSettings::Rendering::m_CullType, 1), SettingsType::CullMode); ImGui::SameLine();
 			GlobalSettings::Notify(ImGui::RadioButton("Back", &GlobalSettings::Rendering::m_CullType, 2), SettingsType::CullMode);
+			GlobalSettings::Notify(ImGui::SliderFloat3("LightPos", GlobalSettings::Rendering::m_LightPos, -30.f, 30.f), SettingsType::PointLightPosition);
 
 		}
 		ImGui::End();
