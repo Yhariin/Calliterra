@@ -7,8 +7,8 @@ public:
 	Drawable() = default;
 	virtual ~Drawable() = default;
 
-	Drawable(DX::XMMATRIX transform)
-		: m_Transform(transform)
+	Drawable(DX::XMMATRIX transform, DX::XMFLOAT3 color)
+		: m_Transform(transform), m_FlatColor(color)
 	{
 	}
 
@@ -17,7 +17,7 @@ public:
 	virtual void Update(DX::XMMATRIX transform) = 0;
 	virtual void Update(float dt) = 0;
 
-	void SetViewProjectionMatrix(DX::XMMATRIX transform) { m_ViewProjectionMatrix = transform; }
+	virtual void SetViewProjectionMatrix(DX::XMMATRIX transform) { m_ViewProjectionMatrix = transform; }
 
 	DX::XMMATRIX GetTransform() { return m_Transform; }
 
@@ -54,4 +54,5 @@ protected:
 
 	DX::XMMATRIX m_Transform;
 	DX::XMMATRIX m_ViewProjectionMatrix;
+	DX::XMFLOAT3 m_FlatColor;
 };

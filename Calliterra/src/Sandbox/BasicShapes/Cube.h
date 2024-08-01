@@ -4,8 +4,7 @@
 class Cube : public Drawable
 {
 public:
-	Cube();
-	Cube(DX::XMMATRIX transform);
+	Cube(DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
     
 	void InitRNG();
 	static void InitBuffers();
@@ -14,6 +13,8 @@ public:
 	void Update(float dt) override;
 
 	void Draw() override;
+private:
+	static void CalculateNormals();
 private:
 	// Positional
 	float m_R;
@@ -34,17 +35,58 @@ private:
 	inline static const uint32_t m_VERTEXCOUNT= 8 * 3 * 3;
 	inline static const uint32_t m_INDEXCOUNT = 36;
 
-	//inline static const float m_CubeVertices[m_VERTEXCOUNT] =
+	struct CubeVertex
+	{
+		DX::XMFLOAT3 Position;
+		DX::XMFLOAT3 Normal;
+	};
+
+	struct CubeTransformConstantBuffer
+	{
+		DX::XMMATRIX Model;
+		DX::XMMATRIX ModelViewProj;
+	};
+
+	inline static constexpr float side = 1.0f / 2.f;
 	inline static const std::vector<float> m_CubeVertices =
 	{
-		-1.0f, -1.0f, -1.0f, 
-		 1.0f, -1.0f, -1.0f, 
-		-1.0f,  1.0f, -1.0f, 
-		 1.0f,  1.0f, -1.0f, 
-		-1.0f, -1.0f,  1.0f, 
-		 1.0f, -1.0f,  1.0f, 
-		-1.0f,  1.0f,  1.0f, 
-		 1.0f,  1.0f,  1.0f 
+		-side, -side, -side, 
+		 side, -side, -side, 
+		-side,  side, -side, 
+		 side,  side, -side, 
+		-side, -side,  side, 
+		 side, -side,  side, 
+		-side,  side,  side, 
+		 side,  side,  side 
+	};
+
+	inline static std::vector<CubeVertex> m_IndependentCubeVertices =
+	{
+		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }},
+		{{  side, -side, -side }, { 0.f, 0.f, 0.f }},
+		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }},
+		{{  side,  side, -side }, { 0.f, 0.f, 0.f }},
+		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }},
+		{{  side, -side,  side }, { 0.f, 0.f, 0.f }},
+		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }},
+		{{  side,  side,  side }, { 0.f, 0.f, 0.f }},
+		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }},
+		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }},
+		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }},
+		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }},
+		{{  side, -side, -side }, { 0.f, 0.f, 0.f }},
+		{{  side,  side, -side }, { 0.f, 0.f, 0.f }},
+		{{  side, -side,  side }, { 0.f, 0.f, 0.f }},
+		{{  side,  side,  side }, { 0.f, 0.f, 0.f }},
+		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }},
+		{{  side, -side, -side }, { 0.f, 0.f, 0.f }},
+		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }},
+		{{  side, -side,  side }, { 0.f, 0.f, 0.f }},
+		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }},
+		{{  side,  side, -side }, { 0.f, 0.f, 0.f }},
+		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }},
+		{{  side,  side,  side }, { 0.f, 0.f, 0.f }},
+
 	};
 
 	inline static uint32_t m_CubeIndices[m_INDEXCOUNT] =
@@ -55,6 +97,16 @@ private:
 		4,5,7, 4,7,6,
 		0,4,2, 2,4,6,
 		0,1,4, 1,5,4
+	};
+
+	inline static uint32_t m_IndependentCubeIndices[] =
+	{
+		 0, 2, 1,  2, 3, 1,
+		 4, 5, 7,  4, 7, 6,
+		 8,10, 9, 10,11, 9,
+		12,13,15, 12,15,14,
+		16,17,18, 18,17,19,
+		20,23,21, 20,22,23
 	};
 
 	inline static std::shared_ptr<Shader> s_VertexShader = nullptr;

@@ -30,7 +30,7 @@ public:
 	DX11OutputDevices() = default;
 	DX11OutputDevices(ComPtr<ID3D11Device> Device);
 
-	DX11OutputDevice& GetCurrentWindowOutputDevice(HWND hWnd);
+	DX11OutputDevice* GetCurrentWindowOutputDevice(HWND hWnd);
 
 private:
 	std::vector<DX11OutputDevice> m_OutputDevices;

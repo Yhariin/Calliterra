@@ -37,27 +37,21 @@ DX11Shader::DX11Shader(DX11Context& context, const std::string& filepath, Shader
 	{
 	case VERTEX_SHADER:
 		ASSERT_HR(m_DX11Context.GetDevice().CreateVertexShader(m_CompiledShader->GetBufferPointer(), m_CompiledShader->GetBufferSize(), nullptr, &m_VertexShader));
-		LOG_INFO("Vertex Shader Created");
 		break;
 	case PIXEL_SHADER:
 		ASSERT_HR(m_DX11Context.GetDevice().CreatePixelShader(m_CompiledShader->GetBufferPointer(), m_CompiledShader->GetBufferSize(), nullptr, &m_PixelShader));
-		LOG_INFO("Pixel Shader Created");
 		break;
 	case COMPUTE_SHADER:
 		ASSERT_HR(m_DX11Context.GetDevice().CreateComputeShader(m_CompiledShader->GetBufferPointer(), m_CompiledShader->GetBufferSize(), nullptr, &m_ComputeShader));
-		LOG_INFO("Compute Shader Created");
 		break;
 	case GEOMETRY_SHADER:
 		ASSERT_HR(m_DX11Context.GetDevice().CreateGeometryShader(m_CompiledShader->GetBufferPointer(), m_CompiledShader->GetBufferSize(), nullptr, &m_GeometryShader));
-		LOG_INFO("Geometry Shader Created");
 		break;
 	case HULL_SHADER:
 		ASSERT_HR(m_DX11Context.GetDevice().CreateHullShader(m_CompiledShader->GetBufferPointer(), m_CompiledShader->GetBufferSize(), nullptr, &m_HullShader));
-		LOG_INFO("Hull Shader Created");
 		break;
 	case DOMAIN_SHADER:
 		ASSERT_HR(m_DX11Context.GetDevice().CreateDomainShader(m_CompiledShader->GetBufferPointer(), m_CompiledShader->GetBufferSize(), nullptr, &m_DomainShader));
-		LOG_INFO("Domain Shader Created");
 		break;
 	default:
 		ASSERT(false, "Unknown shader type");

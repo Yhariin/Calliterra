@@ -1,13 +1,8 @@
 #include "pch.h"
 #include "Cube.h"
 
-Cube::Cube()
-{
-	InitRNG();
-}
-
-Cube::Cube(DX::XMMATRIX transform)
-	: Drawable(transform)
+Cube::Cube(DX::XMMATRIX transform, DX::XMFLOAT3 color)
+	: Drawable(transform, color)
 { 
 	InitRNG();
 }
@@ -39,21 +34,23 @@ void Cube::InitRNG()
 
 void Cube::InitBuffers()
 {
-	s_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
-	s_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
-	s_VertexBuffer = Renderer::CreateVertexBuffer(m_CubeVertices, m_VERTEXCOUNT, s_VertexShader.get());
-	s_IndexBuffer = Renderer::CreateIndexBuffer(m_CubeIndices, m_INDEXCOUNT);
+	CalculateNormals();
+	s_VertexShader = Renderer::CreateShader("assets/shaders/PhongVS.hlsl", Shader::VERTEX_SHADER);
+	s_PixelShader = Renderer::CreateShader("assets/shaders/PhongPS.hlsl", Shader::PIXEL_SHADER);
+	s_VertexBuffer = Renderer::CreateVertexBuffer(m_IndependentCubeVertices, static_cast<uint32_t>(m_IndependentCubeVertices.size()), s_VertexShader.get());
+	s_IndexBuffer = Renderer::CreateIndexBuffer(m_IndependentCubeIndices, m_INDEXCOUNT);
 
 	s_VertexShader->Bind();
 	s_PixelShader->Bind();
 
 	s_VertexBuffer->CreateLayout({
 		{"POSITION", 0, ShaderDataType::Float3},
+		{"NORMAL", 0, ShaderDataType::Float3},
 		});
 	s_VertexBuffer->SetLayout();
 		
-	s_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
-	s_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
+	s_TransformConstantBuffer = Renderer::CreateConstantBuffer<CubeTransformConstantBuffer>(Shader::VERTEX_SHADER);
+	s_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, {0.7f, 0.7f, 0.9f, 0.0f}, 1);
 
 }
 
@@ -64,6 +61,8 @@ void Cube::Update(DX::XMMATRIX transform)
 
 void Cube::Update(float dt)
 {
+	dt *= 0.5;
+
 	m_Roll += m_dRoll * dt;
 	m_Pitch += m_dPitch * dt;
 	m_Yaw += m_dYaw * dt;
@@ -72,7 +71,6 @@ void Cube::Update(float dt)
 	m_Chi += m_dChi * dt;
 
 	m_Transform =
-		//DX::XMMatrixTranslation(0.f, 20.f, 0.f) *
 		DX::XMMatrixRotationRollPitchYaw(m_Pitch, m_Yaw, m_Roll) *
 		DX::XMMatrixTranslation(m_R, 0.f, 0.f) *
 		DX::XMMatrixRotationRollPitchYaw(m_Theta, m_Phi, m_Chi) * 
@@ -81,8 +79,30 @@ void Cube::Update(float dt)
 
 void Cube::Draw()
 {
-	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix));
+	CubeTransformConstantBuffer cb = { DX::XMMatrixTranspose(m_Transform), DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix) };
+
+	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, cb);
 	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_TransformConstantBuffer, s_ColorConstantBuffer });
 	Renderer::Draw();
 
+}
+
+void Cube::CalculateNormals()
+{
+	using namespace DirectX; // For some reason we need to include this line in order to use the XMMath overloaded operators...
+	for (int i = 0; i < m_IndependentCubeVertices.size(); i += 3)
+	{
+		CubeVertex& v0 = m_IndependentCubeVertices[m_IndependentCubeIndices[i]];
+		CubeVertex& v1 = m_IndependentCubeVertices[m_IndependentCubeIndices[i+1]];
+		CubeVertex& v2 = m_IndependentCubeVertices[m_IndependentCubeIndices[i+2]];
+		const XMVECTOR p0 = XMLoadFloat3(&v0.Position);
+		const XMVECTOR p1 = XMLoadFloat3(&v1.Position);
+		const XMVECTOR p2 = XMLoadFloat3(&v2.Position);
+
+		const XMVECTOR normal = XMVector3Normalize(XMVector3Cross( (p1 - p0), (p2 - p0)) );
+
+		XMStoreFloat3(&v0.Normal, normal);
+		XMStoreFloat3(&v1.Normal, normal);
+		XMStoreFloat3(&v2.Normal, normal);
+	}
 }

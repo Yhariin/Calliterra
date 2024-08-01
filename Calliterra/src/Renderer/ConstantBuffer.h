@@ -4,5 +4,5 @@ class ConstantBuffer
 {
 public:
 	virtual ~ConstantBuffer() = default;
-	virtual void Bind() = 0;
+	virtual void Bind(std::optional<uint32_t> slot) = 0;
 };

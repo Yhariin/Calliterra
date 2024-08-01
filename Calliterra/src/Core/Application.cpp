@@ -12,8 +12,8 @@ Application::Application()
 	ASSERT(!s_Instance, "Application already exists!");
 	s_Instance = this;
 
-	Timer::SetApplicationTimer(&m_ApplicationTimer);
-	m_ApplicationTimer.Reset();
+	Timer::SetApplicationTimer(&s_ApplicationTimer);
+	s_ApplicationTimer.Reset();
 
 	// Create Window here
 	m_Window = std::make_unique<Window>();
@@ -56,26 +56,26 @@ void Application::Run()
 	{
 		// Calculate deltaTime
 		double time = DeltaTime::GetCurrentTimeMicroseconds();
-		m_DeltaTime = time - m_LastFrameTime;
+		s_DeltaTime = time - m_LastFrameTime;
 		m_LastFrameTime = time;
 
 		// Clear previous frame
-		Renderer::SetClearColor(0.7f, 0.7f, 1.0f);
+		Renderer::SetClearColor(0.07f, 0.0f, 0.12f);
 		Renderer::Clear();
 
 
 		// Draw new frame
-		m_Sandbox->OnUpdate(static_cast<float>(m_DeltaTime.GetSeconds()));
+		m_Sandbox->OnUpdate(static_cast<float>(s_DeltaTime.GetSeconds()));
 
 
 		m_ImGui.Begin();
 		//m_ImGui.DemoWindow();
 		m_ImGui.SettingsGui();
-		m_ImGui.DebugGui(m_DeltaTime);
+		m_ImGui.DebugGui(s_DeltaTime);
 		m_ImGui.End();
 
 
-		m_Window->OnUpdate(m_DeltaTime);
+		m_Window->OnUpdate(s_DeltaTime);
 
 	}
 }

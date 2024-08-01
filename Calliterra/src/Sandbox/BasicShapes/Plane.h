@@ -4,8 +4,7 @@
 class Plane : public Drawable
 {
 public:
-	Plane(uint32_t resolution);
-	Plane(uint32_t resolution, DX::XMMATRIX transform);
+	Plane(uint32_t resolution, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 
 	void Draw() override;
 

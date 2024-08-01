@@ -38,6 +38,7 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 
 	if (vertexBuffer != nullptr)
 	{
+		vertexBuffer->SetLayout();
 		vertexBuffer->Bind();
 	}
 
@@ -49,7 +50,7 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 
 	for (auto& buffer : constantBufferList)
 	{
-		buffer->Bind();
+		buffer->Bind({});
 	}
 }
 

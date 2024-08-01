@@ -48,8 +48,6 @@ public:
 			)
 		);
 
-		LOG_INFO("Vertex Buffer Created");
-		
 	}
 
 	DX11VertexBuffer(const DX11Context& context, const std::vector<std::vector<Type>>& listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, ComPtr<ID3DBlob> shaderByteCode)
@@ -78,8 +76,6 @@ public:
 					&m_D3DVertexBufferArray[i]
 				)
 			);
-
-			LOG_INFO("Vertex Buffer Created");
 
 		}
 
@@ -129,7 +125,7 @@ public:
 			desc.push_back(tmp);
 		}
 
-		ASSERT_HR(
+	ASSERT_HR(
 			m_DX11Context.GetDevice().CreateInputLayout(
 				&desc[0],
 				static_cast<UINT>(desc.size()),
@@ -141,7 +137,6 @@ public:
 
 		m_HasLayout = true;
 
-		LOG_INFO("Input Layout Created");
 	}
 
 	void DX11VertexBuffer<Type>::CreateLayoutList(const std::vector<VertexBufferLayout>& layoutList) override

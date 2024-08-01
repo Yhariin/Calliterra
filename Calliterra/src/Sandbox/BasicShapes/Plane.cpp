@@ -1,14 +1,8 @@
 #include "pch.h"
 #include "Plane.h"
 
-Plane::Plane(uint32_t resolution)
-{
-	CalculatePlane(resolution);
-	InitBuffers();
-}
-
-Plane::Plane(uint32_t resolution, DX::XMMATRIX transform)
-	: Drawable(transform)
+Plane::Plane(uint32_t resolution, DX::XMMATRIX transform, DX::XMFLOAT3 color )
+	: Drawable(transform, color)
 {
 	CalculatePlane(resolution);
 	InitBuffers();
@@ -79,7 +73,5 @@ void Plane::InitBuffers()
 
 	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
 	m_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMVECTOR>(Shader::PIXEL_SHADER, DX::XMVECTOR({0.3f, 0.3f, 0.3f, 1.f}));
-	//m_TransformConstantBuffer->Bind();
-	//m_ColorConstantBuffer->Bind();
 
 }

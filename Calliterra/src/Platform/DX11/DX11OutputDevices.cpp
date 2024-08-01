@@ -48,7 +48,7 @@ DX11OutputDevices::DX11OutputDevices(ComPtr<ID3D11Device> device)
 	}
 }
 
-DX11OutputDevice& DX11OutputDevices::GetCurrentWindowOutputDevice(HWND hWnd)
+DX11OutputDevice* DX11OutputDevices::GetCurrentWindowOutputDevice(HWND hWnd)
 {
 	HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 
@@ -56,8 +56,11 @@ DX11OutputDevice& DX11OutputDevices::GetCurrentWindowOutputDevice(HWND hWnd)
 	{
 		if (device.GetMonitor() == monitor)
 		{
-			return device;
+			return &device;
 		}
 	}
+
+	ASSERT(false, "Could not find output device corresponding to monitor!");
+	return nullptr;
 
 }
