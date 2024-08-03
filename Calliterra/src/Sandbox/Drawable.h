@@ -17,7 +17,8 @@ public:
 	virtual void Update(DX::XMMATRIX transform) = 0;
 	virtual void Update(float dt) = 0;
 
-	virtual void SetViewProjectionMatrix(DX::XMMATRIX transform) { m_ViewProjectionMatrix = transform; }
+	virtual void SetViewMatrix(DX::XMMATRIX transform) { m_ViewMatrix = transform; }
+	virtual void SetProjectionMatrix(DX::XMMATRIX transform) { m_ProjectionMatrix = transform; }
 
 	DX::XMMATRIX GetTransform() { return m_Transform; }
 
@@ -53,6 +54,7 @@ protected:
 	};
 
 	DX::XMMATRIX m_Transform;
-	DX::XMMATRIX m_ViewProjectionMatrix;
+	DX::XMMATRIX m_ViewMatrix;
+	DX::XMMATRIX m_ProjectionMatrix;
 	DX::XMFLOAT3 m_FlatColor;
 };

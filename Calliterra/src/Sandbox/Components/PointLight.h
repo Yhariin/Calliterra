@@ -14,7 +14,8 @@ public:
 	void Update(float dt) override;
 
 	void InitBuffers();
-	void SetViewProjectionMatrix(DX::XMMATRIX transform) override { m_Sphere.SetViewProjectionMatrix(transform); }
+	void SetViewMatrix(DX::XMMATRIX transform) override { m_Sphere.SetViewMatrix(transform); m_ViewMatrix = transform; }
+	void SetProjectionMatrix(DX::XMMATRIX transform) override { m_Sphere.SetProjectionMatrix(transform); m_ProjectionMatrix = transform; }
 
 private:
 	IcoSphere m_Sphere;

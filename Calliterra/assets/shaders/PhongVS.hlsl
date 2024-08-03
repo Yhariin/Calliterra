@@ -6,23 +6,25 @@ struct VSIn
 
 struct VSOut
 {
-    float3 worldPos : POSITION;
+    float3 CameraPos : POSITION;
     float3 Normal : NORMAL;
     float4 Pos : SV_POSITION;
 };
 
-cbuffer Constantbuffer 
+cbuffer Transforms 
 {
     matrix Model;
+    matrix ModelView;
     matrix ModelViewProj;
+    matrix NormalMatrix;
 };
 
 VSOut main(VSIn vIn)
 {
     VSOut vOut;
     vOut.Pos = mul(float4(vIn.Position, 1.0f), ModelViewProj);
-    vOut.worldPos = (float3)mul(float4(vIn.Position, 1.0f), Model);
-    vOut.Normal = mul(vIn.Normal, (float3x3)Model);
+    vOut.CameraPos = (float3)mul(float4(vIn.Position, 1.0f), ModelView);
+    vOut.Normal = normalize(mul(vIn.Normal, (float3x3) NormalMatrix));
 
     return vOut;
 }

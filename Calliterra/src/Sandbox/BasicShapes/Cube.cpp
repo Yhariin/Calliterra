@@ -50,7 +50,14 @@ void Cube::InitBuffers()
 	s_VertexBuffer->SetLayout();
 		
 	s_TransformConstantBuffer = Renderer::CreateConstantBuffer<CubeTransformConstantBuffer>(Shader::VERTEX_SHADER);
-	s_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, {0.7f, 0.7f, 0.9f, 0.0f}, 1);
+
+	CubePixelConstantBuffer pcb = {
+		DX::XMFLOAT3(0.7f, 0.7f, 0.9f),
+		0.6f,
+		128.f
+	};
+
+	s_PixelConstantBuffer = Renderer::CreateConstantBuffer<CubePixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 
 }
 
@@ -79,10 +86,15 @@ void Cube::Update(float dt)
 
 void Cube::Draw()
 {
-	CubeTransformConstantBuffer cb = { DX::XMMatrixTranspose(m_Transform), DX::XMMatrixTranspose(m_Transform * m_ViewProjectionMatrix) };
+	CubeTransformConstantBuffer cb = { 
+		DX::XMMatrixTranspose(m_Transform), 
+		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix),
+		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix),
+		DX::XMMatrixInverse(nullptr, m_Transform * m_ViewMatrix)
+	};
 
 	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, cb);
-	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_TransformConstantBuffer, s_ColorConstantBuffer });
+	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_TransformConstantBuffer, s_PixelConstantBuffer });
 	Renderer::Draw();
 
 }

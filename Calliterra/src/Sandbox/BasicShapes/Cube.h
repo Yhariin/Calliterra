@@ -44,7 +44,17 @@ private:
 	struct CubeTransformConstantBuffer
 	{
 		DX::XMMATRIX Model;
+		DX::XMMATRIX ModelView;
 		DX::XMMATRIX ModelViewProj;
+		DX::XMMATRIX NormalMatrix;
+	};
+
+	struct CubePixelConstantBuffer
+	{
+		alignas(16) DX::XMFLOAT3 Color;
+		float SpecularIntensity;
+		float SpecularPower;
+		float padding[2];
 	};
 
 	inline static constexpr float side = 1.0f / 2.f;
@@ -114,7 +124,7 @@ private:
 	inline static std::shared_ptr<VertexBuffer> s_VertexBuffer = nullptr;
 	inline static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
 	inline static std::shared_ptr<ConstantBuffer> s_TransformConstantBuffer = nullptr;
-	inline static std::shared_ptr<ConstantBuffer> s_ColorConstantBuffer = nullptr;
+	inline static std::shared_ptr<ConstantBuffer> s_PixelConstantBuffer = nullptr;
 
 };
 
