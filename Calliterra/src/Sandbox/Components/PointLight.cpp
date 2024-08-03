@@ -14,7 +14,9 @@ void PointLight::Draw()
 {
 	m_Sphere.Draw();
 	m_PixelShader->Bind();
-	Renderer::UpdateConstantBuffer(m_PositionConstantBuffer, m_Position);
+	DX::XMFLOAT4 posViewSpace;
+	DX::XMStoreFloat4(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat4(&m_Position), m_ViewMatrix));
+	Renderer::UpdateConstantBuffer(m_PositionConstantBuffer, posViewSpace);
 	m_PositionConstantBuffer->Bind({});
 }
 

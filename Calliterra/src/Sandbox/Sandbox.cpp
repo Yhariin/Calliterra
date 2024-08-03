@@ -18,8 +18,9 @@ void Sandbox::OnUpdate(float dt)
 	m_Camera.OnUpdate(dt);
 	for (auto& drawable : m_Drawables)
 	{
+		drawable->SetViewMatrix(m_Camera.GetViewMatrix());
+		drawable->SetProjectionMatrix(m_Camera.GetProjectionMatrix());
 		drawable->Update(dt);
-		drawable->SetViewProjectionMatrix(m_Camera.GetViewProjectionMatrix());
 		drawable->Draw();
 	}
 
