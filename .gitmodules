@@ -7,3 +7,6 @@
 [submodule "Calliterra/vendor/rapidobj"]
 	path = Calliterra/vendor/rapidobj
 	url = https://github.com/guybrush77/rapidobj.git
+[submodule "Calliterra/vendor/fastgltf"]
+	path = Calliterra/vendor/fastgltf
+	url = https://github.com/Yhariin/fastgltf.git
