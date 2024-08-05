@@ -70,7 +70,7 @@ void Camera::OnUpdate(float dt)
 		
 		RecalculateViewProjectionMatrix();
 	}
-
+	
 }
 
 void Camera::OnEvent(Event& e)
