@@ -14,8 +14,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["ImGui"] = PROJECT_NAME .. "/vendor/imgui"
+IncludeDir["fastgltf"] = PROJECT_NAME .. "/vendor/fastgltf/include"
 
 include (PROJECT_NAME .. "/vendor/imgui")
+include (PROJECT_NAME .. "/vendor/fastgltf")
 
 project (PROJECT_NAME)
     location "Calliterra"
@@ -42,13 +44,15 @@ project (PROJECT_NAME)
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.ImGui}",
         "%{prj.name}/vendor/rapidobj/include",
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.fastgltf}"
     }
 
     links
     {
-        "ImGui"
+        "ImGui",
+        "fastgltf"
     }
 
     filter "system:windows"
