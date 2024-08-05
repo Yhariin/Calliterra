@@ -6,7 +6,7 @@ struct VSIn
 
 struct VSOut
 {
-    float3 CameraPos : POSITION;
+    float3 ViewSpacePos : POSITION;
     float3 Normal : NORMAL;
     float4 Pos : SV_POSITION;
 };
@@ -23,7 +23,7 @@ VSOut main(VSIn vIn)
 {
     VSOut vOut;
     vOut.Pos = mul(float4(vIn.Position, 1.0f), ModelViewProj);
-    vOut.CameraPos = (float3)mul(float4(vIn.Position, 1.0f), ModelView);
+    vOut.ViewSpacePos = (float3)mul(float4(vIn.Position, 1.0f), ModelView);
     vOut.Normal = normalize(mul(vIn.Normal, (float3x3) NormalMatrix));
 
     return vOut;

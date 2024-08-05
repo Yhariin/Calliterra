@@ -1,6 +1,6 @@
 struct VSOut
 {
-    float3 CameraPos : POSITION;
+    float3 ViewSpacePos : POSITION;
     float3 Normal : NORMAL;
     float4 Pos : SV_POSITION;
 };
@@ -27,20 +27,19 @@ static const float attQuad = 0.0025f;
 
 float4 main(VSOut pIn) : SV_TARGET
 {
-    const float3 vertexToLight = lightPos - pIn.CameraPos;
-    const float distToLight = length(vertexToLight);
-    const float3 directionToLight = vertexToLight / distToLight;
+    const float3 fragmentToLight = lightPos - pIn.ViewSpacePos;
+    const float distToLight = length(fragmentToLight);
+    const float3 directionToLight = normalize(fragmentToLight);
 
     const float att = 1.f / (attConst + attLin * distToLight + attQuad * (distToLight * distToLight));
 
     const float3 diffuse = diffuseColor * diffuseIntensity * att * max(0.0f, dot(directionToLight, pIn.Normal));
 
     // Reflected light vector
-    const float3 w = pIn.Normal * dot(vertexToLight, pIn.Normal);
-    const float3 r = w * 2.0f - vertexToLight;
+    const float3 r = reflect(-directionToLight, pIn.Normal);
 
     // Calculate specular intensity based on angle between viewing vector
-    const float3 specular = att * (diffuseColor * diffuseIntensity) * specularIntensity * pow(max(0.0f, dot(normalize(-r), normalize(pIn.CameraPos))), specularPower);
+    const float3 specular = att * (diffuseColor * diffuseIntensity) * specularIntensity * pow(max(0.0f, dot(r, normalize(-pIn.ViewSpacePos))), specularPower);
     
     return float4(saturate(diffuse + ambient + specular) * MaterialColor, 1.0f);
     //return float4(pIn.Normal, 1.0f);
