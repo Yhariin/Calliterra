@@ -37,7 +37,8 @@ project (PROJECT_NAME)
     files
     {
         "%{prj.name}/src/**.cpp",
-        "%{prj.name}/src/**.h"
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/vendor/ufbx/ufbx.c"
     }
 
     includedirs
@@ -45,6 +46,7 @@ project (PROJECT_NAME)
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
         "%{prj.name}/vendor/rapidobj/include",
+        "%{prj.name}/vendor/ufbx/",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.fastgltf}"
     }
@@ -54,6 +56,9 @@ project (PROJECT_NAME)
         "ImGui",
         "fastgltf"
     }
+
+    filter "files:**.c"
+        flags {"NoPCH"}
 
     filter "system:windows"
 		cppdialect "C++20"

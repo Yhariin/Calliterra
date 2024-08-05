@@ -10,3 +10,6 @@
 [submodule "Calliterra/vendor/fastgltf"]
 	path = Calliterra/vendor/fastgltf
 	url = https://github.com/Yhariin/fastgltf.git
+[submodule "Calliterra/vendor/ufbx"]
+	path = Calliterra/vendor/ufbx
+	url = https://github.com/ufbx/ufbx.git
