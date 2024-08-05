@@ -42,7 +42,8 @@ project (PROJECT_NAME)
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{prj.name}/vendor/rapidobj/include",
     }
 
     links

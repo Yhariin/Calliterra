@@ -4,3 +4,6 @@
 [submodule "Calliterra/vendor/imgui"]
 	path = Calliterra/vendor/imgui
 	url = https://github.com/Yhariin/imgui.git
+[submodule "Calliterra/vendor/rapidobj"]
+	path = Calliterra/vendor/rapidobj
+	url = https://github.com/guybrush77/rapidobj.git
