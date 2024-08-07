@@ -45,7 +45,7 @@ void Sandbox::LoadSandboxPreset()
 
 	std::shared_ptr<rapidobj::Result> dragonModel = ModelLoader::LoadModelObj("assets/models/dragon.obj");
 	std::shared_ptr<fastgltf::Asset> vaseClayModel = ModelLoader::LoadModelGltf("assets/models/Vase_Clay.gltf");
-	std::shared_ptr<UfbxScene> heartModel = ModelLoader::LoadModelFbx("assets/models/HumanHeart_FBX.fbx");
+	std::shared_ptr<UfbxScene> heartModel = ModelLoader::LoadModelFbx("assets/models/FBX_Table.FBX");
 
 	m_Drawables.emplace_back(std::make_unique<Model>(dragonModel, DX::XMMatrixTranslation(10.f, 0.f, -10.f), DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));
 	m_Drawables.emplace_back(std::make_unique<Model>(vaseClayModel, DX::XMMatrixTranslation(0.f, 0.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
