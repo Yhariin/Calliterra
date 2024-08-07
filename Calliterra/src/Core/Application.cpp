@@ -5,6 +5,8 @@
 #include "Renderer/Renderer.h"
 #include "Platform/DX11/DX11Shader.h"
 
+#include "Asset/ModelLoader.h"
+
 Application::Application()
 {
 	ASSERT(!s_Instance, "Application already exists!");
