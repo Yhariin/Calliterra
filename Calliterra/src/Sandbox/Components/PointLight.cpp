@@ -2,7 +2,7 @@
 #include "PointLight.h"
 
 PointLight::PointLight(DX::XMMATRIX transform, DX::XMFLOAT3 color)
-	: m_Sphere(4, transform, color), Drawable(transform, color)
+	: m_Sphere(3, transform, color), Drawable(transform, color)
 {
 	DX::XMStoreFloat4(&m_Position, DX::XMVector4Transform(DX::XMLoadFloat4(&m_Position), transform));
 	InitBuffers();
@@ -25,20 +25,11 @@ void PointLight::OnSettingsUpdate(SettingsType type)
 	m_Position = DX::XMFLOAT4(GlobalSettings::Rendering::LightPos().x, GlobalSettings::Rendering::LightPos().y, GlobalSettings::Rendering::LightPos().z, 1.0f);
 }
 
-void PointLight::Update(DX::XMMATRIX transform)
-{
-	m_Transform = transform;
-
-
-	m_Transform = DX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	m_Sphere.Update(m_Transform);
-}
-
 void PointLight::Update(float dt)
 {
 
 	m_Transform = DX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	m_Sphere.Update(m_Transform);
+	m_Sphere.SetTransform(m_Transform);
 }
 
 void PointLight::InitBuffers()

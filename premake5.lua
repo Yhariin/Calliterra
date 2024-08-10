@@ -31,7 +31,8 @@ project (PROJECT_NAME)
 
     defines
     {
-        "_CONSOLE"
+        "_CONSOLE",
+        "UFBX_REAL_IS_FLOAT"
     }
 
     files

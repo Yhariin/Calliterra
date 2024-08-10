@@ -61,11 +61,6 @@ void Cube::InitBuffers()
 
 }
 
-void Cube::Update(DX::XMMATRIX transform)
-{
-	m_Transform = transform;
-}
-
 void Cube::Update(float dt)
 {
 	dt *= 0.5;

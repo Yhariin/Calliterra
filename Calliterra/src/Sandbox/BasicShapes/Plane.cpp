@@ -27,11 +27,6 @@ void Plane::Update(float dt)
 
 }
 
-void Plane::Update(DX::XMMATRIX transform)
-{
-	m_Transform = transform;
-}
-
 void Plane::CalculatePlane(uint32_t resolution)
 {
 	float div = 1.f / resolution;

@@ -1,5 +1,5 @@
 #pragma once
-#include "SandBox/Drawable.h"
+#include "Renderer/Drawable.h"
 #include "Sandbox/BasicShapes/IcoSphere.h"
 #include "Core/GlobalSettings.h"
 
@@ -10,12 +10,11 @@ public:
 	void Draw() override;
 
 	void OnSettingsUpdate(SettingsType setting) override;
-	void Update(DX::XMMATRIX transform) override;
 	void Update(float dt) override;
 
 	void InitBuffers();
-	void SetViewMatrix(DX::XMMATRIX transform) override { m_Sphere.SetViewMatrix(transform); m_ViewMatrix = transform; }
-	void SetProjectionMatrix(DX::XMMATRIX transform) override { m_Sphere.SetProjectionMatrix(transform); m_ProjectionMatrix = transform; }
+	void SetViewMatrix(const DX::XMMATRIX& transform) override { m_Sphere.SetViewMatrix(transform); m_ViewMatrix = transform; }
+	void SetProjectionMatrix(const DX::XMMATRIX& transform) override { m_Sphere.SetProjectionMatrix(transform); m_ProjectionMatrix = transform; }
 
 private:
 	IcoSphere m_Sphere;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Sandbox/Drawable.h"
+#include "Renderer/Drawable.h"
 
 class Cube : public Drawable
 {
@@ -9,7 +9,6 @@ public:
 	void InitRNG();
 	static void InitBuffers();
 
-	void Update(DX::XMMATRIX transform) override;
 	void Update(float dt) override;
 
 	void Draw() override;

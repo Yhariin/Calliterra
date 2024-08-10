@@ -20,11 +20,6 @@ void IcoSphere::Update(float dt)
 
 }
 
-void IcoSphere::Update(DX::XMMATRIX transform)
-{
-	m_Transform = transform;
-}
-
 // http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 void IcoSphere::CalculateSphere(const int resolution)
 {
@@ -110,7 +105,7 @@ int IcoSphere::GetMidPoint(uint32_t p1, uint32_t p2)
 
 void IcoSphere::InitBuffers()
 {
-	if(DX::XMVector3Equal(DX::XMLoadFloat3(&m_FlatColor), {-1.f, -1.f, -1.f}))
+	if(DX::XMVector3Equal(DX::XMLoadFloat3(&m_Color), {-1.f, -1.f, -1.f}))
 	{ 
 		m_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
 		m_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
@@ -128,7 +123,7 @@ void IcoSphere::InitBuffers()
 		m_VertexShader->Bind();
 		m_PixelShader->Bind();
 
-		m_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, DX::XMFLOAT4(m_FlatColor.x, m_FlatColor.y, m_FlatColor.z, 1.f));
+		m_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, DX::XMFLOAT4(m_Color.x, m_Color.y, m_Color.z, 1.f));
 	}
 
 	m_VertexBuffer = Renderer::CreateVertexBuffer(m_SphereVertices, static_cast<uint32_t>(m_SphereVertices.size()), m_VertexShader.get());

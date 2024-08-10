@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/Renderer.h"
+#include "Renderer.h"
 
 class Drawable
 {
@@ -8,24 +8,19 @@ public:
 	virtual ~Drawable() = default;
 
 	Drawable(DX::XMMATRIX transform, DX::XMFLOAT3 color)
-		: m_Transform(transform), m_FlatColor(color)
+		: m_Transform(transform), m_Color(color)
 	{
 	}
 
 	virtual void Draw() = 0;
 
-	virtual void Update(DX::XMMATRIX transform) = 0;
 	virtual void Update(float dt) = 0;
 
-	virtual void SetViewMatrix(DX::XMMATRIX transform) { m_ViewMatrix = transform; }
-	virtual void SetProjectionMatrix(DX::XMMATRIX transform) { m_ProjectionMatrix = transform; }
+	virtual void SetTransform(const DX::XMMATRIX& transform) { m_Transform = transform; }
+	virtual void SetViewMatrix(const DX::XMMATRIX& transform) { m_ViewMatrix = transform; }
+	virtual void SetProjectionMatrix(const DX::XMMATRIX& transform) { m_ProjectionMatrix = transform; }
 
 	DX::XMMATRIX GetTransform() { return m_Transform; }
-
-	void Bind()
-	{
-
-	}
 
 protected:
 	struct FaceColorsBuffer
@@ -54,7 +49,7 @@ protected:
 	};
 
 	DX::XMMATRIX m_Transform;
-	DX::XMMATRIX m_ViewMatrix;
-	DX::XMMATRIX m_ProjectionMatrix;
-	DX::XMFLOAT3 m_FlatColor;
+	DX::XMMATRIX m_ViewMatrix = DX::XMMatrixIdentity();
+	DX::XMMATRIX m_ProjectionMatrix = DX::XMMatrixIdentity();
+	DX::XMFLOAT3 m_Color;
 };

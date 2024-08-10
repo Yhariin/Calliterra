@@ -1,5 +1,5 @@
 #pragma once
-#include "Sandbox/Drawable.h"
+#include "Renderer/Drawable.h"
 
 class IcoSphere : public Drawable
 {
@@ -8,7 +8,6 @@ public:
 	
 	void Draw() override;
 
-	void Update(DX::XMMATRIX transform) override;
 	void Update(float dt) override;
 
 private:

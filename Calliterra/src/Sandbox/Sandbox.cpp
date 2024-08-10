@@ -5,8 +5,7 @@
 #include "Sandbox/BasicShapes/IcoSphere.h"
 #include "Sandbox/BasicShapes/Plane.h"
 #include "Sandbox/Components/PointLight.h"
-#include "Sandbox/Components/Model.h"
-
+#include "Asset/Model.h"
 #include "Asset/ModelLoader.h"
 
 Sandbox::Sandbox(float aspectRatio)
@@ -43,13 +42,16 @@ void Sandbox::LoadSandboxPreset()
 	}
 	CreatePointLight();
 
-	std::shared_ptr<rapidobj::Result> dragonModel = ModelLoader::LoadModelObj("assets/models/dragon.obj");
+	//std::shared_ptr<rapidobj::Result> dragonModel = ModelLoader::LoadModelObj("assets/models/dragon.obj");
 	std::shared_ptr<fastgltf::Asset> vaseClayModel = ModelLoader::LoadModelGltf("assets/models/Vase_Clay.gltf");
-	std::shared_ptr<UfbxScene> heartModel = ModelLoader::LoadModelFbx("assets/models/FBX_Table.FBX");
+	std::shared_ptr<fastgltf::Asset> nanoModel = ModelLoader::LoadModelGltf("assets/models/nano.gltf");
+	//std::shared_ptr<UfbxScene> heartModel = ModelLoader::LoadModelFbx("assets/models/HumanHeart_FBX.fbx");
 
-	m_Drawables.emplace_back(std::make_unique<Model>(dragonModel, DX::XMMatrixTranslation(10.f, 0.f, -10.f), DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));
+	DX::XMMATRIX transform = DX::XMMatrixRotationX(DX::XMConvertToRadians(90)) * DX::XMMatrixTranslation(10.f, 10.f, -10.f);
+	m_Drawables.emplace_back(std::make_unique<Model>(nanoModel, transform, DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));
+	//m_Drawables.emplace_back(std::make_unique<Model>(dragonModel, DX::XMMatrixTranslation(10.f, 0.f, -10.f), DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));
 	m_Drawables.emplace_back(std::make_unique<Model>(vaseClayModel, DX::XMMatrixTranslation(0.f, 0.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
-	m_Drawables.emplace_back(std::make_unique<Model>(heartModel, DX::XMMatrixTranslation(5.f, 10.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
+	//m_Drawables.emplace_back(std::make_unique<Model>(heartModel, DX::XMMatrixTranslation(5.f, 10.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
 
 }
 
@@ -72,7 +74,7 @@ void Sandbox::CreatePlane()
 {
 	m_Drawables.emplace_back(std::make_unique<Plane>(1));
 
-	m_Drawables.back()->Update(
+	m_Drawables.back()->SetTransform(
 		DX::XMMatrixTranslation(-0.5f, 0.0f, -0.5f) *
 		DX::XMMatrixScaling(100.f, 1.f, 100.f)
 	);

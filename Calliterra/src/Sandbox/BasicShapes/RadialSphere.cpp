@@ -15,11 +15,6 @@ void RadialSphere::Draw()
 	Renderer::Draw();
 }
 
-void RadialSphere::Update(DX::XMMATRIX transform)
-{
-	m_Transform = transform;
-}
-
 void RadialSphere::Update(float dt)
 {
 	m_Delta += 2.f * dt;

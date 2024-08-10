@@ -68,8 +68,6 @@ Window::Window(const WindowProps& windowProps)
 
 	m_Timer.SetCallback(lambda);
 
-	//ShowWindow(m_hWnd, SW_SHOW);
-
 	ImGui_ImplWin32_Init(m_hWnd);
 
 	DisableCursor();
