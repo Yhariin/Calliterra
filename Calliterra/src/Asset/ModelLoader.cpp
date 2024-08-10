@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ModelLoader.h"
 #include "fastgltf/tools.hpp"
+#include "fastgltf/math.hpp"
 
 std::shared_ptr<rapidobj::Result> ModelLoader::LoadModelObj(const std::filesystem::path& filepath)
 {
@@ -28,10 +29,33 @@ std::shared_ptr<UfbxScene> ModelLoader::LoadModelFbx(const std::filesystem::path
 	ufbx_error error; // Optional, pass NULL if you don't care about errors
 
 	std::shared_ptr<UfbxScene> scene = std::make_shared<UfbxScene>(ufbx_load_file(ufbx_string_view(filepath.generic_string().c_str(), filepath.generic_string().length()), &opts, &error));
-	//ufbx_scene* scene1 = ufbx_load_file("assets/models/HumanHeart_FBX.fbx", &opts, &error);
 	ASSERT(scene.get(), error.description.data);
 
 	return scene;
+}
+
+std::vector<std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const rapidobj::Result& model)
+{
+	std::vector<std::unique_ptr<Mesh>> meshes;
+	return meshes;
+}
+
+std::vector<std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const fastgltf::Asset& model, DX::XMMATRIX transform, DX::XMFLOAT3 color)
+{
+	std::vector<std::unique_ptr<Mesh>> meshes;
+
+	for (int i = 0; i < model.meshes.size(); i++)
+	{
+		meshes.emplace_back(std::make_unique<Mesh>(i, model, transform, color));
+	}
+
+	return meshes;
+}
+
+std::vector<std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const UfbxScene& model)
+{
+	std::vector<std::unique_ptr<Mesh>> meshes;
+	return meshes;
 }
 
 std::vector<ModelVertex> ModelLoader::GetModelVertexVector(const rapidobj::Result& objModel)
@@ -67,11 +91,11 @@ std::vector<uint32_t> ModelLoader::GetModelIndexVector(const rapidobj::Result& o
 	return indices;
 }
 
-std::vector<ModelVertex> ModelLoader::GetModelVertexVector(const fastgltf::Asset& objModel)
+std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const fastgltf::Asset& objModel, int meshIndex)
 {
 	std::vector<ModelVertex> vertices;
 
-	for (auto it = objModel.meshes[0].primitives.begin(); it < objModel.meshes[0].primitives.end(); it++)
+	for (auto it = objModel.meshes[meshIndex].primitives.begin(); it < objModel.meshes[meshIndex].primitives.end(); it++)
 	{
 		DX::XMFLOAT3 position;
 		DX::XMFLOAT3 normal;
@@ -118,17 +142,17 @@ std::vector<ModelVertex> ModelLoader::GetModelVertexVector(const fastgltf::Asset
 	return vertices;
 }
 
-std::vector<uint32_t> ModelLoader::GetModelIndexVector(const fastgltf::Asset& objModel)
+std::vector<uint32_t> ModelLoader::GetMeshIndexVector(const fastgltf::Asset& objModel, int meshIndex)
 {
 	std::vector<uint32_t> indices;
-	for (auto it = objModel.meshes[0].primitives.begin(); it < objModel.meshes[0].primitives.end(); it++)
+	for (auto it = objModel.meshes[meshIndex].primitives.begin(); it < objModel.meshes[meshIndex].primitives.end(); it++)
 	{
 		auto& indexAccessor = objModel.accessors[it->indicesAccessor.value()];
 		ASSERT(indexAccessor.bufferViewIndex.has_value());
 
 		indices.resize(indexAccessor.count);
 
-		fastgltf::copyFromAccessor<std::uint32_t>(objModel, indexAccessor, &indices[0]);
+		fastgltf::copyFromAccessor<std::uint32_t>(objModel, indexAccessor, indices.data());
 	}
 
 	return indices;
@@ -138,35 +162,10 @@ std::vector<ModelVertex> ModelLoader::GetModelVertexVector(const UfbxScene& objM
 {
 	std::vector<ModelVertex> vertices;
 	auto& mesh = objModel.Meshes()[0];
-	//vertices.reserve(objModel.Meshes()[0]->num_vertices);
-
-	//int index = 0;
-	//for (auto position : objModel.Meshes()[0]->vertex_position.values)
-	//{
-	//	vertices.push_back({ {position.x, position.y, position.z}, {} });
-	//	index++;
-	//}
-
-	//index = 0;
-	//for (auto normal : objModel.Meshes()[0]->vertex_normal.values)
-	//{
-	//	vertices[index].Normal = { normal.x, normal.y, normal.z };
-	//	index++;
-	//}
-
-	//for (ufbx_face face : mesh->faces)
-	//{
-	//	for (uint32_t corner = 0; corner < face.num_indices; corner++)
-	//	{
-	//		vertices.push_back({});
-	//	}
-
-	//}
 
 	std::vector<uint32_t> tri_indices;
 	tri_indices.resize(mesh->max_face_triangles * 3);
 
-	// TODO: triangulate the faces
 	for (ufbx_face face : mesh->faces)
 	{
 
@@ -181,24 +180,8 @@ std::vector<ModelVertex> ModelLoader::GetModelVertexVector(const UfbxScene& objM
             ufbx_vec3 normal = mesh->vertex_normal[index];
 
 			vertices.push_back({ {position.x, position.y, position.z}, {normal.x, normal.y, normal.z} });
-			//vertices[index] = { {position.x, position.y, position.z}, {normal.x, normal.y, normal.z} };
 		}
 
-		/*
-        // Loop through the corners of the polygon.
-        for (uint32_t corner = 0; corner < face.num_indices; corner++) 
-		{
-            // Faces are defined by consecutive indices, one for each corner.
-            uint32_t index = face.index_begin + corner;
-
-            // Retrieve the position, normal and uv for the vertex.
-            ufbx_vec3 position = mesh->vertex_position[index];
-            ufbx_vec3 normal = mesh->vertex_normal[index];
-
-			vertices[index] = { {position.x, position.y, position.z}, {normal.x, normal.y, normal.z} };
-			//vertices.push_back({ {position.x, position.y, position.z}, {normal.x, normal.y, normal.z} });
-        }
-		*/
     }
 	ASSERT(vertices.size() == mesh->num_triangles * 3);
 
@@ -211,21 +194,69 @@ std::vector<uint32_t> ModelLoader::GetModelIndexVector(const UfbxScene& objModel
 	auto& mesh = objModel.Meshes()[0];
 	indices.resize(mesh->num_triangles * 3);
 
-	//std::vector<ModelVertex> vertices = ModelLoader::GetModelVertexVector(objModel);
 	ufbx_vertex_stream stream[1] = { {vertices.data(), vertices.size(), sizeof(ModelVertex)} };
 
-	uint32_t num_vertices = ufbx_generate_indices(stream, 1, indices.data(), indices.size(), nullptr, nullptr);
+	uint32_t num_vertices = static_cast<uint32_t>(ufbx_generate_indices(stream, 1, indices.data(), indices.size(), nullptr, nullptr));
 
 	vertices.resize(num_vertices);
 	return indices;
-	//indices.reserve(objModel.Meshes()[0]->max_face_triangles * 3);
 
-	//for (auto face : objModel.Meshes()[0]->faces)
-	//{
-	//	for (uint32_t corner = 0; corner < face.num_indices; corner++)
-	//	{
-	//		indices.push_back(face.index_begin + corner);
-	//	}
-	//}
+}
+
+#pragma warning(disable:4715) // Disable warning about no return for all control paths since we are always guarenteed to return
+const fastgltf::Node& ModelLoader::GetRootNode(const fastgltf::Asset& model)
+{
+	std::map<size_t, size_t> nodeMap;
+	for (size_t i = 0; i < model.nodes.size(); i++)
+	{
+		nodeMap[i] = -1;
+		for (int j = 0; j < model.nodes[i].children.size(); j++)
+		{
+			nodeMap[model.nodes[i].children[j]] = i;
+		}
+	}
+
+	for (auto it = nodeMap.begin(); it != nodeMap.end(); it++)
+	{
+		if (it->second == -1) return model.nodes[it->first];
+	}
+
+	ASSERT(false, "No Root node found!");
+	#pragma warning(default:4715)
+}
+
+DX::XMMATRIX ModelLoader::GetMeshTransform(const fastgltf::Asset& model, const fastgltf::Node& node)
+{
+	DX::XMMATRIX transform;
+	if (auto value = std::get_if<fastgltf::math::fmat4x4>(&node.transform))
+	{
+		transform = DX::XMMatrixTranspose(DX::XMLoadFloat4x4(reinterpret_cast<const DX::XMFLOAT4X4*>(&node.transform)));
+	}
+	else
+	{
+		auto trs = std::get<fastgltf::TRS>(node.transform);
+		transform =
+			DX::XMMatrixScaling(trs.scale.x(), trs.scale.y(), trs.scale.z()) *
+			DX::XMMatrixRotationRollPitchYaw(trs.rotation.x(), trs.rotation.y(), trs.rotation.z()) *
+			DX::XMMatrixTranslation(trs.translation.x(), trs.translation.y(), trs.translation.z());
+	}
+
+	return transform;
+}
+
+std::unique_ptr<Node> ModelLoader::ParseNode(const fastgltf::Asset& model, const fastgltf::Node& node, const std::vector<std::unique_ptr<Mesh>>& modelMeshes, bool isRoot)
+{
+	DX::XMMATRIX transform = GetMeshTransform(model, node);
+
+	std::vector<Mesh*> currentMesh;
+	currentMesh.push_back(modelMeshes.at(node.meshIndex.value()).get());
+
+	std::unique_ptr<Node> nextNode = std::make_unique<Node>(static_cast<int>(node.meshIndex.value()), node.name.c_str(), std::move(currentMesh), transform);
+	for (int i = 0; i < node.children.size(); i++)
+	{
+		nextNode->AddChild(ParseNode(model, model.nodes[node.children[i]], modelMeshes, false));
+	}
+
+	return nextNode;
 
 }
