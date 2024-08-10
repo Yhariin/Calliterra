@@ -22,8 +22,8 @@ static const float3 ambient = { 0.05f, 0.05f, 0.05f };
 static const float3 diffuseColor = { 1.f, 1.f, 1.f };
 static const float diffuseIntensity = 1.0f;
 static const float attConst = 1.0f;
-static const float attLin = 0.045f;
-static const float attQuad = 0.0025f;
+static const float attLin = 0.015f;
+static const float attQuad = 0.0015f;
 
 float4 main(VSOut pIn) : SV_TARGET
 {
