@@ -31,3 +31,4 @@ using Microsoft::WRL::ComPtr;
 
 #include "Core/Assert.h"
 #include "Core/Log.h"
+#include "Core/Timer.h"

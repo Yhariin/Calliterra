@@ -4,7 +4,13 @@
 Model::Model(std::shared_ptr<rapidobj::Result> model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
 	: Drawable(transform, color)
 {
-	m_Meshes = std::move(ModelLoader::GetModelMeshes(*model));
+	m_Meshes = std::move(ModelLoader::GetModelMeshes(*model, transform, color));
+
+	m_Root = ModelLoader::ParseNode(*model, m_Meshes);
+
+	m_Root->SetModelTransform(m_Transform);
+	m_Root->ApplyTransformations();
+	
 }
 
 Model::Model(std::shared_ptr<fastgltf::Asset> model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
@@ -13,7 +19,7 @@ Model::Model(std::shared_ptr<fastgltf::Asset> model, const DX::XMMATRIX& transfo
 	m_Meshes = std::move(ModelLoader::GetModelMeshes(*model, transform, color));
 
 	fastgltf::Node root = ModelLoader::GetRootNode(*model);
-	m_Root = ModelLoader::ParseNode(*model, root, m_Meshes, true);
+	m_Root = ModelLoader::ParseNode(*model, root, m_Meshes);
 
 	m_Root->SetModelTransform(m_Transform);
 	m_Root->ApplyTransformations();

@@ -9,6 +9,7 @@ struct ModelVertex;
 class Mesh : public Drawable
 {
 public:
+	Mesh(int meshIndex, const rapidobj::Result& ObjModel, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 	Mesh(int meshIndex, const fastgltf::Asset& gltfModel, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 
 	void Draw() override;
@@ -37,9 +38,9 @@ private:
 private:
 	int m_MeshIndex;
 
-	std::shared_ptr<rapidobj::Mesh> m_ObjMesh;
+	const rapidobj::Result* m_ObjModel;
 	const fastgltf::Asset* m_GltfModel;
-	std::shared_ptr<ufbx_mesh> m_FbxMesh;
+	const ufbx_mesh* m_FbxMesh;
 
 	std::vector<ModelVertex> m_Vertices;
 	std::vector<uint32_t> m_Indices;

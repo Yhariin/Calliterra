@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "Mesh.h"
 
+Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, DX::XMMATRIX transform, DX::XMFLOAT3 color)
+	: Drawable(transform, color), m_MeshIndex(meshIndex), m_ObjModel(&ObjModel)
+{
+	m_Vertices = ModelLoader::GetMeshVertexVector(*m_ObjModel, m_MeshIndex);
+	m_Indices = ModelLoader::GetMeshIndexVector(*m_ObjModel, m_MeshIndex);
+
+	InitBuffers();
+}
+
 Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, DX::XMMATRIX transform, DX::XMFLOAT3 color)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_GltfModel(&gltfModel)
 {
