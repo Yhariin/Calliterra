@@ -1,16 +1,18 @@
 #pragma once
 #include "Renderer/Drawable.h"
 #include "Node.h"
-#include "ModelLoader.h"
 #include "Renderer/Renderer.h"
+#include "ModelLoader.h"
 
 struct ModelVertex;
+class UfbxScene;
 
 class Mesh : public Drawable
 {
 public:
-	Mesh(int meshIndex, const rapidobj::Result& ObjModel, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
-	Mesh(int meshIndex, const fastgltf::Asset& gltfModel, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
+	Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
+	Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
+	Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 
 	void Draw() override;
 
@@ -40,7 +42,7 @@ private:
 
 	const rapidobj::Result* m_ObjModel;
 	const fastgltf::Asset* m_GltfModel;
-	const ufbx_mesh* m_FbxMesh;
+	const UfbxScene* m_FbxModel;
 
 	std::vector<ModelVertex> m_Vertices;
 	std::vector<uint32_t> m_Indices;

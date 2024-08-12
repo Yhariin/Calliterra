@@ -3,6 +3,8 @@
 #include "fastgltf/tools.hpp"
 #include "fastgltf/math.hpp"
 
+//==============================Obj====================================
+#pragma region obj
 std::shared_ptr<rapidobj::Result> ModelLoader::LoadModelObj(const std::filesystem::path& filepath)
 {
 	std::shared_ptr<rapidobj::Result> model = std::make_shared<rapidobj::Result>(rapidobj::ParseFile(filepath, rapidobj::MaterialLibrary::Ignore()));
@@ -12,55 +14,15 @@ std::shared_ptr<rapidobj::Result> ModelLoader::LoadModelObj(const std::filesyste
 	return model;
 }
 
-std::shared_ptr<fastgltf::Asset> ModelLoader::LoadModelGltf(const std::filesystem::path& filepath)
+std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const rapidobj::Result& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
 {
-	auto gltfFile = fastgltf::MappedGltfFile::FromPath(filepath);
-	ASSERT(bool(gltfFile), fastgltf::getErrorMessage(gltfFile.error()));
-
-	auto asset = (m_GltfParser.loadGltf(gltfFile.get(), filepath.parent_path(), m_GltfOptions));
-	ASSERT(asset.error() == fastgltf::Error::None, fastgltf::getErrorMessage(asset.error()));
-
-	return std::make_shared<fastgltf::Asset>(std::move(asset.get()));
-}
-
-std::shared_ptr<UfbxScene> ModelLoader::LoadModelFbx(const std::filesystem::path& filepath)
-{
-	ufbx_load_opts opts = { }; // Optional, pass NULL for defaults
-	ufbx_error error; // Optional, pass NULL if you don't care about errors
-
-	std::shared_ptr<UfbxScene> scene = std::make_shared<UfbxScene>(ufbx_load_file(ufbx_string_view(filepath.generic_string().c_str(), filepath.generic_string().length()), &opts, &error));
-	ASSERT(scene.get(), error.description.data);
-
-	return scene;
-}
-
-std::vector<std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const rapidobj::Result& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
-{
-	std::vector<std::unique_ptr<Mesh>> meshes;
+	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
 
 	for (int i = 0; i < model.shapes.size(); i++)
 	{
-		meshes.emplace_back(std::make_unique<Mesh>(i, model, transform, color));
+		meshes[i] = std::make_unique<Mesh>(i, model, transform, color);
 	}
 
-	return meshes;
-}
-
-std::vector<std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const fastgltf::Asset& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
-{
-	std::vector<std::unique_ptr<Mesh>> meshes;
-
-	for (int i = 0; i < model.meshes.size(); i++)
-	{
-		meshes.emplace_back(std::make_unique<Mesh>(i, model, transform, color));
-	}
-
-	return meshes;
-}
-
-std::vector<std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
-{
-	std::vector<std::unique_ptr<Mesh>> meshes;
 	return meshes;
 }
 
@@ -106,6 +68,47 @@ std::vector<uint32_t> ModelLoader::GetMeshIndexVector(const rapidobj::Result& ob
 	std::generate(indices.begin(), indices.end(), [index = 0]() mutable { return index++; });
 
 	return indices;
+}
+
+std::unique_ptr<Node> ModelLoader::ParseNode(const rapidobj::Result& model, const std::unordered_map<int, std::unique_ptr<Mesh>>& modelMeshes)
+{
+	std::vector<Mesh*> currentMeshes;
+	for (auto& mesh : modelMeshes)
+	{
+		currentMeshes.push_back(mesh.second.get());
+	}
+	
+	std::unique_ptr<Node> root = std::make_unique<Node>(0, "Root", DX::XMMatrixIdentity(), std::move(currentMeshes));
+
+	return root;
+}
+#pragma endregion
+
+
+
+//==============================Gltf===================================
+#pragma region gltf
+std::shared_ptr<fastgltf::Asset> ModelLoader::LoadModelGltf(const std::filesystem::path& filepath)
+{
+	auto gltfFile = fastgltf::MappedGltfFile::FromPath(filepath);
+	ASSERT(bool(gltfFile), fastgltf::getErrorMessage(gltfFile.error()));
+
+	auto asset = (m_GltfParser.loadGltf(gltfFile.get(), filepath.parent_path(), m_GltfOptions));
+	ASSERT(asset.error() == fastgltf::Error::None, fastgltf::getErrorMessage(asset.error()));
+
+	return std::make_shared<fastgltf::Asset>(std::move(asset.get()));
+}
+
+std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const fastgltf::Asset& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
+{
+	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
+
+	for (int i = 0; i < model.meshes.size(); i++)
+	{
+		meshes[i] = std::make_unique<Mesh>(i, model, transform, color);
+	}
+
+	return meshes;
 }
 
 std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const fastgltf::Asset& objModel, int meshIndex)
@@ -175,48 +178,20 @@ std::vector<uint32_t> ModelLoader::GetMeshIndexVector(const fastgltf::Asset& obj
 	return indices;
 }
 
-std::vector<ModelVertex> ModelLoader::GetModelVertexVector(const UfbxScene& objModel)
+std::unique_ptr<Node> ModelLoader::ParseNode(const fastgltf::Asset& model, const fastgltf::Node& node, const std::unordered_map<int, std::unique_ptr<Mesh>>& modelMeshes)
 {
-	std::vector<ModelVertex> vertices;
-	auto& mesh = objModel.Meshes()[0];
+	DX::XMMATRIX transform = GetMeshTransform(model, node);
 
-	std::vector<uint32_t> tri_indices;
-	tri_indices.resize(mesh->max_face_triangles * 3);
+	std::vector<Mesh*> currentMesh;
+	currentMesh.push_back(modelMeshes.at(static_cast<int>(node.meshIndex.value())).get());
 
-	for (ufbx_face face : mesh->faces)
+	std::unique_ptr<Node> nextNode = std::make_unique<Node>(static_cast<int>(node.meshIndex.value()), node.name.c_str(), transform, std::move(currentMesh));
+	for (int i = 0; i < node.children.size(); i++)
 	{
+		nextNode->AddChild(ParseNode(model, model.nodes[node.children[i]], modelMeshes));
+	}
 
-		// Triangulate the face into tri_indices[]
-		uint32_t num_tris = ufbx_triangulate_face(tri_indices.data(), tri_indices.size(), mesh, face);
-
-		for (uint32_t i = 0; i < num_tris * 3; i++)
-		{
-			uint32_t index = tri_indices[i];
-
-            ufbx_vec3 position = mesh->vertex_position[index];
-            ufbx_vec3 normal = mesh->vertex_normal[index];
-
-			vertices.push_back({ {position.x, position.y, position.z}, {normal.x, normal.y, normal.z} });
-		}
-
-    }
-	ASSERT(vertices.size() == mesh->num_triangles * 3);
-
-	return vertices;
-}
-
-std::vector<uint32_t> ModelLoader::GetModelIndexVector(const UfbxScene& objModel, std::vector<ModelVertex>& vertices)
-{
-	std::vector<uint32_t> indices;
-	auto& mesh = objModel.Meshes()[0];
-	indices.resize(mesh->num_triangles * 3);
-
-	ufbx_vertex_stream stream[1] = { {vertices.data(), vertices.size(), sizeof(ModelVertex)} };
-
-	uint32_t num_vertices = static_cast<uint32_t>(ufbx_generate_indices(stream, 1, indices.data(), indices.size(), nullptr, nullptr));
-
-	vertices.resize(num_vertices);
-	return indices;
+	return nextNode;
 
 }
 
@@ -260,33 +235,116 @@ DX::XMMATRIX ModelLoader::GetMeshTransform(const fastgltf::Asset& model, const f
 
 	return transform;
 }
+#pragma endregion
 
-std::unique_ptr<Node> ModelLoader::ParseNode(const fastgltf::Asset& model, const fastgltf::Node& node, const std::vector<std::unique_ptr<Mesh>>& modelMeshes)
+
+
+//===============================Fbx===================================
+#pragma region fbx
+std::shared_ptr<UfbxScene> ModelLoader::LoadModelFbx(const std::filesystem::path& filepath)
 {
-	DX::XMMATRIX transform = GetMeshTransform(model, node);
+	ufbx_load_opts opts = { }; // Optional, pass NULL for defaults
+	ufbx_error error; // Optional, pass NULL if you don't care about errors
+
+	std::shared_ptr<UfbxScene> scene = std::make_shared<UfbxScene>(ufbx_load_file(ufbx_string_view(filepath.generic_string().c_str(), filepath.generic_string().length()), &opts, &error));
+	ASSERT(scene.get(), error.description.data);
+
+	return scene;
+}
+
+std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
+{
+	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
+
+	for (const auto& mesh : model.Meshes())
+	{
+		int meshIndex = mesh->element_id;
+		meshes[meshIndex] = std::make_unique<Mesh>(meshIndex, model, transform, color);
+	}
+
+	return meshes;
+}
+
+std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const UfbxScene& objModel, int meshIndex)
+{
+	std::vector<ModelVertex> vertices;
+	const auto& mesh = reinterpret_cast<ufbx_mesh*>(objModel.Elements()[meshIndex]);
+
+	std::vector<uint32_t> tri_indices;
+	tri_indices.resize(mesh->max_face_triangles * 3);
+
+	for (ufbx_face face : mesh->faces)
+	{
+
+		// Triangulate the face into tri_indices[]
+		uint32_t num_tris = ufbx_triangulate_face(tri_indices.data(), tri_indices.size(), mesh, face);
+
+		for (uint32_t i = 0; i < num_tris * 3; i++)
+		{
+			uint32_t index = tri_indices[i];
+
+            ufbx_vec3 position = mesh->vertex_position[index];
+            ufbx_vec3 normal = mesh->vertex_normal[index];
+
+			vertices.push_back({ {position.x, position.y, position.z}, {normal.x, normal.y, normal.z} });
+		}
+
+    }
+	ASSERT(vertices.size() == mesh->num_triangles * 3);
+
+	return vertices;
+}
+
+std::vector<uint32_t> ModelLoader::GetMeshIndexVector(const UfbxScene& objModel, std::vector<ModelVertex>& vertices, int meshIndex)
+{
+	std::vector<uint32_t> indices;
+	const auto& mesh = reinterpret_cast<ufbx_mesh*>(objModel.Elements()[meshIndex]);
+	indices.resize(mesh->num_triangles * 3);
+
+	ufbx_vertex_stream stream[1] = { {vertices.data(), vertices.size(), sizeof(ModelVertex)} };
+
+	uint32_t num_vertices = static_cast<uint32_t>(ufbx_generate_indices(stream, 1, indices.data(), indices.size(), nullptr, nullptr));
+
+	vertices.resize(num_vertices);
+	return indices;
+
+}
+
+std::unique_ptr<Node> ModelLoader::ParseNode(const UfbxScene& model, const ufbx_node& node, const std::unordered_map<int, std::unique_ptr<Mesh>>& modelMeshes)
+{
+	DX::XMMATRIX transform = GetNodeTransform(node);
 
 	std::vector<Mesh*> currentMesh;
-	currentMesh.push_back(modelMeshes.at(node.meshIndex.value()).get());
-
-	std::unique_ptr<Node> nextNode = std::make_unique<Node>(static_cast<int>(node.meshIndex.value()), node.name.c_str(), std::move(currentMesh), transform);
-	for (int i = 0; i < node.children.size(); i++)
+	std::unique_ptr<Node> nextNode;
+	if (node.mesh != nullptr)
 	{
-		nextNode->AddChild(ParseNode(model, model.nodes[node.children[i]], modelMeshes));
+		currentMesh.push_back(modelMeshes.at(node.mesh->element_id).get());
+		nextNode = std::make_unique<Node>(node.mesh->element_id, node.name.data, transform, std::move(currentMesh));
+	}
+	else
+	{
+		ASSERT(DX::XMMatrixIsIdentity(transform));
+		nextNode = std::make_unique<Node>();
 	}
 
+	for (int i = 0; i < node.children.count; i++)
+	{
+		nextNode->AddChild(ParseNode(model, *node.children[i], modelMeshes));
+	}
 	return nextNode;
-
 }
 
-std::unique_ptr<Node> ModelLoader::ParseNode(const rapidobj::Result& model, const std::vector<std::unique_ptr<Mesh>>& modelMeshes)
+
+DX::XMMATRIX ModelLoader::GetNodeTransform(const ufbx_node& node)
 {
-	std::vector<Mesh*> currentMeshes;
-	for (auto& mesh : modelMeshes)
-	{
-		currentMeshes.push_back(mesh.get());
-	}
-	
-	std::unique_ptr<Node> root = std::make_unique<Node>(0, "TestName", std::move(currentMeshes), DX::XMMatrixIdentity());
+	DX::XMMATRIX transform;
+	auto trs = node.local_transform;
+	transform =
+		DX::XMMatrixScaling(trs.scale.x, trs.scale.y, trs.scale.z) *
+		DX::XMMatrixRotationQuaternion({ trs.rotation.x, trs.rotation.y, trs.rotation.z }) *
+		DX::XMMatrixTranslation(trs.translation.x, trs.translation.y, trs.translation.z);
 
-	return root;
+	return transform;
 }
+#pragma endregion
+

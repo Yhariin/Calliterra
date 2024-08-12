@@ -5,7 +5,8 @@ class Mesh;
 class Node
 {
 public:
-	Node(int id, const std::string& name, std::vector<Mesh*> meshes, const DX::XMMATRIX& relativeTransform);
+	Node(int id, const std::string& name,  const DX::XMMATRIX& relativeTransform, std::vector<Mesh*> meshes);
+	Node();
 
 	void Draw();
 
@@ -31,7 +32,7 @@ private:
 	std::vector<std::unique_ptr<Node>> m_Children;
 	std::vector<Mesh*> m_Meshes;
 
-	DX::XMMATRIX m_RelativeTransform;
+	DX::XMMATRIX m_RelativeTransform = DX::XMMatrixIdentity();
 	DX::XMMATRIX m_ModelTransform = DX::XMMatrixIdentity();
 	DX::XMMATRIX m_AppliedTransform = DX::XMMatrixIdentity();
 };

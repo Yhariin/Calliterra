@@ -2,17 +2,25 @@
 #include "Node.h"
 #include "Mesh.h"
 
-Node::Node(int id, const std::string& name, std::vector<Mesh*> meshes, const DX::XMMATRIX& relativeTransform)
-	: m_Id(id), m_Name(name), m_Meshes(std::move(meshes)), m_RelativeTransform(relativeTransform)
+Node::Node(int id, const std::string& name,  const DX::XMMATRIX& relativeTransform, std::vector<Mesh*> meshes)
+	: m_Id(id), m_Name(name), m_RelativeTransform(relativeTransform), m_Meshes(std::move(meshes))
 {
+}
 
+// Constructor for an empty node with no corresponding mesh
+Node::Node()
+	: m_Id(-1), m_Name(""), m_RelativeTransform(DX::XMMatrixIdentity())
+{
 }
 
 void Node::Draw() 
 {
 	for (const auto& mesh : m_Meshes)
 	{
-		mesh->Draw();
+		if (!m_Meshes.empty())
+		{
+			mesh->Draw();
+		}
 	}
 
 	for (const auto& child : m_Children)
@@ -28,7 +36,10 @@ void Node::ApplyTransformations(const DX::XMMATRIX& transform)
 	
 	for (const auto& mesh : m_Meshes)
 	{
-		mesh->SetTransform(accumulatedTransform);
+		if (!m_Meshes.empty())
+		{
+			mesh->SetTransform(accumulatedTransform);
+		}
 	}
 
 	for (const auto& child : m_Children)
@@ -54,14 +65,16 @@ void Node::AddChild(std::unique_ptr<Node> child)
 void Node::SetModelTransform(const DX::XMMATRIX& transform)
 {
 	m_ModelTransform = transform;
-
 }
 
 void Node::SetProjectionMatrix(const DX::XMMATRIX& projMatrix)
 {
 	for (const auto& mesh : m_Meshes)
 	{
-		mesh->SetProjectionMatrix(projMatrix);
+		if (!m_Meshes.empty())
+		{
+			mesh->SetProjectionMatrix(projMatrix);
+		}
 	}
 
 	for (const auto& child : m_Children)
@@ -74,7 +87,10 @@ void Node::SetViewMatrix(const DX::XMMATRIX& viewMatrix)
 {
 	for (const auto& mesh : m_Meshes)
 	{
-		mesh->SetViewMatrix(viewMatrix);
+		if (!m_Meshes.empty())
+		{
+			mesh->SetViewMatrix(viewMatrix);
+		}
 	}
 
 	for (const auto& child : m_Children)

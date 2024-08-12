@@ -7,7 +7,7 @@ public:
 	Drawable() = default;
 	virtual ~Drawable() = default;
 
-	Drawable(DX::XMMATRIX transform, DX::XMFLOAT3 color)
+	Drawable(const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
 		: m_Transform(transform), m_Color(color)
 	{
 	}

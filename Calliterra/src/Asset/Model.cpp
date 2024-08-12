@@ -28,6 +28,13 @@ Model::Model(std::shared_ptr<fastgltf::Asset> model, const DX::XMMATRIX& transfo
 Model::Model(std::shared_ptr<UfbxScene> model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
 	: Drawable(transform, color)
 {
+	m_Meshes = std::move(ModelLoader::GetModelMeshes(*model, transform, color));
+
+	m_Root = ModelLoader::ParseNode(*model, *model->Root_node(), m_Meshes);
+
+	m_Root->SetModelTransform(m_Transform);
+	m_Root->ApplyTransformations();
+
 }
 
 void Model::Draw()

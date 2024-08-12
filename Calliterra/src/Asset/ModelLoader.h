@@ -17,29 +17,41 @@ struct ModelVertex
 class ModelLoader
 {
 public:
+	//==============================Obj====================================
 	static std::shared_ptr<rapidobj::Result> LoadModelObj(const std::filesystem::path& filepath);
-	static std::shared_ptr<fastgltf::Asset> LoadModelGltf(const std::filesystem::path& filepath);
-	static std::shared_ptr<UfbxScene> LoadModelFbx(const std::filesystem::path& filepath);
 
-	static std::vector<std::unique_ptr<Mesh>> GetModelMeshes(const rapidobj::Result& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
-	static std::vector<std::unique_ptr<Mesh>> GetModelMeshes(const fastgltf::Asset& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
-	static std::vector<std::unique_ptr<Mesh>> GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
+	static std::unordered_map<int, std::unique_ptr<Mesh>> GetModelMeshes(const rapidobj::Result& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
 
 	static std::vector<ModelVertex> GetMeshVertexVector(const rapidobj::Result& objModel, int meshIndex);
 	static std::vector<uint32_t> GetMeshIndexVector(const rapidobj::Result& objModel, int meshIndex);
 
+	static std::unique_ptr<Node> ParseNode(const rapidobj::Result& model, const std::unordered_map<int, std::unique_ptr<Mesh>>& modelMeshes);
+
+	//==============================Gltf===================================
+	static std::shared_ptr<fastgltf::Asset> LoadModelGltf(const std::filesystem::path& filepath);
+
+	static std::unordered_map<int, std::unique_ptr<Mesh>> GetModelMeshes(const fastgltf::Asset& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
+
 	static std::vector<ModelVertex> GetMeshVertexVector(const fastgltf::Asset& objModel, int meshIndex);
 	static std::vector<uint32_t> GetMeshIndexVector(const fastgltf::Asset& objModel, int meshIndex);
 
-	static std::vector<ModelVertex> GetModelVertexVector(const UfbxScene& objModel);
-	static std::vector<uint32_t> GetModelIndexVector(const UfbxScene& objModel, std::vector<ModelVertex>& vertices);
-
-	static std::unique_ptr<Node> ParseNode(const fastgltf::Asset& model, const fastgltf::Node& node, const std::vector<std::unique_ptr<Mesh>>& modelMeshes);
-	static std::unique_ptr<Node> ParseNode(const rapidobj::Result& model, const std::vector<std::unique_ptr<Mesh>>& modelMeshes);
+	static std::unique_ptr<Node> ParseNode(const fastgltf::Asset& model, const fastgltf::Node& node, const std::unordered_map<int, std::unique_ptr<Mesh>>& modelMeshes);
 	static const fastgltf::Node& GetRootNode(const fastgltf::Asset& model);
+
+	//==============================Fbx===================================
+	static std::shared_ptr<UfbxScene> LoadModelFbx(const std::filesystem::path& filepath);
+
+	//static std::vector<std::unique_ptr<Mesh>> GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
+	static std::unordered_map<int, std::unique_ptr<Mesh>> GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
+
+	static std::vector<ModelVertex> GetMeshVertexVector(const UfbxScene& objModel, int meshIndex);
+	static std::vector<uint32_t> GetMeshIndexVector(const UfbxScene& objModel, std::vector<ModelVertex>& vertices, int meshIndex);
+
+	static std::unique_ptr<Node> ParseNode(const UfbxScene& model, const ufbx_node& node, const std::unordered_map<int, std::unique_ptr<Mesh>>& modelMeshes);
 
 private:
 	static DX::XMMATRIX GetMeshTransform(const fastgltf::Asset& model, const fastgltf::Node& node);
+	static DX::XMMATRIX GetNodeTransform(const ufbx_node& node);
 
 private:
 	static constexpr auto m_GltfSupportedExtensions =
@@ -86,7 +98,7 @@ public:
 	ufbx_unknown_list Unknowns() const { return m_Scene->unknowns; }
 
 	// Nodes
-	ufbx_node_list Nodes() { return m_Scene->nodes; }
+	ufbx_node_list Nodes() const { return m_Scene->nodes; }
 
 	// Node attributes (common)
 	ufbx_mesh_list Meshes() const { return m_Scene->meshes; }

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Mesh.h"
 
-Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, DX::XMMATRIX transform, DX::XMFLOAT3 color)
+Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_ObjModel(&ObjModel)
 {
 	m_Vertices = ModelLoader::GetMeshVertexVector(*m_ObjModel, m_MeshIndex);
@@ -10,11 +10,20 @@ Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, DX::XMMATRIX transfo
 	InitBuffers();
 }
 
-Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, DX::XMMATRIX transform, DX::XMFLOAT3 color)
+Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_GltfModel(&gltfModel)
 {
 	m_Vertices = ModelLoader::GetMeshVertexVector(*m_GltfModel, m_MeshIndex);
 	m_Indices = ModelLoader::GetMeshIndexVector(*m_GltfModel, m_MeshIndex);
+
+	InitBuffers();
+}
+
+Mesh::Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
+	: Drawable(transform, color), m_MeshIndex(meshIndex), m_FbxModel(&fbxModel)
+{
+	m_Vertices = ModelLoader::GetMeshVertexVector(*m_FbxModel, m_MeshIndex);
+	m_Indices = ModelLoader::GetMeshIndexVector(*m_FbxModel, m_Vertices, m_MeshIndex);
 
 	InitBuffers();
 }

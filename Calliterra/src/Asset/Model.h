@@ -27,6 +27,6 @@ private:
 	std::shared_ptr<UfbxScene> m_FbxModel;
 
 	std::unique_ptr<Node> m_Root;
-	std::vector<std::unique_ptr<Mesh>> m_Meshes;
+	std::unordered_map<int, std::unique_ptr<Mesh>> m_Meshes;
 };
 
