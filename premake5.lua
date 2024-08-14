@@ -39,7 +39,8 @@ project (PROJECT_NAME)
     {
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/src/**.h",
-        "%{prj.name}/vendor/ufbx/ufbx.c"
+        "%{prj.name}/vendor/ufbx/ufbx.c",
+        "%{prj.name}/vendor/stb/stb_image.c"
     }
 
     includedirs
@@ -48,6 +49,7 @@ project (PROJECT_NAME)
         "%{prj.name}/vendor/spdlog/include",
         "%{prj.name}/vendor/rapidobj/include",
         "%{prj.name}/vendor/ufbx/",
+        "%{prj.name}/vendor/stb/",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.fastgltf}"
     }
