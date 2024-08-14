@@ -3,6 +3,7 @@
 #include "Platform/DX11/DX11VertexBuffer.h"
 #include "Platform/DX11/DX11IndexBuffer.h"
 #include "Platform/DX11/DX11Shader.h"
+#include "Platform/DX11/DX11Texture.h"
 
 void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 {
@@ -29,6 +30,7 @@ void Renderer::Clear()
 void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList, 
 					const std::shared_ptr<VertexBuffer>& vertexBuffer, 
 					const std::shared_ptr<IndexBuffer>& indexBuffer, 
+					const std::shared_ptr<Texture>& texture, 
 					const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList)
 {
 	for (auto& shader : shaderList)
@@ -46,6 +48,11 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 	{
 		indexBuffer->Bind();
 		s_IndexCount = indexBuffer->GetCount();
+	}
+
+	if (texture != nullptr)
+	{
+		texture->Bind({});
 	}
 
 	for (auto& buffer : constantBufferList)
@@ -90,5 +97,20 @@ std::shared_ptr<Shader> Renderer::CreateShader(const std::string& filepath, Shad
 	LOG_ERROR("Unknown RendererAPI");
 	return nullptr;
 
+}
+
+std::shared_ptr<Texture> Renderer::CreateTexture(const std::string& filepath, uint32_t slot)
+{
+	switch(GetAPI())
+	{
+	case RendererAPI::None: 
+		ASSERT(false, "RendererAPI is set to None!");
+		return nullptr;
+	case RendererAPI::DX11:
+		return std::make_shared<DX11Texture>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), filepath, slot);
+	}
+
+	LOG_ERROR("Unknown RendererAPI");
+	return nullptr;
 }
 

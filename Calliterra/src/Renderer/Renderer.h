@@ -6,6 +6,7 @@
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/Shader.h"
 #include "Renderer/ConstantBuffer.h"
+#include "Renderer/Texture.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
 #include "Platform/DX11/DX11VertexBuffer.h"
 
@@ -16,9 +17,10 @@ public:
 	static void Shutdown();
 	static void SetClearColor(float r, float g, float b, float a = 1.f);
 	static void Clear();
-	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {}, 
-					 const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr, 
-					 const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr, 
+	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {},
+					 const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr,
+					 const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr,
+					 const std::shared_ptr<Texture>& texture = nullptr,
 					 const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList = {}
 	);
 	static void Draw();
@@ -152,6 +154,8 @@ public:
 		}
 
 	}
+
+	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0);
 
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 private:

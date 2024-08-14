@@ -38,7 +38,7 @@ void Mesh::Draw()
 	};
 
 	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, cb);
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, { m_TransformConstantBuffer, m_PixelConstantBuffer });
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, nullptr, { m_TransformConstantBuffer, m_PixelConstantBuffer });
 	Renderer::Draw();
 }
 

@@ -38,6 +38,7 @@ private:
 	{
 		DX::XMFLOAT3 Position;
 		DX::XMFLOAT3 Normal;
+		DX::XMFLOAT2 Texture;
 	};
 
 	struct CubeTransformConstantBuffer
@@ -71,30 +72,30 @@ private:
 
 	inline static std::vector<CubeVertex> m_IndependentCubeVertices =
 	{
-		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }},
-		{{  side, -side, -side }, { 0.f, 0.f, 0.f }},
-		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }},
-		{{  side,  side, -side }, { 0.f, 0.f, 0.f }},
-		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }},
-		{{  side, -side,  side }, { 0.f, 0.f, 0.f }},
-		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }},
-		{{  side,  side,  side }, { 0.f, 0.f, 0.f }},
-		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }},
-		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }},
-		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }},
-		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }},
-		{{  side, -side, -side }, { 0.f, 0.f, 0.f }},
-		{{  side,  side, -side }, { 0.f, 0.f, 0.f }},
-		{{  side, -side,  side }, { 0.f, 0.f, 0.f }},
-		{{  side,  side,  side }, { 0.f, 0.f, 0.f }},
-		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }},
-		{{  side, -side, -side }, { 0.f, 0.f, 0.f }},
-		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }},
-		{{  side, -side,  side }, { 0.f, 0.f, 0.f }},
-		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }},
-		{{  side,  side, -side }, { 0.f, 0.f, 0.f }},
-		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }},
-		{{  side,  side,  side }, { 0.f, 0.f, 0.f }},
+		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }, {0.f, 0.f}},
+		{{  side, -side, -side }, { 0.f, 0.f, 0.f }, {1.f, 0.f}},
+		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }, {0.f, 1.f}},
+		{{  side,  side, -side }, { 0.f, 0.f, 0.f }, {1.f, 1.f}},
+		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }, {0.f, 0.f}},
+		{{  side, -side,  side }, { 0.f, 0.f, 0.f }, {1.f, 0.f}},
+		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }, {0.f, 1.f}},
+		{{  side,  side,  side }, { 0.f, 0.f, 0.f }, {1.f, 1.f}},
+		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }, {0.f, 0.f}},
+		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }, {1.f, 0.f}},
+		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }, {0.f, 1.f}},
+		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }, {1.f, 1.f}},
+		{{  side, -side, -side }, { 0.f, 0.f, 0.f }, {0.f, 0.f}},
+		{{  side,  side, -side }, { 0.f, 0.f, 0.f }, {1.f, 0.f}},
+		{{  side, -side,  side }, { 0.f, 0.f, 0.f }, {0.f, 1.f}},
+		{{  side,  side,  side }, { 0.f, 0.f, 0.f }, {1.f, 1.f}},
+		{{ -side, -side, -side }, { 0.f, 0.f, 0.f }, {0.f, 0.f}},
+		{{  side, -side, -side }, { 0.f, 0.f, 0.f }, {1.f, 0.f}},
+		{{ -side, -side,  side }, { 0.f, 0.f, 0.f }, {0.f, 1.f}},
+		{{  side, -side,  side }, { 0.f, 0.f, 0.f }, {1.f, 1.f}},
+		{{ -side,  side, -side }, { 0.f, 0.f, 0.f }, {0.f, 0.f}},
+		{{  side,  side, -side }, { 0.f, 0.f, 0.f }, {1.f, 0.f}},
+		{{ -side,  side,  side }, { 0.f, 0.f, 0.f }, {0.f, 1.f}},
+		{{  side,  side,  side }, { 0.f, 0.f, 0.f }, {1.f, 1.f}},
 
 	};
 
@@ -122,6 +123,7 @@ private:
 	inline static std::shared_ptr<Shader> s_PixelShader = nullptr;
 	inline static std::shared_ptr<VertexBuffer> s_VertexBuffer = nullptr;
 	inline static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
+	inline static std::shared_ptr<Texture> s_Texture = nullptr;
 	inline static std::shared_ptr<ConstantBuffer> s_TransformConstantBuffer = nullptr;
 	inline static std::shared_ptr<ConstantBuffer> s_PixelConstantBuffer = nullptr;
 

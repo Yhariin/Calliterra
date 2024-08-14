@@ -35,8 +35,8 @@ void Cube::InitRNG()
 void Cube::InitBuffers()
 {
 	CalculateNormals();
-	s_VertexShader = Renderer::CreateShader("assets/shaders/PhongVS.hlsl", Shader::VERTEX_SHADER);
-	s_PixelShader = Renderer::CreateShader("assets/shaders/PhongPS.hlsl", Shader::PIXEL_SHADER);
+	s_VertexShader = Renderer::CreateShader("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
+	s_PixelShader = Renderer::CreateShader("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
 	s_VertexBuffer = Renderer::CreateVertexBuffer(m_IndependentCubeVertices, static_cast<uint32_t>(m_IndependentCubeVertices.size()), s_VertexShader.get());
 	s_IndexBuffer = Renderer::CreateIndexBuffer(m_IndependentCubeIndices, m_INDEXCOUNT);
 
@@ -46,8 +46,11 @@ void Cube::InitBuffers()
 	s_VertexBuffer->CreateLayout({
 		{"POSITION", 0, ShaderDataType::Float3},
 		{"NORMAL", 0, ShaderDataType::Float3},
+		{"TEXCOORD", 0, ShaderDataType::Float2},
 		});
 	s_VertexBuffer->SetLayout();
+
+	s_Texture = Renderer::CreateTexture("assets/textures/batchest.jpg");
 		
 	s_TransformConstantBuffer = Renderer::CreateConstantBuffer<CubeTransformConstantBuffer>(Shader::VERTEX_SHADER);
 
@@ -89,7 +92,7 @@ void Cube::Draw()
 	};
 
 	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, cb);
-	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_TransformConstantBuffer, s_PixelConstantBuffer });
+	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, s_Texture, { s_TransformConstantBuffer, s_PixelConstantBuffer });
 	Renderer::Draw();
 
 }
