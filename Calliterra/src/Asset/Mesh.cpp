@@ -90,7 +90,7 @@ void Mesh::InitBuffers()
 
 	PixelConstantBuffer pcb = {
 		1.f,
-		35.f
+		m_Material->GetShininess()
 	};
 
 	if (!m_Material->HasMaterialMap(Material::Specular))

@@ -32,6 +32,10 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 		{
 			material->AddMaterialMap(Material::Specular, "assets/models/nano_textured/" + model.materials[materialIndex].specular_texname);
 		}
+		else
+		{
+			material->SetShininess(model.materials[materialIndex].shininess);
+		}
 
 		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material));
 	}
