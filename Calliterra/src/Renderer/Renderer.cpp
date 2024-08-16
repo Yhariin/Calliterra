@@ -30,7 +30,7 @@ void Renderer::Clear()
 void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList, 
 					const std::shared_ptr<VertexBuffer>& vertexBuffer, 
 					const std::shared_ptr<IndexBuffer>& indexBuffer, 
-					const std::shared_ptr<Texture>& texture, 
+					const std::vector<std::shared_ptr<Texture>>& textureList, 
 					const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList)
 {
 	for (auto& shader : shaderList)
@@ -50,7 +50,7 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 		s_IndexCount = indexBuffer->GetCount();
 	}
 
-	if (texture != nullptr)
+	for (auto& texture : textureList)
 	{
 		texture->Bind({});
 	}

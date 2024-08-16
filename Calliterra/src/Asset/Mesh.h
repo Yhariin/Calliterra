@@ -3,6 +3,7 @@
 #include "Node.h"
 #include "Renderer/Renderer.h"
 #include "ModelLoader.h"
+#include "Material.h"
 
 struct ModelVertex;
 class UfbxScene;
@@ -10,9 +11,9 @@ class UfbxScene;
 class Mesh : public Drawable
 {
 public:
-	Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
-	Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
-	Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
+	Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, std::unique_ptr<Material> material = nullptr);
+	Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, std::unique_ptr<Material> material = nullptr);
+	Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, std::unique_ptr<Material> material = nullptr);
 
 	void Draw() override;
 
@@ -31,7 +32,6 @@ private:
 
 	struct PixelConstantBuffer
 	{
-		alignas(16) DX::XMFLOAT3 Color;
 		float SpecularIntensity;
 		float SpecularPower;
 		float padding[2];
@@ -46,11 +46,13 @@ private:
 
 	std::vector<ModelVertex> m_Vertices;
 	std::vector<uint32_t> m_Indices;
+	std::unique_ptr<Material> m_Material;
 
 	std::shared_ptr<Shader> m_VertexShader = nullptr;
 	std::shared_ptr<Shader> m_PixelShader = nullptr;
 	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
 	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
+	std::vector<std::shared_ptr<Texture>> m_Textures;
 	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
 	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
 };

@@ -92,7 +92,7 @@ void Cube::Draw()
 	};
 
 	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, cb);
-	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, s_Texture, { s_TransformConstantBuffer, s_PixelConstantBuffer });
+	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_Texture }, { s_TransformConstantBuffer, s_PixelConstantBuffer });
 	Renderer::Draw();
 
 }

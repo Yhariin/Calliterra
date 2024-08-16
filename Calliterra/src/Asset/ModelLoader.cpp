@@ -2,12 +2,13 @@
 #include "ModelLoader.h"
 #include "fastgltf/tools.hpp"
 #include "fastgltf/math.hpp"
+#include "Material.h"
 
 //==============================Obj====================================
 #pragma region obj
 std::shared_ptr<rapidobj::Result> ModelLoader::LoadModelObj(const std::filesystem::path& filepath)
 {
-	std::shared_ptr<rapidobj::Result> model = std::make_shared<rapidobj::Result>(rapidobj::ParseFile(filepath, rapidobj::MaterialLibrary::Ignore()));
+	std::shared_ptr<rapidobj::Result> model = std::make_shared<rapidobj::Result>(rapidobj::ParseFile(filepath));
 	ASSERT(!model->error, model->error.code.message());
 	ASSERT_VERIFY(Triangulate(*model.get()), model->error.code.message());
 
@@ -20,7 +21,19 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 
 	for (int i = 0; i < model.shapes.size(); i++)
 	{
-		meshes[i] = std::make_unique<Mesh>(i, model, transform, color);
+		int materialIndex = model.shapes[i].mesh.material_ids[0];
+		std::unique_ptr<Material> material = std::make_unique<Material>();
+
+		if (model.materials[materialIndex].diffuse_texname != "")
+		{
+			material->AddMaterialMap(Material::Diffuse, "assets/models/nano_textured/" + model.materials[materialIndex].diffuse_texname);
+		}
+		if (model.materials[materialIndex].specular_texname != "")
+		{
+			material->AddMaterialMap(Material::Specular, "assets/models/nano_textured/" + model.materials[materialIndex].specular_texname);
+		}
+
+		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material));
 	}
 
 	return meshes;
@@ -39,9 +52,11 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const rapidobj::Result
 		{
 			int posIndex = mesh.indices[i * 3 + j].position_index;
 			int normIndex = mesh.indices[i * 3 + j].normal_index;
+			int texIndex = mesh.indices[i * 3 + j].texcoord_index;
 
 			DX::XMFLOAT3 pos;
 			DX::XMFLOAT3 norm;
+			DX::XMFLOAT2 tex;
 
 			pos.x = objModel.attributes.positions[posIndex * 3];
 			pos.y = objModel.attributes.positions[posIndex * 3 + 1];
@@ -51,7 +66,14 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const rapidobj::Result
 			norm.y = objModel.attributes.normals[normIndex * 3 + 1];
 			norm.z = objModel.attributes.normals[normIndex * 3 + 2];
 
-			vertices.push_back({ pos, norm });
+			tex.x = objModel.attributes.texcoords[texIndex * 2];
+			tex.y = objModel.attributes.texcoords[texIndex * 2 + 1];
+
+			if (m_FlipUVs)
+			{
+				DX::XMStoreFloat2(&tex, DX::XMVector2Transform(DX::XMLoadFloat2(&tex), DX::XMMatrixRotationX(DX::XMConvertToRadians(180)) * DX::XMMatrixTranslation(0.f, 1.f, 0.f)));
+			}
+			vertices.push_back({ pos, norm, tex });
 		}
 
 	}

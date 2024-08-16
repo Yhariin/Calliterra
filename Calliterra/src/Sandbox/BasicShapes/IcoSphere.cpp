@@ -11,7 +11,7 @@ IcoSphere::IcoSphere(const int resolution, DX::XMMATRIX transform, DX::XMFLOAT3 
 void IcoSphere::Draw()
 {
 	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix));
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, nullptr, { m_TransformConstantBuffer, m_ColorConstantBuffer });
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, { m_TransformConstantBuffer, m_ColorConstantBuffer });
 	Renderer::Draw();
 }
 

@@ -12,6 +12,7 @@ struct ModelVertex
 {
 	DX::XMFLOAT3 Position;
 	DX::XMFLOAT3 Normal;
+	DX::XMFLOAT2 Tex;
 };
 
 class ModelLoader
@@ -41,7 +42,6 @@ public:
 	//==============================Fbx===================================
 	static std::shared_ptr<UfbxScene> LoadModelFbx(const std::filesystem::path& filepath);
 
-	//static std::vector<std::unique_ptr<Mesh>> GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
 	static std::unordered_map<int, std::unique_ptr<Mesh>> GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
 
 	static std::vector<ModelVertex> GetMeshVertexVector(const UfbxScene& objModel, int meshIndex);
@@ -67,6 +67,7 @@ private:
 		fastgltf::Options::GenerateMeshIndices;
 
 	inline static fastgltf::Parser m_GltfParser = fastgltf::Parser(m_GltfSupportedExtensions);
+	inline static constexpr bool m_FlipUVs = true;
 };
 
 // Wrapper class for ufbx_scene to support RAII

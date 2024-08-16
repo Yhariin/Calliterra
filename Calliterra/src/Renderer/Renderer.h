@@ -20,7 +20,7 @@ public:
 	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {},
 					 const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr,
 					 const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr,
-					 const std::shared_ptr<Texture>& texture = nullptr,
+					 const std::vector<std::shared_ptr<Texture>>& textures = {},
 					 const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList = {}
 	);
 	static void Draw();
