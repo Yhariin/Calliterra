@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "IcoSphere.h"
 
-IcoSphere::IcoSphere(const int resolution, DX::XMMATRIX transform, DX::XMFLOAT3 color)
-	: Drawable(transform, color)
+IcoSphere::IcoSphere(const uint32_t resolution, DX::XMMATRIX transform, DX::XMFLOAT3 color)
+	: m_Resolution(resolution), Drawable(transform, color)
 {
 	CalculateSphere(resolution);
 	InitBuffers();
@@ -42,7 +42,7 @@ void IcoSphere::CalculateSphere(const int resolution)
 	AddVertex(DX::XMFLOAT3(-t, 0, 1));
 
 	// Create the triangle faces of Icosahedron
-	std::vector<TriangleIndices> faces =
+	std::vector<Indices> faces =
 	{
 		{0,11,5}, {0,5,1}, {0,1,7}, {0,7,10}, {0,10,11},
 		{1,5,9}, {5,11,4}, {11,10,2}, {10,7,6}, {7,1,8},
@@ -53,17 +53,17 @@ void IcoSphere::CalculateSphere(const int resolution)
 	// Subdivide triangles
 	for (int i = 0; i < resolution; i++)
 	{
-		std::vector<TriangleIndices> faces2;
+		std::vector<Indices> faces2;
 		for (auto tri : faces)
 		{
 			int a = GetMidPoint(tri.v1, tri.v2);
 			int b = GetMidPoint(tri.v2, tri.v3);
 			int c = GetMidPoint(tri.v3, tri.v1);
 
-			faces2.emplace_back(TriangleIndices(tri.v1, a, c));
-			faces2.emplace_back(TriangleIndices(tri.v2, b, a));
-			faces2.emplace_back(TriangleIndices(tri.v3, c, b));
-			faces2.emplace_back(TriangleIndices(a, b, c));
+			faces2.emplace_back(Indices(tri.v1, a, c));
+			faces2.emplace_back(Indices(tri.v2, b, a));
+			faces2.emplace_back(Indices(tri.v3, c, b));
+			faces2.emplace_back(Indices(a, b, c));
 		}
 
 		faces = faces2;
@@ -71,9 +71,9 @@ void IcoSphere::CalculateSphere(const int resolution)
 
 	for(auto tri : faces)
 	{
-		m_SphereIndices.push_back(tri.v1);
-		m_SphereIndices.push_back(tri.v2);
-		m_SphereIndices.push_back(tri.v3);
+		m_Indices.push_back(tri.v1);
+		m_Indices.push_back(tri.v2);
+		m_Indices.push_back(tri.v3);
 	}
 }
 
@@ -89,8 +89,8 @@ int IcoSphere::GetMidPoint(uint32_t p1, uint32_t p2)
 		return m_MiddlePointCache.at(key);
 	}
 
-	DX::XMFLOAT3 point1 = m_SphereVertices[p1];
-	DX::XMFLOAT3 point2 = m_SphereVertices[p2];
+	DX::XMFLOAT3 point1 = m_Vertices[p1];
+	DX::XMFLOAT3 point2 = m_Vertices[p2];
 	DX::XMFLOAT3 middle = DX::XMFLOAT3(
 		(point1.x + point2.x) / 2.f,
 		(point1.y + point2.y) / 2.f,
@@ -105,29 +105,31 @@ int IcoSphere::GetMidPoint(uint32_t p1, uint32_t p2)
 
 void IcoSphere::InitBuffers()
 {
+	const auto geometryTag = "$IcoSphere." + std::to_string(m_Resolution);
 	if(DX::XMVector3Equal(DX::XMLoadFloat3(&m_Color), {-1.f, -1.f, -1.f}))
 	{ 
-		m_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
-		m_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
+		m_VertexShader = Shader::Resolve("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
+		m_PixelShader = Shader::Resolve("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
 
 		m_VertexShader->Bind();
 		m_PixelShader->Bind();
 
-		m_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
+		m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
 	}
 	else
 	{
-		m_VertexShader = Renderer::CreateShader("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
-		m_PixelShader = Renderer::CreateShader("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
+		m_VertexShader = Shader::Resolve("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
+		m_PixelShader = Shader::Resolve("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
 
 		m_VertexShader->Bind();
 		m_PixelShader->Bind();
 
-		m_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, DX::XMFLOAT4(m_Color.x, m_Color.y, m_Color.z, 1.f));
+		m_ColorConstantBuffer = ConstantBuffer::Resolve<DX::XMFLOAT4>(Shader::PIXEL_SHADER, DX::XMFLOAT4(m_Color.x, m_Color.y, m_Color.z, 1.f));
 	}
 
-	m_VertexBuffer = Renderer::CreateVertexBuffer(m_SphereVertices, m_VertexShader.get());
-	m_IndexBuffer = Renderer::CreateIndexBuffer(m_SphereIndices);
+	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices, m_VertexShader.get());
+	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
+
 
 	m_VertexShader->Bind();
 	m_PixelShader->Bind();
@@ -137,16 +139,16 @@ void IcoSphere::InitBuffers()
 		});
 	m_VertexBuffer->SetLayout();
 
-	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
+	m_TransformConstantBuffer = ConstantBuffer::Resolve<DX::XMMATRIX>(Shader::VERTEX_SHADER, {});
 }
 
 int IcoSphere::AddVertex(DX::XMFLOAT3 point)
 {
 	float length = sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
-	m_SphereVertices.emplace_back(DX::XMFLOAT3(
+	m_Vertices.emplace_back(DX::XMFLOAT3(
 		point.x / length,
 		point.y / length,
 		point.z / length));
-	return static_cast<int>(m_SphereVertices.size()-1);
+	return static_cast<int>(m_Vertices.size()-1);
 
 }

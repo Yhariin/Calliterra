@@ -17,7 +17,7 @@ private:
 		DX::XMFLOAT3 Normal;
 	};
 
-	struct PlaneTransformConstantBuffer
+	struct TransformConstantBuffer
 	{
 		DX::XMMATRIX Model;
 		DX::XMMATRIX ModelView;
@@ -25,7 +25,7 @@ private:
 		DX::XMMATRIX NormalMatrix;
 	};
 
-	struct PlanePixelConstantBuffer
+	struct PixelConstantBuffer
 	{
 		alignas(16) DX::XMFLOAT3 Color;
 		float SpecularIntensity;
@@ -37,14 +37,16 @@ private:
 	void InitBuffers();
 	void CalculateNormals();
 
-	std::vector<PlaneVertex> m_PlaneVertices;
-	std::vector<uint32_t> m_PlaneIndices;
+private:
+	uint32_t m_Resolution;
+	std::vector<PlaneVertex> m_Vertices;
+	std::vector<uint32_t> m_Indices;
 
 	std::shared_ptr<Shader> m_VertexShader = nullptr;
 	std::shared_ptr<Shader> m_PixelShader = nullptr;
 	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
 	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
 	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
-	std::shared_ptr<ConstantBuffer> m_PlanePixelConstantBuffer = nullptr;
+	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
 };
 

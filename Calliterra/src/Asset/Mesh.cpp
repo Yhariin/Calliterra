@@ -92,7 +92,7 @@ void Mesh::InitBuffers()
 		}
 	}
 
-	m_TransformConstantBuffer = ConstantBuffer::Resolve<TransformConstantBuffer>(typeid(TransformConstantBuffer).name(), Shader::VERTEX_SHADER, TransformConstantBuffer());
+	m_TransformConstantBuffer = ConstantBuffer::Resolve<TransformConstantBuffer>(Shader::VERTEX_SHADER, TransformConstantBuffer());
 
 	PixelConstantBuffer pcb = {
 		1.f,
@@ -101,6 +101,6 @@ void Mesh::InitBuffers()
 
 	if (!m_Material->HasMaterialMap(Material::Specular))
 	{
-		m_PixelConstantBuffer = ConstantBuffer::Resolve<PixelConstantBuffer>(typeid(PixelConstantBuffer).name(), Shader::PIXEL_SHADER, pcb, 1);
+		m_PixelConstantBuffer = ConstantBuffer::Resolve<PixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 	}
 }

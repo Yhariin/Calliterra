@@ -34,11 +34,12 @@ void Cube::InitRNG()
 
 void Cube::InitBuffers()
 {
+	const auto geometryTag = "$Cube.";
 	CalculateNormals();
-	s_VertexShader = Renderer::CreateShader("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
-	s_PixelShader = Renderer::CreateShader("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
-	s_VertexBuffer = Renderer::CreateVertexBuffer(m_IndependentCubeVertices, s_VertexShader.get());
-	s_IndexBuffer = Renderer::CreateIndexBuffer(m_IndependentCubeIndices);
+	s_VertexShader = Shader::Resolve("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
+	s_PixelShader = Shader::Resolve("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
+	s_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_IndependentCubeVertices, s_VertexShader.get());
+	s_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_IndependentCubeIndices);
 
 	s_VertexShader->Bind();
 	s_PixelShader->Bind();
@@ -50,9 +51,9 @@ void Cube::InitBuffers()
 		});
 	s_VertexBuffer->SetLayout();
 
-	s_Texture = Renderer::CreateTexture("assets/textures/batchest.jpg");
+	s_Texture = Texture::Resolve("assets/textures/batchest.jpg");
 		
-	s_TransformConstantBuffer = Renderer::CreateConstantBuffer<CubeTransformConstantBuffer>(Shader::VERTEX_SHADER);
+	s_TransformConstantBuffer = ConstantBuffer::Resolve<CubeTransformConstantBuffer>(Shader::VERTEX_SHADER, {});
 
 	CubePixelConstantBuffer pcb = {
 		DX::XMFLOAT3(0.7f, 0.7f, 0.9f),
@@ -60,7 +61,7 @@ void Cube::InitBuffers()
 		128.f
 	};
 
-	s_PixelConstantBuffer = Renderer::CreateConstantBuffer<CubePixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
+	s_PixelConstantBuffer = ConstantBuffer::Resolve<CubePixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 
 }
 

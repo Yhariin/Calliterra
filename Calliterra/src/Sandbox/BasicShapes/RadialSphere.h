@@ -15,8 +15,9 @@ private:
 	void InitBuffers();
 
 private:
-	std::vector<DX::XMVECTOR> m_SphereVertices;
-	std::vector<uint32_t> m_SphereIndices;
+	uint32_t m_LatDiv, m_LongDiv;
+	std::vector<DX::XMVECTOR> m_Vertices;
+	std::vector<uint32_t> m_Indices;
 
 	std::shared_ptr<Shader> m_VertexShader = nullptr;
 	std::shared_ptr<Shader> m_PixelShader = nullptr;

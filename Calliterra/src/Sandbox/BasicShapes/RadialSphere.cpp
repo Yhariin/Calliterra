@@ -2,7 +2,7 @@
 #include "RadialSphere.h"
 
 RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX transform, DX::XMFLOAT3 color)
-	: Drawable(transform, color)
+	: m_LatDiv(latDiv), m_LongDiv(longDiv), Drawable(transform, color)
 {
 	CalculateSphere(latDiv, longDiv);
 	InitBuffers();
@@ -41,15 +41,15 @@ void RadialSphere::CalculateSphere(const int longDiv, const int latDiv)
 
 		for (int iLat = 0; iLat < latDiv; iLat++)
 		{
-			m_SphereVertices.emplace_back(DX::XMVector3Transform(longBase, DX::XMMatrixRotationZ(lattitudeAngle * iLat)));
+			m_Vertices.emplace_back(DX::XMVector3Transform(longBase, DX::XMMatrixRotationZ(lattitudeAngle * iLat)));
 		}
 	}
 
 	// Add the cap vertices
-	const uint32_t iNorthPole = static_cast<uint32_t>(m_SphereVertices.size());
-	m_SphereVertices.emplace_back(base);
-	const uint32_t iSouthPole = static_cast<uint32_t>(m_SphereVertices.size());
-	m_SphereVertices.emplace_back(DX::XMVectorNegate(base));
+	const uint32_t iNorthPole = static_cast<uint32_t>(m_Vertices.size());
+	m_Vertices.emplace_back(base);
+	const uint32_t iSouthPole = static_cast<uint32_t>(m_Vertices.size());
+	m_Vertices.emplace_back(DX::XMVectorNegate(base));
 
 	const auto calculateIndex = [latDiv, longDiv](auto iLong, auto iLat)
 		{ return iLong * latDiv + iLat; };
@@ -58,52 +58,54 @@ void RadialSphere::CalculateSphere(const int longDiv, const int latDiv)
 	{
 		for (int iLat = 0; iLat < latDiv - 1; iLat++)
 		{
-			m_SphereIndices.push_back(calculateIndex(iLong, iLat));
-			m_SphereIndices.push_back(calculateIndex(iLong, iLat+1));
-			m_SphereIndices.push_back(calculateIndex(iLong+1, iLat));
-			m_SphereIndices.push_back(calculateIndex(iLong, iLat+1));
-			m_SphereIndices.push_back(calculateIndex(iLong+1, iLat+1));
-			m_SphereIndices.push_back(calculateIndex(iLong+1, iLat));
+			m_Indices.push_back(calculateIndex(iLong, iLat));
+			m_Indices.push_back(calculateIndex(iLong, iLat+1));
+			m_Indices.push_back(calculateIndex(iLong+1, iLat));
+			m_Indices.push_back(calculateIndex(iLong, iLat+1));
+			m_Indices.push_back(calculateIndex(iLong+1, iLat+1));
+			m_Indices.push_back(calculateIndex(iLong+1, iLat));
 		}
 		// Wrap band
-		m_SphereIndices.push_back(calculateIndex(iLong, latDiv-1));
-		m_SphereIndices.push_back(calculateIndex(iLong, 0));
-		m_SphereIndices.push_back(calculateIndex(iLong+1, latDiv-1));
-		m_SphereIndices.push_back(calculateIndex(iLong, 0));
-		m_SphereIndices.push_back(calculateIndex(iLong+1, 0));
-		m_SphereIndices.push_back(calculateIndex(iLong+1, latDiv-1));
+		m_Indices.push_back(calculateIndex(iLong, latDiv-1));
+		m_Indices.push_back(calculateIndex(iLong, 0));
+		m_Indices.push_back(calculateIndex(iLong+1, latDiv-1));
+		m_Indices.push_back(calculateIndex(iLong, 0));
+		m_Indices.push_back(calculateIndex(iLong+1, 0));
+		m_Indices.push_back(calculateIndex(iLong+1, latDiv-1));
 	}
 
 	// Cap fans
 	for (int iLat = 0; iLat < latDiv - 1; iLat++)
 	{
 		// North
-		m_SphereIndices.push_back(iNorthPole);
-		m_SphereIndices.push_back(calculateIndex(0, iLat+1));
-		m_SphereIndices.push_back(calculateIndex(0, iLat));
+		m_Indices.push_back(iNorthPole);
+		m_Indices.push_back(calculateIndex(0, iLat+1));
+		m_Indices.push_back(calculateIndex(0, iLat));
 
 		// South
-		m_SphereIndices.push_back(calculateIndex(longDiv - 2, iLat));
-		m_SphereIndices.push_back(calculateIndex(longDiv - 2, iLat+1));
-		m_SphereIndices.push_back(iSouthPole);
+		m_Indices.push_back(calculateIndex(longDiv - 2, iLat));
+		m_Indices.push_back(calculateIndex(longDiv - 2, iLat+1));
+		m_Indices.push_back(iSouthPole);
 	}
 
-	m_SphereIndices.push_back(iNorthPole);
-	m_SphereIndices.push_back(calculateIndex(0, latDiv-1));
-	m_SphereIndices.push_back(calculateIndex(0, 0));
+	m_Indices.push_back(iNorthPole);
+	m_Indices.push_back(calculateIndex(0, latDiv-1));
+	m_Indices.push_back(calculateIndex(0, 0));
 
-	m_SphereIndices.push_back(calculateIndex(longDiv -2, latDiv-1));
-	m_SphereIndices.push_back(calculateIndex(longDiv -2, 0));
-	m_SphereIndices.push_back(iSouthPole);
+	m_Indices.push_back(calculateIndex(longDiv -2, latDiv-1));
+	m_Indices.push_back(calculateIndex(longDiv -2, 0));
+	m_Indices.push_back(iSouthPole);
 
 }
 
 void RadialSphere::InitBuffers()
 {
-	m_VertexShader = Renderer::CreateShader("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
-	m_PixelShader = Renderer::CreateShader("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
-	m_VertexBuffer = Renderer::CreateVertexBuffer(m_SphereVertices, m_VertexShader.get());
-	m_IndexBuffer = Renderer::CreateIndexBuffer(m_SphereIndices);
+	const auto geometryTag = "$RadialSphere." + std::to_string(m_LatDiv) + "." + std::to_string(m_LongDiv);
+
+	m_VertexShader = Shader::Resolve("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
+	m_PixelShader = Shader::Resolve("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
+	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices, m_VertexShader.get());
+	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
 
 	m_VertexShader->Bind();
 	m_PixelShader->Bind();
@@ -113,7 +115,7 @@ void RadialSphere::InitBuffers()
 		});
 	m_VertexBuffer->SetLayout();
 
-	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<DX::XMMATRIX>(Shader::VERTEX_SHADER);
-	m_ColorConstantBuffer = Renderer::CreateConstantBuffer<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
+	m_TransformConstantBuffer = ConstantBuffer::Resolve<DX::XMMATRIX>(Shader::VERTEX_SHADER, {});
+	m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
 }
 

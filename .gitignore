@@ -13,3 +13,5 @@ imgui*.ini
 **.vcxproj.filters
 **.vcxproj.user
 **.csproj
+
+/Calliterra/assets/models/HumanHeart_FBX.fbx
