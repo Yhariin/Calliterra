@@ -15,9 +15,8 @@ public:
 	}
 
 	template<typename Type>
-	static std::shared_ptr<ConstantBuffer> Resolve(const std::string& tag, Shader::ShaderType shaderType, const Type& constants, uint32_t slot = 0)
+	static std::shared_ptr<ConstantBuffer> Resolve(Shader::ShaderType shaderType, const Type& constants, uint32_t slot = 0, const std::string& tag = typeid(Type).name())
 	{
-		ASSERT(tag != "?");
 		return Renderer::GetResourceLibrary().Resolve<ConstantBuffer>(tag, shaderType, constants, slot);
 	}
 

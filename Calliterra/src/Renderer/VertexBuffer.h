@@ -25,14 +25,12 @@ public:
 	template <typename Type>
 	static std::shared_ptr<VertexBuffer> Resolve(const std::string& tag, const std::vector<Type>& vertices, Shader* shader = nullptr)
 	{
-		ASSERT(tag != "?");
 		return Renderer::GetResourceLibrary().Resolve<VertexBuffer>(tag, vertices, shader);
 	}
 
 	template <typename Type>
 	static std::shared_ptr<VertexBuffer> Resolve(const std::string& tag, const std::vector<std::vector<Type>>& listOfVertexArrays, uint32_t bufferCount, Shader* shader = nullptr)
 	{
-		ASSERT(tag != "?");
 		return Renderer::GetResourceLibrary().Resolve<VertexBuffer>(tag, listOfVertexArrays, shader);
 	}
 
