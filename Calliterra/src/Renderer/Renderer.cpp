@@ -14,7 +14,6 @@ void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 
 void Renderer::Shutdown()
 {
-
 }
 
 void Renderer::SetClearColor(float r, float g, float b, float a)
@@ -66,7 +65,7 @@ void Renderer::Draw()
 	s_RendererAPI->DrawIndexed(s_IndexCount);
 }
 
-std::shared_ptr<IndexBuffer> Renderer::CreateIndexBuffer(const uint32_t* indices, uint32_t count)
+std::shared_ptr<IndexBuffer> Renderer::CreateIndexBuffer(const std::vector<uint32_t>& indices)
 {
 	switch(GetAPI())
 	{
@@ -74,7 +73,7 @@ std::shared_ptr<IndexBuffer> Renderer::CreateIndexBuffer(const uint32_t* indices
 		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case RendererAPI::DX11:
-		return std::make_shared<DX11IndexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), indices, count);
+		return std::make_shared<DX11IndexBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), indices);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
@@ -112,5 +111,10 @@ std::shared_ptr<Texture> Renderer::CreateTexture(const std::string& filepath, ui
 
 	LOG_ERROR("Unknown RendererAPI");
 	return nullptr;
+}
+
+RendererResourceLibrary& Renderer::GetResourceLibrary()
+{
+	return s_ResourceLibrary;
 }
 

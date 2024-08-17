@@ -126,8 +126,8 @@ void IcoSphere::InitBuffers()
 		m_ColorConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, DX::XMFLOAT4(m_Color.x, m_Color.y, m_Color.z, 1.f));
 	}
 
-	m_VertexBuffer = Renderer::CreateVertexBuffer(m_SphereVertices, static_cast<uint32_t>(m_SphereVertices.size()), m_VertexShader.get());
-	m_IndexBuffer = Renderer::CreateIndexBuffer(&m_SphereIndices[0], static_cast<uint32_t>(m_SphereIndices.size()));
+	m_VertexBuffer = Renderer::CreateVertexBuffer(m_SphereVertices, m_VertexShader.get());
+	m_IndexBuffer = Renderer::CreateIndexBuffer(m_SphereIndices);
 
 	m_VertexShader->Bind();
 	m_PixelShader->Bind();

@@ -11,8 +11,9 @@ public:
 
 private:
 	DX11Context& m_DX11Context;
-
 	uint32_t m_Slot;
+
+	std::string m_Filepath;
 	int m_Width;
 	int m_Height;
 	int m_NumChannels;

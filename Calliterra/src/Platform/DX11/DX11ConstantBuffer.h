@@ -6,45 +6,16 @@ template<typename Type>
 class DX11ConstantBuffer : public ConstantBuffer
 {
 public:
-	DX11ConstantBuffer(DX11Context& context, const Type& constants, uint32_t slot = 0)
+	DX11ConstantBuffer(DX11Context& context, Shader::ShaderType shaderType, const Type& constants, uint32_t slot = 0)
 		: m_Context(context), m_Slot(slot)
 	{
-		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		bufferDesc.MiscFlags = 0;
-		bufferDesc.ByteWidth = sizeof(constants);
-		bufferDesc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA subresourceData = {};
-		subresourceData.pSysMem = &constants;
-		
-		ASSERT_HR(
-			m_Context.GetDevice().CreateBuffer(
-				&bufferDesc, &subresourceData, &m_ConstantBuffer
-			)
-		);
-		
+		InitBufferWithData(constants);
 	}
 
-	DX11ConstantBuffer(DX11Context& context, uint32_t slot = 0)
+	DX11ConstantBuffer(DX11Context& context, Shader::ShaderType shaderType, uint32_t slot = 0)
 		: m_Context(context), m_Slot(slot)
 	{
-		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		bufferDesc.MiscFlags = 0;
-		bufferDesc.ByteWidth = sizeof(Type);
-		bufferDesc.StructureByteStride = 0;
-
-		ASSERT_HR(
-			m_Context.GetDevice().CreateBuffer(
-				&bufferDesc, nullptr, &m_ConstantBuffer
-			)
-		);
-		
+		InitBufferWithoutData();
 	}
 
 	void Update(const Type& constants)
@@ -68,6 +39,44 @@ protected:
 	DX11Context& m_Context;
 	ComPtr<ID3D11Buffer> m_ConstantBuffer;
 	uint32_t m_Slot;
+
+private:
+	void InitBufferWithData(const Type& constants)
+	{
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bufferDesc.MiscFlags = 0;
+		bufferDesc.ByteWidth = sizeof(constants);
+		bufferDesc.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA subresourceData = {};
+		subresourceData.pSysMem = &constants;
+		
+		ASSERT_HR(
+			m_Context.GetDevice().CreateBuffer(
+				&bufferDesc, &subresourceData, &m_ConstantBuffer
+			)
+		);
+	}
+
+	void InitBufferWithoutData()
+	{
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bufferDesc.MiscFlags = 0;
+		bufferDesc.ByteWidth = sizeof(Type);
+		bufferDesc.StructureByteStride = 0;
+
+		ASSERT_HR(
+			m_Context.GetDevice().CreateBuffer(
+				&bufferDesc, nullptr, &m_ConstantBuffer
+			)
+		);
+	}
 };
 
 template<typename Type>

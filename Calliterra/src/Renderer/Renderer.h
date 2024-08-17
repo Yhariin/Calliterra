@@ -1,12 +1,13 @@
 #pragma once
 
 #include "RendererAPI.h"
-#include "Renderer/GraphicsContext.h"
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/IndexBuffer.h"
-#include "Renderer/Shader.h"
-#include "Renderer/ConstantBuffer.h"
-#include "Renderer/Texture.h"
+#include "RendererResourceLibrary.h"
+#include "GraphicsContext.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "Shader.h"
+#include "ConstantBuffer.h"
+#include "Texture.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
 #include "Platform/DX11/DX11VertexBuffer.h"
 
@@ -26,7 +27,7 @@ public:
 	static void Draw();
 
 	template<typename Type>
-	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<Type>& vertices, uint32_t elementCount, Shader* shader = nullptr)
+	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<Type>& vertices, Shader* shader = nullptr)
 	{
 		switch(GetAPI())
 		{
@@ -35,7 +36,7 @@ public:
 			return nullptr;
 		case RendererAPI::DX11:
 			ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
-			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), vertices, elementCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), vertices, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
 		}
 
 		LOG_ERROR("Unknown RendererAPI");
@@ -43,7 +44,7 @@ public:
 	}
 
 	template<typename Type>
-	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<std::vector<Type>>& listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, Shader* shader = nullptr)
+	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<std::vector<Type>>& listOfVertexArrays, Shader* shader = nullptr)
 	{
 		switch(GetAPI())
 		{
@@ -52,15 +53,14 @@ public:
 			return nullptr;
 		case RendererAPI::DX11:
 			ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
-			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), listOfVertexArrays, listOfElementCounts, bufferCount, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), listOfVertexArrays, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
 		}
 
 		LOG_ERROR("Unknown RendererAPI");
 		return nullptr;
 	}
-	//static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const float* vertices, uint32_t elementCount, Shader* shader = nullptr);
-	//static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const float** listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, Shader* shader = nullptr);
-	static std::shared_ptr<IndexBuffer> CreateIndexBuffer(const uint32_t* indices, uint32_t count);
+
+	static std::shared_ptr<IndexBuffer> CreateIndexBuffer(const std::vector<uint32_t>& indices);
 	static std::shared_ptr<Shader> CreateShader(const std::string& filepath, Shader::ShaderType type);
 
 	template<typename Type>
@@ -79,17 +79,17 @@ public:
 				ASSERT(false, "Shader type unknown!");
 				break;
 			case Shader::VERTEX_SHADER:
-				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
+				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, constants, slot);
 			case Shader::PIXEL_SHADER:
-				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
+				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, constants, slot);
 			case Shader::COMPUTE_SHADER:
-				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
+				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, constants, slot);
 			case Shader::GEOMETRY_SHADER:
-				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
+				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, constants, slot);
 			case Shader::HULL_SHADER:
-				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
+				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, constants, slot);
 			case Shader::DOMAIN_SHADER:
-				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), constants, slot);
+				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, constants, slot);
 			}
 
 		}
@@ -116,17 +116,17 @@ public:
 				ASSERT(false, "Shader type unknown!");
 				break;
 			case Shader::VERTEX_SHADER:
-				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
+				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
 			case Shader::PIXEL_SHADER:
-				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
+				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
 			case Shader::COMPUTE_SHADER:
-				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
+				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
 			case Shader::GEOMETRY_SHADER:
-				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
+				return std::make_shared<DX11GeometryConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
 			case Shader::HULL_SHADER:
-				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
+				return std::make_shared<DX11HullConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
 			case Shader::DOMAIN_SHADER:
-				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), slot);
+				return std::make_shared<DX11DomainConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
 			}
 		}
 
@@ -157,10 +157,13 @@ public:
 
 	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0);
 
+	static RendererResourceLibrary& GetResourceLibrary();
+
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 private:
 	inline static std::shared_ptr<RendererAPI> s_RendererAPI = RendererAPI::Create();
 	inline static std::shared_ptr<GraphicsContext> s_GraphicsContext = nullptr;
+	inline static RendererResourceLibrary s_ResourceLibrary;
 	inline static uint32_t s_IndexCount = 0;
 };
 

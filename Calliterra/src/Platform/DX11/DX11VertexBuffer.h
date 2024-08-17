@@ -26,59 +26,16 @@ template<typename Type>
 class DX11VertexBuffer : public VertexBuffer
 {
 public:
-	DX11VertexBuffer(const DX11Context& context, const std::vector<Type>& vertices, uint32_t elementCount, ComPtr<ID3DBlob> shaderByteCode)
-		: m_DX11Context(context), m_VertexLists(std::vector<std::vector<Type>>{vertices}), m_ElementCountList(&elementCount), m_BufferCount(1), m_ShaderByteCode(shaderByteCode)
+	DX11VertexBuffer(const DX11Context& context, const std::vector<Type>& vertices, ComPtr<ID3DBlob> shaderByteCode)
+		: m_DX11Context(context), m_VertexLists(std::vector<std::vector<Type>>{vertices}), m_BufferCount(1), m_ShaderByteCode(shaderByteCode)
 	{
-		D3D11_BUFFER_DESC vbDesc = {};
-		vbDesc.Usage = D3D11_USAGE_DEFAULT;
-		vbDesc.ByteWidth = static_cast<UINT>(sizeof(Type) * vertices.size());
-		vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vbDesc.CPUAccessFlags = 0;
-		vbDesc.MiscFlags = 0;
-		vbDesc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA vertexInitData = {};
-		vertexInitData.pSysMem = &vertices[0];
-
-		ASSERT_HR(
-			m_DX11Context.GetDevice().CreateBuffer(
-				&vbDesc,
-				&vertexInitData,
-				&m_D3DVertexBufferArray[0]
-			)
-		);
-
+		InitSingleVertexBuffer();
 	}
 
-	DX11VertexBuffer(const DX11Context& context, const std::vector<std::vector<Type>>& listOfVertexArrays, const uint32_t* listOfElementCounts, uint32_t bufferCount, ComPtr<ID3DBlob> shaderByteCode)
-		: m_DX11Context(context), m_VertexLists(listOfVertexArrays), m_ElementCountList(listOfElementCounts), m_BufferCount(bufferCount), m_ShaderByteCode(shaderByteCode)
+	DX11VertexBuffer(const DX11Context& context, const std::vector<std::vector<Type>>& listOfVertexArrays, ComPtr<ID3DBlob> shaderByteCode)
+		: m_DX11Context(context), m_VertexLists(listOfVertexArrays), m_BufferCount(listOfVertexArrays.size()), m_ShaderByteCode(shaderByteCode)
 	{
-
-		ASSERT(bufferCount < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Too many buffers are being bound!");
-
-		for (uint32_t i = 0; i < bufferCount; i++)
-		{
-			D3D11_BUFFER_DESC vbDesc = {};
-			vbDesc.Usage = D3D11_USAGE_DEFAULT;
-			vbDesc.ByteWidth = static_cast<UINT>(sizeof(Type) * listOfVertexArrays[i].size());
-			vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			vbDesc.CPUAccessFlags = 0;
-			vbDesc.MiscFlags = 0;
-			vbDesc.StructureByteStride = 0;
-
-			D3D11_SUBRESOURCE_DATA vertexInitData = {};
-			vertexInitData.pSysMem = &listOfVertexArrays[i][0]; //! Sus
-
-			ASSERT_HR(
-				m_DX11Context.GetDevice().CreateBuffer(
-					&vbDesc,
-					&vertexInitData,
-					&m_D3DVertexBufferArray[i]
-				)
-			);
-
-		}
-
+		InitMultiVertexBuffers();
 	}
 
 	void DX11VertexBuffer<Type>::Bind() override
@@ -179,11 +136,60 @@ public:
 	}
 
 private:
+	void InitSingleVertexBuffer()
+	{
+		D3D11_BUFFER_DESC vbDesc = {};
+		vbDesc.Usage = D3D11_USAGE_DEFAULT;
+		vbDesc.ByteWidth = static_cast<UINT>(sizeof(Type) * m_VertexLists[0].size());
+		vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbDesc.CPUAccessFlags = 0;
+		vbDesc.MiscFlags = 0;
+		vbDesc.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA vertexInitData = {};
+		vertexInitData.pSysMem = m_VertexLists[0].data();
+
+		ASSERT_HR(
+			m_DX11Context.GetDevice().CreateBuffer(
+				&vbDesc,
+				&vertexInitData,
+				&m_D3DVertexBufferArray[0]
+			)
+		);
+	}
+
+	void InitMultiVertexBuffers()
+	{
+		ASSERT(m_BufferCount < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Too many buffers are being bound!");
+
+		for (uint32_t i = 0; i < m_BufferCount; i++)
+		{
+			D3D11_BUFFER_DESC vbDesc = {};
+			vbDesc.Usage = D3D11_USAGE_DEFAULT;
+			vbDesc.ByteWidth = static_cast<UINT>(sizeof(Type) * m_VertexLists[i].size());
+			vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vbDesc.CPUAccessFlags = 0;
+			vbDesc.MiscFlags = 0;
+			vbDesc.StructureByteStride = 0;
+
+			D3D11_SUBRESOURCE_DATA vertexInitData = {};
+			vertexInitData.pSysMem = m_VertexLists[i].data(); 
+
+			ASSERT_HR(
+				m_DX11Context.GetDevice().CreateBuffer(
+					&vbDesc,
+					&vertexInitData,
+					&m_D3DVertexBufferArray[i]
+				)
+			);
+		}
+
+	}
+
+private:
 	const DX11Context& m_DX11Context;
 
-	const float** m_VertexArrayList;
 	const std::vector<std::vector<Type>> m_VertexLists;
-	const uint32_t* m_ElementCountList;
 	const uint32_t m_BufferCount;
 
 	ComPtr<ID3D11Buffer> m_D3DVertexBufferArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];

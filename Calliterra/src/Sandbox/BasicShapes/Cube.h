@@ -99,7 +99,7 @@ private:
 
 	};
 
-	inline static uint32_t m_CubeIndices[m_INDEXCOUNT] =
+	inline static std::vector<uint32_t> m_CubeIndices =
 	{
 		0,2,1, 2,3,1,
 		1,3,5, 3,7,5,
@@ -109,7 +109,7 @@ private:
 		0,1,4, 1,5,4
 	};
 
-	inline static uint32_t m_IndependentCubeIndices[] =
+	inline static std::vector<uint32_t> m_IndependentCubeIndices =
 	{
 		 0, 2, 1,  2, 3, 1,
 		 4, 5, 7,  4, 7, 6,

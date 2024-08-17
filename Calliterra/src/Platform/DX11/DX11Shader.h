@@ -7,7 +7,7 @@ class DX11Shader : public Shader
 public:
 	DX11Shader(DX11Context& context, const std::string& filepath, Shader::ShaderType type);
 
-	void Bind() override;
+	void Bind();
 
 	ComPtr<ID3DBlob> GetCompiledShaderByteCode() { return m_CompiledShader; }
 private:
@@ -15,8 +15,8 @@ private:
 
 private:
 	DX11Context& m_DX11Context;
-	std::string m_Filepath;
 	ShaderType m_ShaderType;
+	std::string m_Filepath;
 	ComPtr<ID3DBlob> m_CompiledShader;
 	ComPtr<ID3DBlob> m_CompilationErrorMsgs;
 

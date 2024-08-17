@@ -3,10 +3,9 @@
 #include "stb_image.h"
 
 DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint32_t slot)
-	: m_DX11Context(context), m_Slot(slot)
+	: m_DX11Context(context), m_Filepath(filepath), m_Slot(slot)
 {
 
-	//stbi_set_flip_vertically_on_load(true);
 	m_TextureData = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_NumChannels, m_DesiredChannels);
 	ASSERT(m_TextureData);
 

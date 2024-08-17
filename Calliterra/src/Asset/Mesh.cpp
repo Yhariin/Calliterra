@@ -56,17 +56,23 @@ void Mesh::Update(float dt)
 
 void Mesh::InitBuffers()
 {
-	m_VertexShader = Renderer::CreateShader("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
+	using namespace std::string_literals;
+	const auto base = "assets/models/nano_textured/"s;
+
+	auto meshTag = base + "%" + std::to_string(m_MeshIndex);
+	m_VertexShader = Shader::Resolve("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
+
 	if (m_Material->HasMaterialMap(Material::Specular))
 	{
-		m_PixelShader = Renderer::CreateShader("assets/shaders/PhongTexSpecMapPS.hlsl", Shader::PIXEL_SHADER);
+		m_PixelShader = Shader::Resolve("assets/shaders/PhongTexSpecMapPS.hlsl", Shader::PIXEL_SHADER);
 	}
 	else
 	{
-		m_PixelShader = Renderer::CreateShader("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
+		m_PixelShader = Shader::Resolve("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
 	}
-	m_VertexBuffer = Renderer::CreateVertexBuffer(m_Vertices, static_cast<uint32_t>(m_Vertices.size()), m_VertexShader.get());
-	m_IndexBuffer = Renderer::CreateIndexBuffer(&m_Indices[0], static_cast<uint32_t>(m_Indices.size()));
+	m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_Vertices, m_VertexShader.get());
+
+	m_IndexBuffer = IndexBuffer::Resolve(meshTag, m_Indices);
 
 	m_VertexShader->Bind();
 	m_PixelShader->Bind();
@@ -82,11 +88,11 @@ void Mesh::InitBuffers()
 	{
 		if (m_Material->HasMaterialMap(static_cast<Material::MapTypes>(i)))
 		{
-			m_Textures.emplace_back(Renderer::CreateTexture(m_Material->GetMaterialMaps()[i], i));
+			m_Textures.emplace_back(Texture::Resolve(m_Material->GetMaterialMaps()[i], i));
 		}
 	}
 
-	m_TransformConstantBuffer = Renderer::CreateConstantBuffer<TransformConstantBuffer>(Shader::VERTEX_SHADER);
+	m_TransformConstantBuffer = ConstantBuffer::Resolve<TransformConstantBuffer>(typeid(TransformConstantBuffer).name(), Shader::VERTEX_SHADER, TransformConstantBuffer());
 
 	PixelConstantBuffer pcb = {
 		1.f,
@@ -95,6 +101,6 @@ void Mesh::InitBuffers()
 
 	if (!m_Material->HasMaterialMap(Material::Specular))
 	{
-		m_PixelConstantBuffer = Renderer::CreateConstantBuffer<PixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
+		m_PixelConstantBuffer = ConstantBuffer::Resolve<PixelConstantBuffer>(typeid(PixelConstantBuffer).name(), Shader::PIXEL_SHADER, pcb, 1);
 	}
 }

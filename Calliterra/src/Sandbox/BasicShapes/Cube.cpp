@@ -37,8 +37,8 @@ void Cube::InitBuffers()
 	CalculateNormals();
 	s_VertexShader = Renderer::CreateShader("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
 	s_PixelShader = Renderer::CreateShader("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
-	s_VertexBuffer = Renderer::CreateVertexBuffer(m_IndependentCubeVertices, static_cast<uint32_t>(m_IndependentCubeVertices.size()), s_VertexShader.get());
-	s_IndexBuffer = Renderer::CreateIndexBuffer(m_IndependentCubeIndices, m_INDEXCOUNT);
+	s_VertexBuffer = Renderer::CreateVertexBuffer(m_IndependentCubeVertices, s_VertexShader.get());
+	s_IndexBuffer = Renderer::CreateIndexBuffer(m_IndependentCubeIndices);
 
 	s_VertexShader->Bind();
 	s_PixelShader->Bind();
