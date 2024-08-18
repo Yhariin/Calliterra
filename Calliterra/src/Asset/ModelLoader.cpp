@@ -3,6 +3,86 @@
 #include "fastgltf/tools.hpp"
 #include "fastgltf/math.hpp"
 #include "Material.h"
+#include "ModelAPI.h"
+#include "Model.h"
+
+// Loads the modelAPI from a filepath and stores it into an unordered_map,
+// if it already exists inside the map then just return it.
+ModelAPI ModelLoader::LoadModel(const std::filesystem::path& filepath)
+{
+	std::string extension = filepath.extension().string();
+
+	std::transform(extension.begin(), extension.end(), extension.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+
+	std::string key = filepath.string();
+	const auto i = m_Models.find(key);
+
+	if (i == m_Models.end())
+	{
+		ModelAPI model;
+		if (extension == ".obj")
+		{
+			model = ModelAPI(LoadModelObj(filepath));
+		}
+		else if (extension == ".gltf" || extension == ".glb")
+		{
+			model = ModelAPI(LoadModelGltf(filepath));
+		}
+		else if (extension == ".fbx")
+		{
+			model = ModelAPI(LoadModelFbx(filepath));
+		}
+		else
+		{
+			ASSERT(false, "Unsupported model type!");
+		}
+
+		m_Models[key] = model;
+		return model;
+	}
+	else
+	{
+		return m_Models[key];
+	}
+
+}
+
+// Returns a model that is ready to be used given the parameters. Internally calls LoadModel() so
+// this function is all you need if you want a model.
+Model ModelLoader::GetModel(const std::filesystem::path& filepath, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
+{
+	ModelAPI modelAPI = LoadModel(filepath);
+
+	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
+	std::unique_ptr<Node> root;
+
+	switch (modelAPI.GetAPI())
+	{
+	case ModelAPI::Obj:
+	{
+		meshes = GetModelMeshes(*modelAPI.GetObj(), transform, color, filepath.string());
+		root = std::move(ParseNode(*modelAPI.GetObj(), meshes));
+		break;
+	}
+	case ModelAPI::Gltf:
+	{
+		meshes = GetModelMeshes(*modelAPI.GetGltf(), transform, color, filepath.string());
+		fastgltf::Node gltfRoot = ModelLoader::GetRootNode(*modelAPI.GetGltf());
+		root = std::move(ParseNode(*modelAPI.GetGltf(), gltfRoot, meshes));
+		break;
+	}
+	case ModelAPI::Fbx:
+	{
+		meshes = GetModelMeshes(*modelAPI.GetFbx(), transform, color, filepath.string());
+		root = std::move(ParseNode(*modelAPI.GetFbx(), *modelAPI.GetFbx()->Root_node(), meshes));
+		break;
+	}
+	}
+
+	return Model(std::move(root), std::move(meshes), transform, color);
+
+}
 
 //==============================Obj====================================
 #pragma region obj
@@ -15,7 +95,7 @@ std::shared_ptr<rapidobj::Result> ModelLoader::LoadModelObj(const std::filesyste
 	return model;
 }
 
-std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const rapidobj::Result& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
+std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const rapidobj::Result& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, const std::filesystem::path& filepath)
 {
 	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
 
@@ -26,18 +106,18 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 
 		if (model.materials[materialIndex].diffuse_texname != "")
 		{
-			material->AddMaterialMap(Material::Diffuse, "assets/models/nano_textured/" + model.materials[materialIndex].diffuse_texname);
+			material->AddMaterialMap(Material::Diffuse, filepath.parent_path().string() + "/" + model.materials[materialIndex].diffuse_texname);
 		}
 		if (model.materials[materialIndex].specular_texname != "")
 		{
-			material->AddMaterialMap(Material::Specular, "assets/models/nano_textured/" + model.materials[materialIndex].specular_texname);
+			material->AddMaterialMap(Material::Specular, filepath.parent_path().string() + "/" + model.materials[materialIndex].specular_texname);
 		}
 		else
 		{
 			material->SetShininess(model.materials[materialIndex].shininess);
 		}
 
-		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material));
+		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material), filepath.string());
 	}
 
 	return meshes;
@@ -106,7 +186,7 @@ std::unique_ptr<Node> ModelLoader::ParseNode(const rapidobj::Result& model, cons
 	
 	std::unique_ptr<Node> root = std::make_unique<Node>(0, "Root", DX::XMMatrixIdentity(), std::move(currentMeshes));
 
-	return root;
+	return std::move(root);
 }
 #pragma endregion
 
@@ -125,13 +205,14 @@ std::shared_ptr<fastgltf::Asset> ModelLoader::LoadModelGltf(const std::filesyste
 	return std::make_shared<fastgltf::Asset>(std::move(asset.get()));
 }
 
-std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const fastgltf::Asset& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
+std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const fastgltf::Asset& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, const std::string& filepath)
 {
 	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
 
 	for (int i = 0; i < model.meshes.size(); i++)
 	{
-		meshes[i] = std::make_unique<Mesh>(i, model, transform, color);
+		std::unique_ptr<Material> material = std::make_unique<Material>();
+		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material), filepath);
 	}
 
 	return meshes;
@@ -217,7 +298,7 @@ std::unique_ptr<Node> ModelLoader::ParseNode(const fastgltf::Asset& model, const
 		nextNode->AddChild(ParseNode(model, model.nodes[node.children[i]], modelMeshes));
 	}
 
-	return nextNode;
+	return std::move(nextNode);
 
 }
 
@@ -278,14 +359,14 @@ std::shared_ptr<UfbxScene> ModelLoader::LoadModelFbx(const std::filesystem::path
 	return scene;
 }
 
-std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
+std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const UfbxScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, const std::string& filepath)
 {
 	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
 
 	for (const auto& mesh : model.Meshes())
 	{
 		int meshIndex = mesh->element_id;
-		meshes[meshIndex] = std::make_unique<Mesh>(meshIndex, model, transform, color);
+		meshes[meshIndex] = std::make_unique<Mesh>(meshIndex, model, transform, color, nullptr, filepath);
 	}
 
 	return meshes;
@@ -357,7 +438,7 @@ std::unique_ptr<Node> ModelLoader::ParseNode(const UfbxScene& model, const ufbx_
 	{
 		nextNode->AddChild(ParseNode(model, *node.children[i], modelMeshes));
 	}
-	return nextNode;
+	return std::move(nextNode);
 }
 
 

@@ -11,9 +11,26 @@ class UfbxScene;
 class Mesh : public Drawable
 {
 public:
-	Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, std::unique_ptr<Material> material = nullptr);
-	Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, std::unique_ptr<Material> material = nullptr);
-	Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, std::unique_ptr<Material> material = nullptr);
+	Mesh(int meshIndex, 
+		 const rapidobj::Result& ObjModel, 
+		 const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), 
+		 DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, 
+		 std::unique_ptr<Material> material = nullptr, 
+		 const std::string& filepath = "");
+
+	Mesh(int meshIndex, 
+		 const fastgltf::Asset& gltfModel, 
+		 const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), 
+		 DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, 
+		 std::unique_ptr<Material> material = nullptr,
+		 const std::string& filepath = "");
+
+	Mesh(int meshIndex, 
+		 const UfbxScene& fbxModel, 
+		 const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), 
+		 DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, 
+		 std::unique_ptr<Material> material = nullptr,
+		 const std::string& filepath = "");
 
 	void Draw() override;
 
@@ -39,6 +56,7 @@ private:
 
 private:
 	int m_MeshIndex;
+	std::string m_Filepath;
 
 	const rapidobj::Result* m_ObjModel;
 	const fastgltf::Asset* m_GltfModel;

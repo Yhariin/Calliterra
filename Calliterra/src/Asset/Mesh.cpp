@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Mesh.h"
 
-Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material)
-	: Drawable(transform, color), m_MeshIndex(meshIndex), m_ObjModel(&ObjModel), m_Material(std::move(material))
+Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
+	: Drawable(transform, color), m_MeshIndex(meshIndex), m_ObjModel(&ObjModel), m_Material(std::move(material)), m_Filepath(filepath)
 {
 	m_Vertices = ModelLoader::GetMeshVertexVector(*m_ObjModel, m_MeshIndex);
 	m_Indices = ModelLoader::GetMeshIndexVector(*m_ObjModel, m_MeshIndex);
@@ -10,8 +10,8 @@ Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& 
 	InitBuffers();
 }
 
-Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material)
-	: Drawable(transform, color), m_MeshIndex(meshIndex), m_GltfModel(&gltfModel), m_Material(std::move(material))
+Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
+	: Drawable(transform, color), m_MeshIndex(meshIndex), m_GltfModel(&gltfModel), m_Material(std::move(material)), m_Filepath(filepath)
 {
 	m_Vertices = ModelLoader::GetMeshVertexVector(*m_GltfModel, m_MeshIndex);
 	m_Indices = ModelLoader::GetMeshIndexVector(*m_GltfModel, m_MeshIndex);
@@ -19,8 +19,8 @@ Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& 
 	InitBuffers();
 }
 
-Mesh::Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material)
-	: Drawable(transform, color), m_MeshIndex(meshIndex), m_FbxModel(&fbxModel), m_Material(std::move(material))
+Mesh::Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
+	: Drawable(transform, color), m_MeshIndex(meshIndex), m_FbxModel(&fbxModel), m_Material(std::move(material)), m_Filepath(filepath)
 {
 	m_Vertices = ModelLoader::GetMeshVertexVector(*m_FbxModel, m_MeshIndex);
 	m_Indices = ModelLoader::GetMeshIndexVector(*m_FbxModel, m_Vertices, m_MeshIndex);
@@ -57,9 +57,8 @@ void Mesh::Update(float dt)
 void Mesh::InitBuffers()
 {
 	using namespace std::string_literals;
-	const auto base = "assets/models/nano_textured/"s;
 
-	auto meshTag = base + "%" + std::to_string(m_MeshIndex);
+	auto meshTag = m_Filepath + "%" + std::to_string(m_MeshIndex);
 	m_VertexShader = Shader::Resolve("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
 
 	if (m_Material->HasMaterialMap(Material::Specular))

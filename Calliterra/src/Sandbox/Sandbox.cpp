@@ -44,15 +44,14 @@ void Sandbox::LoadSandboxPreset()
 
 	//std::shared_ptr<rapidobj::Result> dragonModel = ModelLoader::LoadModelObj("assets/models/dragon.obj");
 	//std::shared_ptr<fastgltf::Asset> vaseClayModel = ModelLoader::LoadModelGltf("assets/models/Vase_Clay.gltf");
-	//std::shared_ptr<fastgltf::Asset> nanoModel = ModelLoader::LoadModelGltf("assets/models/nano.gltf");
-	std::shared_ptr<rapidobj::Result> nanoModelObj = ModelLoader::LoadModelObj("assets/models/nano_textured/nanosuit.obj");
 	//std::shared_ptr<UfbxScene> heartModel = ModelLoader::LoadModelFbx("assets/models/HumanHeart_FBX.fbx");
 
-	DX::XMMATRIX transform = DX::XMMatrixRotationX(DX::XMConvertToRadians(90)) * DX::XMMatrixTranslation(10.f, 10.f, -10.f);
+	//DX::XMMATRIX transform = DX::XMMatrixRotationX(DX::XMConvertToRadians(90)) * DX::XMMatrixTranslation(10.f, 10.f, -10.f);
 	DX::XMMATRIX transform2 = DX::XMMatrixIdentity();
-	//m_Drawables.emplace_back(std::make_unique<Model>(nanoModel, transform, DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));
-	m_Drawables.emplace_back(std::make_unique<Model>(nanoModelObj, transform2, DX::XMFLOAT3(0.2f, 0.4f, 0.9f )));
-	m_Drawables.emplace_back(std::make_unique<Model>(nanoModelObj, transform, DX::XMFLOAT3(0.2f, 0.4f, 0.9f )));
+
+	m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nano_textured/nanosuit.obj", transform2, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nanosuit_hierarchical.gltf", transform, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+
 	//m_Drawables.emplace_back(std::make_unique<Model>(dragonModel, DX::XMMatrixTranslation(10.f, 0.f, -10.f), DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));
 	//m_Drawables.emplace_back(std::make_unique<Model>(vaseClayModel, DX::XMMatrixTranslation(0.f, 0.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
 	//m_Drawables.emplace_back(std::make_unique<Model>(heartModel, DX::XMMatrixTranslation(5.f, 10.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
