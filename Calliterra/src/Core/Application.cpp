@@ -3,7 +3,6 @@
 
 #include "Window.h"
 #include "Renderer/Renderer.h"
-#include "Platform/DX11/DX11Shader.h"
 
 Application::Application()
 {
