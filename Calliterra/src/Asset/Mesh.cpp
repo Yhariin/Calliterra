@@ -91,7 +91,7 @@ void Mesh::InitBuffers()
 		}
 	}
 
-	m_TransformConstantBuffer = ConstantBuffer::Resolve<TransformConstantBuffer>(Shader::VERTEX_SHADER, TransformConstantBuffer());
+	m_TransformConstantBuffer = ConstantBuffer::Resolve<TransformConstantBuffer>(Shader::VERTEX_SHADER, {});
 
 	PixelConstantBuffer pcb = {
 		1.f,

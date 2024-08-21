@@ -38,7 +38,7 @@ void Sandbox::LoadSandboxPreset()
 	CreatePlane();
 	for(int i = 0; i < 300; i++)
 	{ 
-		CreateCube();
+		//CreateCube();
 	}
 	CreatePointLight();
 
@@ -78,8 +78,12 @@ void Sandbox::CreatePlane()
 	m_Drawables.emplace_back(std::make_unique<Plane>(1));
 
 	m_Drawables.back()->SetTransform(
-		DX::XMMatrixTranslation(-0.5f, 0.0f, -0.5f) *
-		DX::XMMatrixScaling(100.f, 1.f, 100.f)
+		DX::XMMatrixRotationX(DX::XMConvertToRadians(90)) *
+		DX::XMMatrixScaling(10.f, 10.f, 10.f) *
+		DX::XMMatrixTranslation(4.f, 15.f, 0.f)
+
+		//DX::XMMatrixTranslation(-0.5f, 0.0f, -0.5f) *
+		//DX::XMMatrixScaling(100.f, 1.f, 100.f)
 	);
 }
 

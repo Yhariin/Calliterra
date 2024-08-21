@@ -15,6 +15,9 @@ private:
 	{
 		DX::XMFLOAT3 Position;
 		DX::XMFLOAT3 Normal;
+		DX::XMFLOAT3 Tangent;
+		DX::XMFLOAT3 Bitangent;
+		DX::XMFLOAT2 Texture;
 	};
 
 	struct TransformConstantBuffer
@@ -27,7 +30,7 @@ private:
 
 	struct PixelConstantBuffer
 	{
-		alignas(16) DX::XMFLOAT3 Color;
+		//alignas(16) DX::XMFLOAT3 Color;
 		float SpecularIntensity;
 		float SpecularPower;
 		float padding[2];
@@ -36,6 +39,7 @@ private:
 	void CalculatePlane(uint32_t resolution);
 	void InitBuffers();
 	void CalculateNormals();
+	void CalculateTangentSpace();
 
 private:
 	uint32_t m_Resolution;
@@ -46,7 +50,9 @@ private:
 	std::shared_ptr<Shader> m_PixelShader = nullptr;
 	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
 	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
-	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
+	std::vector<std::shared_ptr<Texture>> m_Textures;
+	std::shared_ptr<ConstantBuffer> m_TransformConstantBufferVS = nullptr;
+	std::shared_ptr<ConstantBuffer> m_TransformConstantBufferPS = nullptr;
 	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
 };
 
