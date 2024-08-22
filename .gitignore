@@ -1,6 +1,7 @@
 # Binaries
 bin/
 obj/
+!Calliterra/vendor/assimp/bin
 
 *.log
 imgui.ini
