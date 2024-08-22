@@ -1,11 +1,13 @@
 #pragma once
 
+#include <assimp/scene.h>
 #include <rapidobj/rapidobj.hpp>
 #include <fastgltf/core.hpp>
 #include <ufbx.h>
 
 class UfbxScene;
 
+using AssimpAPI = aiScene;
 using ObjAPI = rapidobj::Result;
 using GltfAPI = fastgltf::Asset;
 using FbxAPI = UfbxScene;
@@ -16,6 +18,7 @@ public:
 	enum API
 	{
 		None = 0,
+		Assimp,
 		Obj,
 		Gltf,
 		Fbx
@@ -23,11 +26,13 @@ public:
 	
 public:
 	ModelAPI() = default;
+	ModelAPI(std::shared_ptr<AssimpAPI> modelAPI);
 	ModelAPI(std::shared_ptr<ObjAPI> modelAPI);
 	ModelAPI(std::shared_ptr<GltfAPI> modelAPI);
 	ModelAPI(std::shared_ptr<FbxAPI> modelAPI);
 
 	API GetAPI();
+	std::shared_ptr<AssimpAPI> GetAssimp();
 	std::shared_ptr<ObjAPI> GetObj();
 	std::shared_ptr<GltfAPI> GetGltf();
 	std::shared_ptr<FbxAPI> GetFbx();
@@ -35,6 +40,7 @@ public:
 private:
 	API m_API = API::None;
 
+	std::shared_ptr<AssimpAPI> m_Assimp = nullptr;
 	std::shared_ptr<ObjAPI> m_Obj = nullptr;
 	std::shared_ptr<GltfAPI> m_Gltf = nullptr;
 	std::shared_ptr<FbxAPI> m_Fbx = nullptr;

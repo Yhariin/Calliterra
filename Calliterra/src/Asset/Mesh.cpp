@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "Mesh.h"
 
+Mesh::Mesh(int meshIndex, const aiScene& ObjModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
+	: Drawable(transform, color), m_MeshIndex(meshIndex), m_AssimpModel(&ObjModel), m_Material(std::move(material)), m_Filepath(filepath)
+{
+	m_Vertices = ModelLoader::GetMeshVertexVector(*m_AssimpModel, m_MeshIndex);
+	m_Indices = ModelLoader::GetMeshIndexVector(*m_AssimpModel, m_MeshIndex);
+
+	InitBuffers();
+}
+
 Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_ObjModel(&ObjModel), m_Material(std::move(material)), m_Filepath(filepath)
 {

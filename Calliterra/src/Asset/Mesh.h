@@ -12,6 +12,13 @@ class Mesh : public Drawable
 {
 public:
 	Mesh(int meshIndex, 
+		 const aiScene& ObjModel, 
+		 const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), 
+		 DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, 
+		 std::unique_ptr<Material> material = nullptr, 
+		 const std::string& filepath = "");
+
+	Mesh(int meshIndex, 
 		 const rapidobj::Result& ObjModel, 
 		 const DX::XMMATRIX& transform = DX::XMMatrixIdentity(), 
 		 DX::XMFLOAT3 color = {-1.f, -1.f, -1.f}, 
@@ -58,6 +65,7 @@ private:
 	int m_MeshIndex;
 	std::string m_Filepath;
 
+	const aiScene* m_AssimpModel;
 	const rapidobj::Result* m_ObjModel;
 	const fastgltf::Asset* m_GltfModel;
 	const UfbxScene* m_FbxModel;

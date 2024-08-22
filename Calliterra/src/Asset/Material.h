@@ -6,10 +6,9 @@ public:
 	enum MapTypes
 	{
 		None = -1,
-		Diffuse,
+		Albedo,
 		Specular,
 		Normal,
-		Albedo,
 		NumSupportedMaps,
 	};
 

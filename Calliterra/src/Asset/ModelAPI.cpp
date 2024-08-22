@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "ModelAPI.h"
 
+ModelAPI::ModelAPI(std::shared_ptr<AssimpAPI> modelAPI)
+	: m_API(Assimp), m_Assimp(modelAPI)
+{
+}
+
 ModelAPI::ModelAPI(std::shared_ptr<ObjAPI> modelAPI)
 	: m_API(Obj), m_Obj(modelAPI)
 {
@@ -19,6 +24,11 @@ ModelAPI::ModelAPI(std::shared_ptr<FbxAPI> modelAPI)
 ModelAPI::API ModelAPI::GetAPI()
 {
 	return m_API;
+}
+
+std::shared_ptr<AssimpAPI> ModelAPI::GetAssimp()
+{
+	return m_Assimp;
 }
 
 std::shared_ptr<ObjAPI> ModelAPI::GetObj()

@@ -1,11 +1,25 @@
 #include "pch.h"
 #include "ModelLoader.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #include "fastgltf/tools.hpp"
 #include "fastgltf/math.hpp"
+
 #include "Material.h"
 #include "ModelAPI.h"
 #include "Model.h"
 
+
+void ModelLoader::Init()
+{
+	s_AssimpImporter = std::make_unique<Assimp::Importer>();
+}
+
+void ModelLoader::Shutdown()
+{
+	s_AssimpImporter.release();
+}
 // Loads the modelAPI from a filepath and stores it into an unordered_map,
 // if it already exists inside the map then just return it.
 ModelAPI ModelLoader::LoadModel(const std::filesystem::path& filepath)
@@ -16,11 +30,12 @@ ModelAPI ModelLoader::LoadModel(const std::filesystem::path& filepath)
     [](unsigned char c){ return std::tolower(c); });
 
 	std::string key = filepath.string();
-	const auto i = m_Models.find(key);
+	const auto i = s_Models.find(key);
 
-	if (i == m_Models.end())
+	if (i == s_Models.end())
 	{
 		ModelAPI model;
+#if FAST_MODEL_LOADING
 		if (extension == ".obj")
 		{
 			model = ModelAPI(LoadModelObj(filepath));
@@ -37,13 +52,16 @@ ModelAPI ModelLoader::LoadModel(const std::filesystem::path& filepath)
 		{
 			ASSERT(false, "Unsupported model type!");
 		}
+#else
+		model = ModelAPI(LoadModelAssimp(filepath));
+#endif
 
-		m_Models[key] = model;
+		s_Models[key] = model;
 		return model;
 	}
 	else
 	{
-		return m_Models[key];
+		return s_Models[key];
 	}
 
 }
@@ -57,6 +75,7 @@ Model ModelLoader::GetModel(const std::filesystem::path& filepath, const DX::XMM
 	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
 	std::unique_ptr<Node> root;
 
+#if FAST_MODEL_LOADING
 	switch (modelAPI.GetAPI())
 	{
 	case ModelAPI::Obj:
@@ -79,8 +98,139 @@ Model ModelLoader::GetModel(const std::filesystem::path& filepath, const DX::XMM
 		break;
 	}
 	}
+#else
+	meshes = GetModelMeshes(*modelAPI.GetAssimp(), transform, color, filepath.string());
+	aiNode* aiRoot = modelAPI.GetAssimp()->mRootNode;
+	int nextId = 0;
+	root = std::move(ParseNode(*modelAPI.GetAssimp(), nextId, *aiRoot, meshes));
+#endif
 
 	return Model(std::move(root), std::move(meshes), transform, color);
+
+}
+//==============================Assimp==================================
+#pragma region assimp 
+
+std::shared_ptr<aiScene> ModelLoader::LoadModelAssimp(const std::filesystem::path& filepath)
+{
+	ASSERT(s_AssimpImporter, "ModelLoader must be initialized before trying to load model!");
+
+	const auto flags = 
+		aiProcess_Triangulate | // Make sure everything is triangles
+		aiProcess_JoinIdenticalVertices | // Each mesh will contain unique vertices
+		aiProcess_ConvertToLeftHanded | // Convert to Direct3D friendly data
+		aiProcess_GenSmoothNormals | // Generate normals if we don't already have them
+		aiProcess_GenUVCoords | // Generate UVs if we don't already have them
+		aiProcess_CalcTangentSpace; // Calculate Tangents and Bitangents
+	
+	//Assimp::Importer importer;
+	const aiScene* scene = s_AssimpImporter->ReadFile(filepath.string(), flags);
+	ASSERT(scene, s_AssimpImporter->GetErrorString());
+
+	return std::make_shared<aiScene>(*scene);
+}
+
+std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const aiScene& model, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, const std::filesystem::path& filepath)
+{
+	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
+	std::string parentPath = filepath.parent_path().string() + "/";
+
+	for (unsigned int i = 0; i < model.mNumMeshes; i++)
+	{
+		aiString aiTexturePath;
+		int materialIndex = model.mMeshes[i]->mMaterialIndex;
+		std::unique_ptr<Material> material = std::make_unique<Material>();
+		const aiMaterial& aiMaterial = *model.mMaterials[materialIndex];
+
+		// Get the albedo/diffuse map
+		bool hasAlbedoMap = aiMaterial.GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &aiTexturePath) == AI_SUCCESS;
+		if (!hasAlbedoMap)
+		{
+			hasAlbedoMap = aiMaterial.GetTexture(aiTextureType_DIFFUSE, 0, &aiTexturePath) == AI_SUCCESS;
+			if (hasAlbedoMap)
+			{
+				material->AddMaterialMap(Material::Albedo, parentPath + aiTexturePath.C_Str());
+			}
+		}
+
+		// Get the specular map, otherwise default the shininess
+		bool hasSpecularMap = aiMaterial.GetTexture(aiTextureType_SPECULAR, 0, &aiTexturePath) == AI_SUCCESS;
+		if (hasSpecularMap)
+		{
+			material->AddMaterialMap(Material::Specular, parentPath + aiTexturePath.C_Str());
+		}
+		else
+		{
+			float shininess;
+			if (aiMaterial.Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS)
+			{
+				material->SetShininess(shininess);
+			}
+		}
+
+		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material), filepath.string());
+	}
+
+	return meshes;
+}
+
+std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const aiScene& objModel, int meshIndex)
+{
+	const auto mesh = objModel.mMeshes[meshIndex];
+	std::vector<ModelVertex> vertices;
+
+	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+	{
+		vertices.emplace_back(
+			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mVertices[i]),
+			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mNormals[i]),
+			//*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mTangents[i]),
+			//*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mBitangents[i]),
+			*reinterpret_cast<DX::XMFLOAT2*>(&mesh->mTextureCoords[0][i])
+		);
+	}
+
+	return vertices;
+}
+
+std::vector<uint32_t> ModelLoader::GetMeshIndexVector(const aiScene& objModel, int meshIndex)
+{
+	const auto mesh = objModel.mMeshes[meshIndex];
+	std::vector<uint32_t> indices;
+
+	indices.reserve(mesh->mNumFaces * 3);
+	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+	{
+		const auto& face = mesh->mFaces[i];
+		ASSERT(face.mNumIndices == 3);
+
+		indices.push_back(face.mIndices[0]);
+		indices.push_back(face.mIndices[1]);
+		indices.push_back(face.mIndices[2]);
+	}
+
+	return indices;
+}
+
+std::unique_ptr<Node> ModelLoader::ParseNode(const aiScene& model, int nextId, const aiNode& node, const std::unordered_map<int, std::unique_ptr<Mesh>>& modelMeshes)
+{
+	std::vector<Mesh*> currentMeshes;
+	const auto transform = DX::XMMatrixTranspose(DX::XMLoadFloat4x4(
+		reinterpret_cast<const DX::XMFLOAT4X4*>(&node.mTransformation)
+	));
+
+	for (unsigned int i = 0; i < node.mNumMeshes; i++)
+	{
+		currentMeshes.push_back(modelMeshes.at(node.mMeshes[i]).get());
+	}
+
+	std::unique_ptr<Node> nextNode = std::make_unique<Node>(nextId++, node.mName.C_Str(), transform, std::move(currentMeshes));
+	for (unsigned int i = 0; i < node.mNumChildren; i++)
+	{
+		nextNode->AddChild(ParseNode(model, nextId, *node.mChildren[i], modelMeshes));
+	}
+
+	return std::move(nextNode);
 
 }
 
@@ -106,7 +256,7 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 
 		if (model.materials[materialIndex].diffuse_texname != "")
 		{
-			material->AddMaterialMap(Material::Diffuse, filepath.parent_path().string() + "/" + model.materials[materialIndex].diffuse_texname);
+			material->AddMaterialMap(Material::Albedo, filepath.parent_path().string() + "/" + model.materials[materialIndex].diffuse_texname);
 		}
 		if (model.materials[materialIndex].specular_texname != "")
 		{
@@ -153,7 +303,7 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const rapidobj::Result
 			tex.x = objModel.attributes.texcoords[texIndex * 2];
 			tex.y = objModel.attributes.texcoords[texIndex * 2 + 1];
 
-			if (m_FlipUVs)
+			if (s_FlipUVs)
 			{
 				DX::XMStoreFloat2(&tex, DX::XMVector2Transform(DX::XMLoadFloat2(&tex), DX::XMMatrixRotationX(DX::XMConvertToRadians(180)) * DX::XMMatrixTranslation(0.f, 1.f, 0.f)));
 			}
@@ -199,7 +349,7 @@ std::shared_ptr<fastgltf::Asset> ModelLoader::LoadModelGltf(const std::filesyste
 	auto gltfFile = fastgltf::MappedGltfFile::FromPath(filepath);
 	ASSERT(bool(gltfFile), fastgltf::getErrorMessage(gltfFile.error()));
 
-	auto asset = (m_GltfParser.loadGltf(gltfFile.get(), filepath.parent_path(), m_GltfOptions));
+	auto asset = (s_GltfParser.loadGltf(gltfFile.get(), filepath.parent_path(), s_GltfOptions));
 	ASSERT(asset.error() == fastgltf::Error::None, fastgltf::getErrorMessage(asset.error()));
 
 	return std::make_shared<fastgltf::Asset>(std::move(asset.get()));

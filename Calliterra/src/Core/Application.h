@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include "Sandbox/Sandbox.h"
 #include "ImGui/ImGuiManager.h"
+#include "Asset/ModelLoader.h"
 
 class Application
 {
@@ -38,6 +39,7 @@ private:
 	inline static Timer s_ApplicationTimer = Timer();
 	std::unique_ptr<Sandbox> m_Sandbox;
 	ImGuiManager m_ImGui;
+	ModelLoader m_ModelLoader;
 };
 
 

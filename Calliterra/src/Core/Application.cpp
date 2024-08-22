@@ -24,6 +24,7 @@ Application::Application()
 	m_Window->SetEventCallback([this](Event& e) { return this->OnEvent(e); });
 
 	Renderer::Init(m_Window->GetGraphicsContext());
+	ModelLoader::Init();
 
 	m_Sandbox = std::make_unique<Sandbox>(m_Window->GetWindowProps().AspectRatio);
 	m_ImGui.SetWindowSize(static_cast<float>(m_Window->GetWindowProps().Width), static_cast<float>(m_Window->GetWindowProps().Height));
@@ -31,6 +32,7 @@ Application::Application()
 
 Application::~Application()
 {
+	m_ModelLoader.Shutdown();
 	Renderer::Shutdown();
 }
 
