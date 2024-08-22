@@ -1,8 +1,8 @@
 float3 MapNormal(
-    const float3 tan, 
-    const float3 bitan, 
-    const float3 normal, 
-    const float2 textureCoord, 
+    const in float3 tan, 
+    const in float3 bitan, 
+    const in float3 normal, 
+    const in float2 textureCoord, 
     uniform Texture2D normalMap,
     uniform SamplerState samplerState)
 {
@@ -47,21 +47,21 @@ float CalculateAttenuation(uniform float attConst, uniform float attLin, uniform
 float3 CalculateDiffuse(
     uniform float3 diffuseColor,
     uniform float diffuseIntensity,
-    const float attenuation,
-    const float3 v_DirToLight,
-    const float3 v_Normal)
+    const in float attenuation,
+    const in float3 v_DirToLight,
+    const in float3 v_Normal)
 {
     return diffuseColor * diffuseIntensity * attenuation * max(0.f, dot(v_DirToLight, v_Normal));
 }
 
 float3 CalculateSpecular(
-    const float3 specularColor,
+    const in float3 specularColor,
     uniform float specularIntensity,
-    const float3 v_Normal,
-    const float3 v_DirToLight,
-    const float3 v_Pos,
-    const float attenuation,
-    const float specularPower)
+    const in float3 v_Normal,
+    const in float3 v_DirToLight,
+    const in float3 v_Pos,
+    const in float attenuation,
+    const in float specularPower)
 {
     // Reflected light vector
     const float3 r = reflect(-v_DirToLight, v_Normal);
