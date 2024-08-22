@@ -11,7 +11,6 @@ Plane::Plane(uint32_t resolution, DX::XMMATRIX transform, DX::XMFLOAT3 color )
 void Plane::Draw()
 {
 	TransformConstantBuffer cb = { 
-		DX::XMMatrixTranspose(m_Transform), 
 		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix),
 		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix),
 		DX::XMMatrixInverse(nullptr, m_Transform * m_ViewMatrix)
@@ -66,19 +65,6 @@ void Plane::CalculatePlane(uint32_t resolution)
 	
 
 	CalculateNormals();
-	//m_Vertices.emplace_back(PlaneVertex({  1.f, -1.f, 0.f }, { 0.f, 0.f, -1.f }, {}, {}, {1.f, 0.f}));
-	//m_Vertices.emplace_back(PlaneVertex({  1.f,  1.f, 0.f }, { 0.f, 0.f, -1.f }, {}, {}, {1.f, 1.f}));
-	//m_Vertices.emplace_back(PlaneVertex({ -1.f,  1.f, 0.f }, { 0.f, 0.f, -1.f }, {}, {}, {0.f, 1.f}));
-	//m_Vertices.emplace_back(PlaneVertex({ -1.f, -1.f, 0.f }, { 0.f, 0.f, -1.f }, {}, {}, {0.f, 0.f}));
-
-	//m_Indices.push_back(1);
-	//m_Indices.push_back(0);
-	//m_Indices.push_back(3);
-
-	//m_Indices.push_back(1);
-	//m_Indices.push_back(3);
-	//m_Indices.push_back(2);
-
 	CalculateTangentSpace();
 
 }
@@ -87,7 +73,7 @@ void Plane::InitBuffers()
 {
 	const auto geometryTag = "$Plane." + std::to_string(m_Resolution);
 
-	m_VertexShader = Shader::Resolve("assets/shaders/TexNormalMapVS.hlsl", Shader::VERTEX_SHADER);
+	m_VertexShader = Shader::Resolve("assets/shaders/NormalMapVS.hlsl", Shader::VERTEX_SHADER);
 	m_PixelShader = Shader::Resolve("assets/shaders/PhongNormalMapPS.hlsl", Shader::PIXEL_SHADER);
 	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices, m_VertexShader.get());
 	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
@@ -111,7 +97,6 @@ void Plane::InitBuffers()
 	m_TransformConstantBufferPS = ConstantBuffer::Resolve<TransformConstantBuffer>(Shader::PIXEL_SHADER, {}, 0);
 
 	PixelConstantBuffer pcb = {
-		//DX::XMFLOAT3(0.3f, 0.3f, 0.3f),
 		.1f,
 		20.f
 	};
@@ -148,14 +133,6 @@ void Plane::CalculateTangentSpace()
 		auto& v1 = m_Vertices[m_Indices[i]];
 		auto& v2 = m_Vertices[m_Indices[i+1]];
 		auto& v3 = m_Vertices[m_Indices[i+2]];
-
-		//XMVECTOR p1 = XMLoadFloat3(&v1.Position);
-		//XMVECTOR p2 = XMLoadFloat3(&v2.Position);
-		//XMVECTOR p3 = XMLoadFloat3(&v3.Position);
-
-		//XMVECTOR uv1 = XMLoadFloat2(&v1.Texture);
-		//XMVECTOR uv2 = XMLoadFloat2(&v2.Texture);
-		//XMVECTOR uv3 = XMLoadFloat2(&v3.Texture);
 
 		XMFLOAT3 p1 = v1.Position;
 		XMFLOAT3 p2 = v2.Position;

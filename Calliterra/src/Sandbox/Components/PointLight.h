@@ -17,6 +17,17 @@ public:
 	void SetProjectionMatrix(const DX::XMMATRIX& transform) override { m_Sphere.SetProjectionMatrix(transform); m_ProjectionMatrix = transform; }
 
 private:
+	struct PointLightConstantBuffer
+	{
+		alignas(16) DX::XMFLOAT3 Position;
+		alignas(16) DX::XMFLOAT3 Ambient;
+		alignas(16) DX::XMFLOAT3 DiffuseColor;
+		float DiffuseIntensity;
+		float AttConst;
+		float AttLin;
+		float AttQuad;
+	};
+private:
 	IcoSphere m_Sphere;
 	DX::XMFLOAT4 m_Position = { 0.f, 0.f, 0.f, 1.f };
 	std::shared_ptr<Shader> m_PixelShader;

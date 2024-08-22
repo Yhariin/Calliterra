@@ -14,9 +14,19 @@ void PointLight::Draw()
 {
 	m_Sphere.Draw();
 	m_PixelShader->Bind();
-	DX::XMFLOAT4 posViewSpace;
-	DX::XMStoreFloat4(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat4(&m_Position), m_ViewMatrix));
-	Renderer::UpdateConstantBuffer(m_PositionConstantBuffer, posViewSpace);
+	DX::XMFLOAT3 posViewSpace;
+	DX::XMStoreFloat3(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat4(&m_Position), m_ViewMatrix));
+	PointLightConstantBuffer cb = {
+		posViewSpace,
+		{ 0.15f, 0.15f, 0.15f },
+		{ 1.f, 1.f, 1.f },
+		1.f,
+		1.f,
+		0.015f,
+		0.0015f
+	};
+	Renderer::UpdateConstantBuffer(m_PositionConstantBuffer, cb);
+
 	m_PositionConstantBuffer->Bind({});
 }
 
@@ -35,5 +45,5 @@ void PointLight::Update(float dt)
 void PointLight::InitBuffers()
 {
 	m_PixelShader = Renderer::CreateShader("assets/shaders/PhongPS.hlsl", Shader::PIXEL_SHADER);
-	m_PositionConstantBuffer = Renderer::CreateConstantBuffer<DX::XMFLOAT4>(Shader::PIXEL_SHADER, 2);
+	m_PositionConstantBuffer = Renderer::CreateConstantBuffer<PointLightConstantBuffer>(Shader::PIXEL_SHADER, 2);
 }

@@ -1,3 +1,5 @@
+#include "Common/TransformsCBuff.hlsl"
+
 struct VSIn
 {
     float3 Position : POSITION;
@@ -6,25 +8,17 @@ struct VSIn
 
 struct VSOut
 {
-    float3 ViewSpacePos : POSITION;
-    float3 Normal : NORMAL;
+    float3 v_Pos: POSITION;
+    float3 v_Normal : NORMAL;
     float4 Pos : SV_POSITION;
-};
-
-cbuffer Transforms 
-{
-    matrix Model;
-    matrix ModelView;
-    matrix ModelViewProj;
-    matrix NormalMatrix;
 };
 
 VSOut main(VSIn vIn)
 {
     VSOut vOut;
     vOut.Pos = mul(float4(vIn.Position, 1.0f), ModelViewProj);
-    vOut.ViewSpacePos = (float3)mul(float4(vIn.Position, 1.0f), ModelView);
-    vOut.Normal = normalize(mul(vIn.Normal, (float3x3) NormalMatrix));
+    vOut.v_Pos = (float3)mul(float4(vIn.Position, 1.0f), ModelView);
+    vOut.v_Normal = normalize(mul(vIn.Normal, (float3x3) NormalMatrix));
 
     return vOut;
 }

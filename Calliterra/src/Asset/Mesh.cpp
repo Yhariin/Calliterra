@@ -40,7 +40,6 @@ Mesh::Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transfo
 void Mesh::Draw()
 {
 	TransformConstantBuffer cb = {
-		DX::XMMatrixTranspose(m_Transform),
 		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix),
 		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix),
 		DX::XMMatrixInverse(nullptr, m_Transform * m_ViewMatrix)
@@ -72,7 +71,7 @@ void Mesh::InitBuffers()
 
 	if (m_Material->HasMaterialMap(Material::Specular))
 	{
-		m_PixelShader = Shader::Resolve("assets/shaders/PhongTexSpecMapPS.hlsl", Shader::PIXEL_SHADER);
+		m_PixelShader = Shader::Resolve("assets/shaders/PhongSpecMapPS.hlsl", Shader::PIXEL_SHADER);
 	}
 	else
 	{

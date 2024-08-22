@@ -48,7 +48,6 @@ private:
 
 	struct TransformConstantBuffer
 	{
-		DX::XMMATRIX Model;
 		DX::XMMATRIX ModelView;
 		DX::XMMATRIX ModelViewProj;
 		DX::XMMATRIX NormalMatrix;

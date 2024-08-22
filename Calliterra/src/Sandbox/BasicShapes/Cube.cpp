@@ -86,7 +86,6 @@ void Cube::Update(float dt)
 void Cube::Draw()
 {
 	CubeTransformConstantBuffer cb = { 
-		DX::XMMatrixTranspose(m_Transform), 
 		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix),
 		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix),
 		DX::XMMatrixInverse(nullptr, m_Transform * m_ViewMatrix)

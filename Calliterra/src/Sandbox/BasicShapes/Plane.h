@@ -22,7 +22,6 @@ private:
 
 	struct TransformConstantBuffer
 	{
-		DX::XMMATRIX Model;
 		DX::XMMATRIX ModelView;
 		DX::XMMATRIX ModelViewProj;
 		DX::XMMATRIX NormalMatrix;
@@ -30,7 +29,6 @@ private:
 
 	struct PixelConstantBuffer
 	{
-		//alignas(16) DX::XMFLOAT3 Color;
 		float SpecularIntensity;
 		float SpecularPower;
 		float padding[2];

@@ -17,7 +17,7 @@ DX11Shader::DX11Shader(DX11Context& context, const std::string& filepath, Shader
 	HRESULT hr = D3DCompileFromFile(
 		filePathWideCString,
 		nullptr,
-		nullptr,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main",
 		ShaderTypeToCompilerTarget().c_str(),
 		shaderFlags,
