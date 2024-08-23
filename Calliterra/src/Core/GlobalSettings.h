@@ -45,7 +45,7 @@ public:
 	private:
 		inline static bool m_IsWireFrame = false;
 		inline static int m_CullType = CullBack;
-		inline static float m_LightPos[3] = {0.f, 20.f, 10.f};
+		inline static float m_LightPos[3] = {10.f, 9.f, 2.5f};
 	};
 
 	struct Camera

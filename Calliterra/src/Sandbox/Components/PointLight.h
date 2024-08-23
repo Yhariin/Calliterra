@@ -29,7 +29,7 @@ private:
 	};
 private:
 	IcoSphere m_Sphere;
-	DX::XMFLOAT4 m_Position = { 0.f, 0.f, 0.f, 1.f };
+	DX::XMFLOAT3 m_Position;
 	std::shared_ptr<Shader> m_PixelShader;
 	std::shared_ptr<ConstantBuffer> m_PositionConstantBuffer;
 };

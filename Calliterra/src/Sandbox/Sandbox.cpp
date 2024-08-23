@@ -35,7 +35,7 @@ void Sandbox::OnEvent(Event& e)
 
 void Sandbox::LoadSandboxPreset()
 {
-	CreatePlane();
+	//CreatePlane();
 	for(int i = 0; i < 300; i++)
 	{ 
 		//CreateCube();
@@ -48,8 +48,10 @@ void Sandbox::LoadSandboxPreset()
 
 	//DX::XMMATRIX transform = DX::XMMatrixRotationX(DX::XMConvertToRadians(90)) * DX::XMMatrixTranslation(10.f, 10.f, -10.f);
 	DX::XMMATRIX transform2 = DX::XMMatrixIdentity();
+	DX::XMMATRIX transform3 = DX::XMMatrixScaling(0.05f, 0.05f, 0.05f);
 
-	m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nano_textured/nanosuit.obj", transform2, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+	m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+	
 	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nanosuit_hierarchical.gltf", transform, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
 
 	//m_Drawables.emplace_back(std::make_unique<Model>(dragonModel, DX::XMMatrixTranslation(10.f, 0.f, -10.f), DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));

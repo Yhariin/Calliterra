@@ -4,10 +4,11 @@
 PointLight::PointLight(DX::XMMATRIX transform, DX::XMFLOAT3 color)
 	: m_Sphere(3, transform, color), Drawable(transform, color)
 {
-	DX::XMStoreFloat4(&m_Position, DX::XMVector4Transform(DX::XMLoadFloat4(&m_Position), transform));
+	DX::XMStoreFloat3(&m_Position, DX::XMVector3Transform(DX::XMLoadFloat3(&m_Position), transform));
 	InitBuffers();
 
 	GlobalSettings::Register(SettingsType::PointLightPosition, this);
+	m_Position = DX::XMFLOAT3(GlobalSettings::Rendering::LightPos().x, GlobalSettings::Rendering::LightPos().y, GlobalSettings::Rendering::LightPos().z);
 }
 
 void PointLight::Draw()
@@ -15,10 +16,10 @@ void PointLight::Draw()
 	m_Sphere.Draw();
 	m_PixelShader->Bind();
 	DX::XMFLOAT3 posViewSpace;
-	DX::XMStoreFloat3(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat4(&m_Position), m_ViewMatrix));
+	DX::XMStoreFloat3(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat3(&m_Position), m_ViewMatrix));
 	PointLightConstantBuffer cb = {
 		posViewSpace,
-		{ 0.15f, 0.15f, 0.15f },
+		{ 0.05f, 0.05f, 0.05f },
 		{ 1.f, 1.f, 1.f },
 		1.f,
 		1.f,
@@ -32,7 +33,7 @@ void PointLight::Draw()
 
 void PointLight::OnSettingsUpdate(SettingsType type)
 {
-	m_Position = DX::XMFLOAT4(GlobalSettings::Rendering::LightPos().x, GlobalSettings::Rendering::LightPos().y, GlobalSettings::Rendering::LightPos().z, 1.0f);
+	m_Position = DX::XMFLOAT3(GlobalSettings::Rendering::LightPos().x, GlobalSettings::Rendering::LightPos().y, GlobalSettings::Rendering::LightPos().z);
 }
 
 void PointLight::Update(float dt)

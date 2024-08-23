@@ -38,9 +38,9 @@ private:
 	float m_Pitch = 0;
 	float m_Yaw = 0;
 
-	static constexpr float m_MoveSpeed = 10.f;
+	static constexpr float m_MoveSpeed = 20.f;
 	static constexpr float m_Sensitivity = 0.001f;
 	static constexpr float m_Near = 0.1f;
-	static constexpr float m_Far = 100.f;
+	static constexpr float m_Far = 500.f;
 };
 

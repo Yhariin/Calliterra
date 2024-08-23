@@ -4,7 +4,7 @@
 Model::Model(std::unique_ptr<Node> root, std::unordered_map<int, std::unique_ptr<Mesh>> meshes, const DX::XMMATRIX& transform, DX::XMFLOAT3 color)
 	: m_Root(std::move(root)), m_Meshes(std::move(meshes)), Drawable(transform, color)
 {
-	m_Root->ApplyTransformations();
+	m_Root->ApplyTransformations(m_Transform);
 }
 
 void Model::Draw()
