@@ -5,11 +5,13 @@
 DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint32_t slot)
 	: m_DX11Context(context), m_Filepath(filepath), m_Slot(slot)
 {
-
 	LOG_DEBUG("Loading {}", filepath);
 	m_TextureData = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_NumChannels, m_DesiredChannels);
 	ASSERT(m_TextureData);
 
+	// Note: It might be worthwhile to first generate the mips on a staging texture then create another
+	// immutable texture with only BIND_SHADER_RESOURCE to allow the driver to optimize. We then copy
+	// over the data from the first texture onto the new one.
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = m_Width;
 	textureDesc.Height = m_Height;
@@ -23,10 +25,6 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
  
-	//D3D11_SUBRESOURCE_DATA sd = {};
-	//sd.pSysMem = m_TextureData;
-	//sd.SysMemPitch = m_Width * m_DesiredChannels;
-
 	ASSERT_HR(
 		m_DX11Context.GetDevice().CreateTexture2D(&textureDesc, nullptr, &m_Texture)
 	);
@@ -44,10 +42,11 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	);
 
 	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
 	samplerDesc.MipLODBias = 0.f;
 	samplerDesc.MinLOD = 0.f;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
