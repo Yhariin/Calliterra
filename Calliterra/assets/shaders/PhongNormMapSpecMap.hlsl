@@ -1,23 +1,24 @@
+#include "Common/VSOut_PosNormTanBitanTex.hlsl"
+#include "Common/TransformsCBuff.hlsl"
 #include "Common/PointLightCBuff.hlsl"
 #include "Common/ShaderOperations.hlsl"
 #include "Common/LightVectorData.hlsl"
 
-struct VSOut
+cbuffer ObjectCBuffer : register(b1)
 {
-    float3 v_Pos: POSITION;
-    float3 v_Normal : NORMAL;
-    float3 v_Tangent : TANGENT;
-    float3 v_Bitangent : BITANGENT;
-    float2 Texture : TEXCOORD;
-    float4 Pos : SV_POSITION;
+    float specularIntensity;
+    float specularPower;
 };
 
 Texture2D tex : register(t0);
 Texture2D specMap : register(t1);
+Texture2D normMap : register(t2);
 SamplerState samplerState;
 
 float4 main(VSOut pIn) : SV_TARGET
 {
+    pIn.v_Normal = MapNormal(pIn.v_Tangent, pIn.v_Bitangent, pIn.v_Normal, pIn.Texture, normMap, samplerState);
+    
     LightVectorData lightVectorData = CalculateLightVectorData(v_LightPos, pIn.v_Pos);
 
     const float attenuation = CalculateAttenuation(AttConst, AttLin, AttQuad, lightVectorData.DistToLight);
@@ -31,5 +32,4 @@ float4 main(VSOut pIn) : SV_TARGET
     const float3 specular = CalculateSpecular(specularReflectionColor, 1.f, pIn.v_Normal, lightVectorData.DirToLight, pIn.v_Pos, attenuation, specularPower);
 
     return float4(saturate((diffuse + Ambient) * tex.Sample(samplerState, pIn.Texture).rgb + specular), 1.0f);
-
 }

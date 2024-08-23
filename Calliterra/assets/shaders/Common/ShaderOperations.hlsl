@@ -17,7 +17,7 @@ float3 MapNormal(
     return normalize(mul(tanNormal, tanToTarget));
 }
 
-float3 MapSpecular(
+void MapSpecular(
     const in float3 v_Pos,
     const in float3 v_Normal, 
     const in float3 v_DirToLight, 
@@ -27,6 +27,7 @@ float3 MapSpecular(
     uniform float3 diffuseIntensity,
     uniform Texture2D specularMap, 
     uniform SamplerState samplerState,
+    out float specularPower,
     out float3 specularReflectionColor)
 {
     const float3 r = reflect(-v_DirToLight, v_Normal);
@@ -34,9 +35,9 @@ float3 MapSpecular(
     // Calculate specular intensity based on angle between viewing vector
     const float4 specularSample = specularMap.Sample(samplerState, textureCoord);
     specularReflectionColor = specularSample.rgb;
-    const float specularPower = pow(2.0f, specularSample.a * 13.0f);
+    specularPower = pow(2.0f, specularSample.a * 13.0f);
 
-    return attenuation * (diffuseColor * diffuseIntensity) * pow(max(0.0f, dot(r, normalize(-v_Pos))), specularPower);
+    //return attenuation * (diffuseColor * diffuseIntensity) * pow(max(0.0f, dot(r, normalize(-v_Pos))), specularPower);
 }
 
 float CalculateAttenuation(uniform float attConst, uniform float attLin, uniform float attQuad, const float distFragToL)

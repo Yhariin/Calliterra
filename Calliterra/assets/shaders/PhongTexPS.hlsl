@@ -1,7 +1,7 @@
 #include "Common/PointLightCBuff.hlsl"
 #include "Common/ShaderOperations.hlsl"
 #include "Common/LightVectorData.hlsl"
-#include "Common/VSOut_PosNormTex.hlsl"
+#include "Common/VSOut_PosNormTanBitanTex.hlsl"
 
 cbuffer ObjectCBuffer : register(b1)
 {

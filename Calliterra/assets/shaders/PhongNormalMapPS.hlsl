@@ -11,7 +11,7 @@ cbuffer ObjectCBuffer : register(b1)
 };
 
 Texture2D tex : register(t0);
-Texture2D nmap : register(t1);
+Texture2D nmap : register(t2);
 SamplerState samplerState;
 
 float4 main(VSOut pIn) : SV_TARGET

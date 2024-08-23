@@ -20,8 +20,8 @@ struct ModelVertex
 {
 	DX::XMFLOAT3 Position;
 	DX::XMFLOAT3 Normal;
-	//DX::XMFLOAT3 Tangent;
-	//DX::XMFLOAT3 Bitangent;
+	DX::XMFLOAT3 Tangent;
+	DX::XMFLOAT3 Bitangent;
 	DX::XMFLOAT2 Texture;
 };
 

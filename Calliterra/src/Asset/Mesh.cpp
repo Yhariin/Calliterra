@@ -67,18 +67,34 @@ void Mesh::InitBuffers()
 	using namespace std::string_literals;
 
 	auto meshTag = m_Filepath + "%" + std::to_string(m_MeshIndex);
-	m_VertexShader = Shader::Resolve("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
 
-	if (m_Material->HasMaterialMap(Material::Specular))
+	bool hasSpecular = m_Material->HasMaterialMap(Material::Specular);
+	bool hasNormal = m_Material->HasMaterialMap(Material::Normal);
+	std::string vertexShaderPath;
+	std::string pixelShaderPath;
+
+	vertexShaderPath = "assets/shaders/NormalMapVS.hlsl";
+
+	if (hasSpecular && hasNormal)
 	{
-		m_PixelShader = Shader::Resolve("assets/shaders/PhongSpecMapPS.hlsl", Shader::PIXEL_SHADER);
+		pixelShaderPath = "assets/shaders/PhongNormMapSpecMap.hlsl";
+	}
+	else if (hasSpecular)
+	{
+		pixelShaderPath = "assets/shaders/PhongSpecMapPS.hlsl";
+	}
+	else if (hasNormal)
+	{
+		pixelShaderPath = "assets/shaders/PhongNormalMapPS.hlsl";
 	}
 	else
 	{
-		m_PixelShader = Shader::Resolve("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
+		pixelShaderPath = "assets/shaders/PhongTexPS.hlsl";
 	}
-	m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_Vertices, m_VertexShader.get());
+	m_VertexShader = Shader::Resolve(vertexShaderPath, Shader::VERTEX_SHADER);
+	m_PixelShader = Shader::Resolve(pixelShaderPath, Shader::PIXEL_SHADER);
 
+	m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_Vertices, m_VertexShader.get());
 	m_IndexBuffer = IndexBuffer::Resolve(meshTag, m_Indices);
 
 	m_VertexShader->Bind();
@@ -87,6 +103,8 @@ void Mesh::InitBuffers()
 	m_VertexBuffer->CreateLayout({
 		{"POSITION", 0, ShaderDataType::Float3},
 		{"NORMAL", 0, ShaderDataType::Float3},
+		{"TANGENT", 0, ShaderDataType::Float3},
+		{"BITANGENT", 0, ShaderDataType::Float3},
 		{"TEXCOORD", 0, ShaderDataType::Float2},
 		});
 	m_VertexBuffer->SetLayout();
@@ -101,13 +119,13 @@ void Mesh::InitBuffers()
 
 	m_TransformConstantBuffer = ConstantBuffer::Resolve<TransformConstantBuffer>(Shader::VERTEX_SHADER, {});
 
-	PixelConstantBuffer pcb = {
-		1.f,
-		m_Material->GetShininess()
-	};
-
-	if (!m_Material->HasMaterialMap(Material::Specular))
+	if (!hasSpecular)
 	{
+		PixelConstantBuffer pcb = {
+			1.f,
+			m_Material->GetShininess()
+		};
+
 		m_PixelConstantBuffer = ConstantBuffer::Resolve<PixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 	}
 }

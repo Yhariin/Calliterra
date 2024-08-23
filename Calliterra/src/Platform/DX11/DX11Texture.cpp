@@ -6,6 +6,7 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	: m_DX11Context(context), m_Filepath(filepath), m_Slot(slot)
 {
 
+	LOG_DEBUG("Loading {}", filepath);
 	m_TextureData = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_NumChannels, m_DesiredChannels);
 	ASSERT(m_TextureData);
 
@@ -21,7 +22,7 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
-
+ 
 	D3D11_SUBRESOURCE_DATA sd = {};
 	sd.pSysMem = m_TextureData;
 	sd.SysMemPitch = m_Width * m_DesiredChannels;

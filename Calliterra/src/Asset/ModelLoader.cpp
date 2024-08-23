@@ -168,6 +168,12 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 			}
 		}
 
+		bool hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexturePath) == AI_SUCCESS;
+		if (hasNormalMap)
+		{
+			material->AddMaterialMap(Material::Normal, parentPath + aiTexturePath.C_Str());
+		}
+
 		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material), filepath.string());
 	}
 
@@ -184,8 +190,8 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const aiScene& objMode
 		vertices.emplace_back(
 			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mVertices[i]),
 			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mNormals[i]),
-			//*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mTangents[i]),
-			//*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mBitangents[i]),
+			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mTangents[i]),
+			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mBitangents[i]),
 			*reinterpret_cast<DX::XMFLOAT2*>(&mesh->mTextureCoords[0][i])
 		);
 	}
@@ -307,7 +313,7 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const rapidobj::Result
 			{
 				DX::XMStoreFloat2(&tex, DX::XMVector2Transform(DX::XMLoadFloat2(&tex), DX::XMMatrixRotationX(DX::XMConvertToRadians(180)) * DX::XMMatrixTranslation(0.f, 1.f, 0.f)));
 			}
-			vertices.push_back({ pos, norm, tex });
+			vertices.push_back({ pos, norm, {}, {}, tex });
 		}
 
 	}
