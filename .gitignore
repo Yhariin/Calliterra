@@ -3,9 +3,6 @@ bin/
 obj/
 !Calliterra/vendor/assimp/bin
 
-assets/models/**
-assets/textures/**
-
 *.log
 imgui.ini
 imgui*.ini
