@@ -19,6 +19,7 @@ private:
 	int m_NumChannels;
 	const int m_DesiredChannels = 4;
 	unsigned char* m_TextureData;
+	bool m_HasAlpha = false;
 
 	ComPtr<ID3D11Texture2D> m_Texture;
 	ComPtr<ID3D11ShaderResourceView> m_TextureView;

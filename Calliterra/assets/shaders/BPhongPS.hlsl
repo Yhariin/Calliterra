@@ -26,7 +26,7 @@ float4 main(VSOut pIn) : SV_TARGET
 
     const float3 diffuse = CalculateDiffuse(DiffuseColor, DiffuseIntensity, attenuation, lightVectorData.DirToLight, pIn.v_Normal);
 
-    const float3 specular = CalculateSpecular(SpecularPower, SpecularIntensity, pIn.v_Normal, lightVectorData.DirToLight, pIn.v_Pos, attenuation, SpecularPower);
+    const float3 specular = CalculateSpecular(SpecularPower, SpecularIntensity, pIn.v_Normal, lightVectorData.DirToLight, lightVectorData.HalfwayDir, pIn.v_Pos, attenuation, SpecularPower);
 
     return float4(saturate(diffuse + Ambient + specular) * MaterialColor, 1.0f);
     

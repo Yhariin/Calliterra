@@ -77,19 +77,19 @@ void Mesh::InitBuffers()
 
 	if (hasSpecular && hasNormal)
 	{
-		pixelShaderPath = "assets/shaders/PhongNormMapSpecMap.hlsl";
+		pixelShaderPath = "assets/shaders/BPhongNormMapSpecMap.hlsl";
 	}
 	else if (hasSpecular)
 	{
-		pixelShaderPath = "assets/shaders/PhongSpecMapPS.hlsl";
+		pixelShaderPath = "assets/shaders/BPhongSpecMapPS.hlsl";
 	}
 	else if (hasNormal)
 	{
-		pixelShaderPath = "assets/shaders/PhongNormalMapPS.hlsl";
+		pixelShaderPath = "assets/shaders/BPhongNormalMapPS.hlsl";
 	}
 	else
 	{
-		pixelShaderPath = "assets/shaders/PhongTexPS.hlsl";
+		pixelShaderPath = "assets/shaders/BPhongTexPS.hlsl";
 	}
 	m_VertexShader = Shader::Resolve(vertexShaderPath, Shader::VERTEX_SHADER);
 	m_PixelShader = Shader::Resolve(pixelShaderPath, Shader::PIXEL_SHADER);
@@ -122,7 +122,7 @@ void Mesh::InitBuffers()
 	if (!hasSpecular)
 	{
 		PixelConstantBuffer pcb = {
-			1.f,
+			0.3f,
 			m_Material->GetShininess()
 		};
 

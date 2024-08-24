@@ -113,7 +113,7 @@ void DX11Context::CreateDeviceContext()
 	D3D_FEATURE_LEVEL featureLevelArray[] = { D3D_FEATURE_LEVEL_11_1 };
 	UINT feautreLevelCount = sizeof(featureLevelArray) / sizeof(D3D_FEATURE_LEVEL);
 
-	UINT createDeviceFlags= 0;
+	UINT createDeviceFlags = 0;
 #ifdef DEBUG
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif

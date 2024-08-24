@@ -11,13 +11,15 @@ cbuffer ObjectCBuffer : register(b1)
 };
 
 Texture2D tex : register(t0);
-Texture2D specMap : register(t1);
-Texture2D normMap : register(t2);
+Texture2D nmap : register(t2);
 SamplerState samplerState;
 
 float4 main(VSOut pIn) : SV_TARGET
 {
-    pIn.v_Normal = MapNormal(pIn.v_Tangent, pIn.v_Bitangent, pIn.v_Normal, pIn.Texture, normMap, samplerState);
+    const float4 diffuseTex = tex.Sample(samplerState, pIn.Texture);
+    clip(diffuseTex.a < 0.1f ? -1 : 1);
+
+    pIn.v_Normal = MapNormal(pIn.v_Tangent, pIn.v_Bitangent, pIn.v_Normal, pIn.Texture, nmap, samplerState);
     
     LightVectorData lightVectorData = CalculateLightVectorData(v_LightPos, pIn.v_Pos);
 
@@ -25,11 +27,7 @@ float4 main(VSOut pIn) : SV_TARGET
 
     const float3 diffuse = CalculateDiffuse(DiffuseColor, DiffuseIntensity, attenuation, lightVectorData.DirToLight, pIn.v_Normal);
 
-    float specularPower;
-    float3 specularReflectionColor;
-    MapSpecular(pIn.v_Pos, pIn.v_Normal, lightVectorData.DirToLight, pIn.Texture, attenuation, DiffuseColor, DiffuseIntensity, specMap, samplerState, specularPower, specularReflectionColor);
+    const float3 specular = CalculateSpecular(DiffuseColor, specularIntensity, pIn.v_Normal, lightVectorData.DirToLight, lightVectorData.HalfwayDir, pIn.v_Pos, attenuation, specularPower);
 
-    const float3 specular = CalculateSpecular(specularReflectionColor, 1.f, pIn.v_Normal, lightVectorData.DirToLight, pIn.v_Pos, attenuation, specularPower);
-
-    return float4(saturate((diffuse + Ambient) * tex.Sample(samplerState, pIn.Texture).rgb + specular), 1.0f);
+    return float4(saturate((diffuse + Ambient) * diffuseTex.rgb + specular), diffuseTex.a);
 }

@@ -45,6 +45,6 @@ void PointLight::Update(float dt)
 
 void PointLight::InitBuffers()
 {
-	m_PixelShader = Renderer::CreateShader("assets/shaders/PhongPS.hlsl", Shader::PIXEL_SHADER);
+	m_PixelShader = Renderer::CreateShader("assets/shaders/BPhongPS.hlsl", Shader::PIXEL_SHADER);
 	m_PositionConstantBuffer = Renderer::CreateConstantBuffer<PointLightConstantBuffer>(Shader::PIXEL_SHADER, 2);
 }

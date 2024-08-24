@@ -140,7 +140,7 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 		aiString aiTexturePath;
 		int materialIndex = model.mMeshes[i]->mMaterialIndex;
 		std::unique_ptr<Material> material = std::make_unique<Material>();
-		const aiMaterial& aiMaterial = *model.mMaterials[materialIndex];
+		aiMaterial& aiMaterial = *model.mMaterials[materialIndex];
 
 		// Get the albedo/diffuse map
 		bool hasAlbedoMap = aiMaterial.GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &aiTexturePath) == AI_SUCCESS;
@@ -152,6 +152,16 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 				material->AddMaterialMap(Material::Albedo, parentPath + aiTexturePath.C_Str());
 			}
 		}
+		else
+		{
+			material->AddMaterialMap(Material::Albedo, parentPath + aiTexturePath.C_Str());
+		}
+	
+		bool hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexturePath) == AI_SUCCESS;
+		if (hasNormalMap)
+		{
+			material->AddMaterialMap(Material::Normal, parentPath + aiTexturePath.C_Str());
+		}
 
 		// Get the specular map, otherwise default the shininess
 		bool hasSpecularMap = aiMaterial.GetTexture(aiTextureType_SPECULAR, 0, &aiTexturePath) == AI_SUCCESS;
@@ -161,17 +171,11 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 		}
 		else
 		{
-			float shininess;
+			float shininess = 1;
 			if (aiMaterial.Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS)
 			{
 				material->SetShininess(shininess);
 			}
-		}
-
-		bool hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexturePath) == AI_SUCCESS;
-		if (hasNormalMap)
-		{
-			material->AddMaterialMap(Material::Normal, parentPath + aiTexturePath.C_Str());
 		}
 
 		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material), filepath.string());

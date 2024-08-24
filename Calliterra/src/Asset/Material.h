@@ -26,6 +26,6 @@ public:
 
 private:
 	std::array<std::string, NumSupportedMaps> m_MaterialMaps;
-	float m_Shininess;
+	float m_Shininess = 1.f;
 };
 

@@ -9,6 +9,11 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	m_TextureData = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_NumChannels, m_DesiredChannels);
 	ASSERT(m_TextureData);
 
+	if (m_NumChannels == 1 || m_NumChannels == 4)
+	{
+		m_HasAlpha = true;
+	}
+
 	// Note: It might be worthwhile to first generate the mips on a staging texture then create another
 	// immutable texture with only BIND_SHADER_RESOURCE to allow the driver to optimize. We then copy
 	// over the data from the first texture onto the new one.

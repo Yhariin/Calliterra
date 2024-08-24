@@ -37,6 +37,9 @@ public:
 
 	void DrawIndexed(uint32_t indexCount);
 
+	void EnableBlending();
+	void DisableBlending();
+
 	ID3D11Device& GetDevice() const { return *m_Device.Get(); }
 	ID3D11DeviceContext& GetDeviceContext() const { return *m_DeviceContext.Get(); }
 
@@ -47,6 +50,7 @@ private:
 	void CreateRenderTargetView();
 	void CreateDepthStencilBuffer();
 	void CreateRasterizerState();
+	void CreateBlendState();
 	void SetRenderViewport(float x, float y, float width, float height);
 private:
 	HWND* m_Hwnd;

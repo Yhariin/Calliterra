@@ -35,7 +35,7 @@ void MapSpecular(
     // Calculate specular intensity based on angle between viewing vector
     const float4 specularSample = specularMap.Sample(samplerState, textureCoord);
     specularReflectionColor = specularSample.rgb;
-    specularPower = pow(2.0f, specularSample.a * 13.0f);
+    specularPower = pow(2.0f, specularSample.a * 13.0f * 4.f);
 
     //return attenuation * (diffuseColor * diffuseIntensity) * pow(max(0.0f, dot(r, normalize(-v_Pos))), specularPower);
 }
@@ -60,13 +60,14 @@ float3 CalculateSpecular(
     uniform float specularIntensity,
     const in float3 v_Normal,
     const in float3 v_DirToLight,
+    const in float3 v_HalfwayDir,
     const in float3 v_Pos,
     const in float attenuation,
     const in float specularPower)
 {
     // Reflected light vector
-    const float3 r = reflect(-v_DirToLight, v_Normal);
+    //const float3 r = reflect(-v_DirToLight, v_Normal);
 
     // Calculate specular intensity based on angle between viewing vector
-    return attenuation * (specularColor * specularIntensity) * pow(max(0.f, dot(r, normalize(-v_Pos))), specularPower);
+    return attenuation * (specularColor * specularIntensity) * pow(max(0.f, dot(v_HalfwayDir, v_Normal)), specularPower);
 }

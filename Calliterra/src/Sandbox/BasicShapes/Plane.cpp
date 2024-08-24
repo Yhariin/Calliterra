@@ -74,7 +74,7 @@ void Plane::InitBuffers()
 	const auto geometryTag = "$Plane." + std::to_string(m_Resolution);
 
 	m_VertexShader = Shader::Resolve("assets/shaders/NormalMapVS.hlsl", Shader::VERTEX_SHADER);
-	m_PixelShader = Shader::Resolve("assets/shaders/PhongNormalMapPS.hlsl", Shader::PIXEL_SHADER);
+	m_PixelShader = Shader::Resolve("assets/shaders/BPhongNormalMapPS.hlsl", Shader::PIXEL_SHADER);
 	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices, m_VertexShader.get());
 	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
 
@@ -91,7 +91,7 @@ void Plane::InitBuffers()
 	m_VertexBuffer->SetLayout();
 
 	m_Textures.emplace_back(Texture::Resolve("assets/textures/brickwall.jpg", 0));
-	m_Textures.emplace_back(Texture::Resolve("assets/textures/brickwall_normal.jpg", 1));
+	m_Textures.emplace_back(Texture::Resolve("assets/textures/brickwall_normal.jpg", 2));
 
 	m_TransformConstantBufferVS = ConstantBuffer::Resolve<TransformConstantBuffer>(Shader::VERTEX_SHADER, {}, 0);
 	m_TransformConstantBufferPS = ConstantBuffer::Resolve<TransformConstantBuffer>(Shader::PIXEL_SHADER, {}, 0);

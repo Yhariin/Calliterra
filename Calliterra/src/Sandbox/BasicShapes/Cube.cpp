@@ -36,8 +36,8 @@ void Cube::InitBuffers()
 {
 	const auto geometryTag = "$Cube.";
 	CalculateNormals();
-	s_VertexShader = Shader::Resolve("assets/shaders/PhongTexVS.hlsl", Shader::VERTEX_SHADER);
-	s_PixelShader = Shader::Resolve("assets/shaders/PhongTexPS.hlsl", Shader::PIXEL_SHADER);
+	s_VertexShader = Shader::Resolve("assets/shaders/BPhongTexVS.hlsl", Shader::VERTEX_SHADER);
+	s_PixelShader = Shader::Resolve("assets/shaders/BPhongTexPS.hlsl", Shader::PIXEL_SHADER);
 	s_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_IndependentCubeVertices, s_VertexShader.get());
 	s_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_IndependentCubeIndices);
 
