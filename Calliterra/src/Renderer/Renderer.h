@@ -9,6 +9,7 @@
 #include "ConstantBuffer.h"
 #include "Texture.h"
 #include "Blender.h"
+#include "DepthStencil.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
 #include "Platform/DX11/DX11VertexBuffer.h"
 
@@ -159,6 +160,7 @@ public:
 
 	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0);
 	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
+	static std::shared_ptr<DepthStencil> CreateDepthStencilState(DepthStencil::Mode mode);
 
 	static RendererResourceLibrary& GetResourceLibrary();
 

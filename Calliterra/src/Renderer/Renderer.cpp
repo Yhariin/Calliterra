@@ -5,6 +5,7 @@
 #include "Platform/DX11/DX11Shader.h"
 #include "Platform/DX11/DX11Texture.h"
 #include "Platform/DX11/DX11Blender.h"
+#include "Platform/DX11/DX11DepthStencil.h"
 
 void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 {
@@ -129,6 +130,21 @@ std::shared_ptr<Blender> Renderer::CreateBlendState(bool enableBlending, Blender
 		return nullptr;
 	case RendererAPI::DX11:
 		return std::make_shared<DX11Blender>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), enableBlending, srcBlend, destBlend, blendOp);
+	}
+
+	LOG_ERROR("Unknown RendererAPI");
+	return nullptr;
+}
+
+std::shared_ptr<DepthStencil> Renderer::CreateDepthStencilState(DepthStencil::Mode mode)
+{
+	switch(GetAPI())
+	{
+	case RendererAPI::None: 
+		ASSERT(false, "RendererAPI is set to None!");
+		return nullptr;
+	case RendererAPI::DX11:
+		return std::make_shared<DX11DepthStencil>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), mode);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
