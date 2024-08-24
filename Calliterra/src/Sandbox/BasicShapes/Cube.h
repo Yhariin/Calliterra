@@ -6,7 +6,6 @@ class Cube : public Drawable
 public:
 	Cube(DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
     
-	void InitRNG();
 	static void InitBuffers();
 
 	void Update(float dt) override;
@@ -16,21 +15,7 @@ private:
 	static void CalculateNormals();
 private:
 	// Positional
-	float m_R;
-	float m_Roll = 0.f;
-	float m_Pitch = 0.f;
-	float m_Yaw = 0.f;
-	float m_Theta;
-	float m_Phi;
-	float m_Chi;
-	// Speed
-	float m_dRoll;
-	float m_dPitch;
-	float m_dYaw;
-	float m_dTheta;
-	float m_dPhi;
-	float m_dChi;
-
+	
 	inline static const uint32_t m_VERTEXCOUNT= 8 * 3 * 3;
 	inline static const uint32_t m_INDEXCOUNT = 36;
 
@@ -50,7 +35,6 @@ private:
 
 	struct CubePixelConstantBuffer
 	{
-		alignas(16) DX::XMFLOAT3 Color;
 		float SpecularIntensity;
 		float SpecularPower;
 		float padding[2];
