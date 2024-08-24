@@ -5,7 +5,8 @@
 #include "ModelLoader.h"
 #include "Material.h"
 
-struct ModelVertex;
+struct ModelVertexFull;
+struct ModelVertexSemi;
 class UfbxScene;
 
 class Mesh : public Drawable
@@ -69,7 +70,8 @@ private:
 	const fastgltf::Asset* m_GltfModel;
 	const UfbxScene* m_FbxModel;
 
-	std::vector<ModelVertex> m_Vertices;
+	std::vector<ModelVertexFull> m_VerticesFull;
+	std::vector<ModelVertexSemi> m_VerticesSemi;
 	std::vector<uint32_t> m_Indices;
 	std::unique_ptr<Material> m_Material;
 

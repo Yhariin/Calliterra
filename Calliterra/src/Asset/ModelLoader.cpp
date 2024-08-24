@@ -184,10 +184,10 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 	return meshes;
 }
 
-std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const aiScene& objModel, int meshIndex)
+std::vector<ModelVertexFull> ModelLoader::GetMeshVertexVectorFull(const aiScene& objModel, int meshIndex)
 {
 	const auto mesh = objModel.mMeshes[meshIndex];
-	std::vector<ModelVertex> vertices;
+	std::vector<ModelVertexFull> vertices;
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -196,6 +196,23 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const aiScene& objMode
 			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mNormals[i]),
 			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mTangents[i]),
 			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mBitangents[i]),
+			*reinterpret_cast<DX::XMFLOAT2*>(&mesh->mTextureCoords[0][i])
+		);
+	}
+
+	return vertices;
+}
+
+std::vector<ModelVertexSemi> ModelLoader::GetMeshVertexVectorSemi(const aiScene& objModel, int meshIndex)
+{
+	const auto mesh = objModel.mMeshes[meshIndex];
+	std::vector<ModelVertexSemi> vertices;
+
+	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+	{
+		vertices.emplace_back(
+			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mVertices[i]),
+			*reinterpret_cast<DX::XMFLOAT3*>(&mesh->mNormals[i]),
 			*reinterpret_cast<DX::XMFLOAT2*>(&mesh->mTextureCoords[0][i])
 		);
 	}
@@ -283,10 +300,10 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 	return meshes;
 }
 
-std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const rapidobj::Result& objModel, int meshIndex)
+std::vector<ModelVertexSemi> ModelLoader::GetMeshVertexVector(const rapidobj::Result& objModel, int meshIndex)
 {
 	const rapidobj::Mesh& mesh = objModel.shapes[meshIndex].mesh;
-	std::vector<ModelVertex> vertices;
+	std::vector<ModelVertexSemi> vertices;
 
 	for (int i = 0; i < objModel.shapes[meshIndex].mesh.num_face_vertices.size(); i++)
 	{
@@ -317,7 +334,7 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const rapidobj::Result
 			{
 				DX::XMStoreFloat2(&tex, DX::XMVector2Transform(DX::XMLoadFloat2(&tex), DX::XMMatrixRotationX(DX::XMConvertToRadians(180)) * DX::XMMatrixTranslation(0.f, 1.f, 0.f)));
 			}
-			vertices.push_back({ pos, norm, {}, {}, tex });
+			vertices.push_back({ pos, norm, tex });
 		}
 
 	}
@@ -378,9 +395,9 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 	return meshes;
 }
 
-std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const fastgltf::Asset& objModel, int meshIndex)
+std::vector<ModelVertexSemi> ModelLoader::GetMeshVertexVector(const fastgltf::Asset& objModel, int meshIndex)
 {
-	std::vector<ModelVertex> vertices;
+	std::vector<ModelVertexSemi> vertices;
 
 	for (auto it = objModel.meshes[meshIndex].primitives.begin(); it < objModel.meshes[meshIndex].primitives.end(); it++)
 	{
@@ -532,9 +549,9 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 	return meshes;
 }
 
-std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const UfbxScene& objModel, int meshIndex)
+std::vector<ModelVertexSemi> ModelLoader::GetMeshVertexVector(const UfbxScene& objModel, int meshIndex)
 {
-	std::vector<ModelVertex> vertices;
+	std::vector<ModelVertexSemi> vertices;
 	const auto& mesh = reinterpret_cast<ufbx_mesh*>(objModel.Elements()[meshIndex]);
 
 	std::vector<uint32_t> tri_indices;
@@ -562,13 +579,13 @@ std::vector<ModelVertex> ModelLoader::GetMeshVertexVector(const UfbxScene& objMo
 	return vertices;
 }
 
-std::vector<uint32_t> ModelLoader::GetMeshIndexVector(const UfbxScene& objModel, std::vector<ModelVertex>& vertices, int meshIndex)
+std::vector<uint32_t> ModelLoader::GetMeshIndexVector(const UfbxScene& objModel, std::vector<ModelVertexSemi>& vertices, int meshIndex)
 {
 	std::vector<uint32_t> indices;
 	const auto& mesh = reinterpret_cast<ufbx_mesh*>(objModel.Elements()[meshIndex]);
 	indices.resize(mesh->num_triangles * 3);
 
-	ufbx_vertex_stream stream[1] = { {vertices.data(), vertices.size(), sizeof(ModelVertex)} };
+	ufbx_vertex_stream stream[1] = { {vertices.data(), vertices.size(), sizeof(ModelVertexSemi)} };
 
 	uint32_t num_vertices = static_cast<uint32_t>(ufbx_generate_indices(stream, 1, indices.data(), indices.size(), nullptr, nullptr));
 

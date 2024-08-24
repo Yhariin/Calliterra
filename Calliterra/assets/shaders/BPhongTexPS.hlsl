@@ -1,7 +1,7 @@
 #include "Common/PointLightCBuff.hlsl"
 #include "Common/ShaderOperations.hlsl"
 #include "Common/LightVectorData.hlsl"
-#include "Common/VSOut_PosNormTanBitanTex.hlsl"
+#include "Common/VSOut_PosNormTex.hlsl"
 
 cbuffer ObjectCBuffer : register(b1)
 {
@@ -26,4 +26,5 @@ float4 main(VSOut pIn) : SV_TARGET
     const float3 specular = CalculateSpecular(DiffuseColor, SpecularIntensity, pIn.v_Normal, lightVectorData.DirToLight, lightVectorData.HalfwayDir, pIn.v_Pos, attentuation, SpecularPower);
 
     return float4(saturate((diffuse + Ambient) * diffuseTex.rgb + specular), diffuseTex.a);
+
 }

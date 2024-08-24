@@ -1,16 +1,7 @@
 #include "Common/PointLightCBuff.hlsl"
 #include "Common/ShaderOperations.hlsl"
 #include "Common/LightVectorData.hlsl"
-
-struct VSOut
-{
-    float3 v_Pos: POSITION;
-    float3 v_Normal : NORMAL;
-    float3 v_Tangent : TANGENT;
-    float3 v_Bitangent : BITANGENT;
-    float2 Texture : TEXCOORD;
-    float4 Pos : SV_POSITION;
-};
+#include "Common/VSOut_PosNormTex.hlsl"
 
 Texture2D tex : register(t0);
 Texture2D specMap : register(t1);

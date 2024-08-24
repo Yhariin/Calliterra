@@ -4,16 +4,13 @@
 Mesh::Mesh(int meshIndex, const aiScene& ObjModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_AssimpModel(&ObjModel), m_Material(std::move(material)), m_Filepath(filepath)
 {
-	m_Vertices = ModelLoader::GetMeshVertexVector(*m_AssimpModel, m_MeshIndex);
-	m_Indices = ModelLoader::GetMeshIndexVector(*m_AssimpModel, m_MeshIndex);
-
 	InitBuffers();
 }
 
 Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_ObjModel(&ObjModel), m_Material(std::move(material)), m_Filepath(filepath)
 {
-	m_Vertices = ModelLoader::GetMeshVertexVector(*m_ObjModel, m_MeshIndex);
+	m_VerticesSemi = ModelLoader::GetMeshVertexVector(*m_ObjModel, m_MeshIndex);
 	m_Indices = ModelLoader::GetMeshIndexVector(*m_ObjModel, m_MeshIndex);
 
 	InitBuffers();
@@ -22,7 +19,7 @@ Mesh::Mesh(int meshIndex, const rapidobj::Result& ObjModel, const DX::XMMATRIX& 
 Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_GltfModel(&gltfModel), m_Material(std::move(material)), m_Filepath(filepath)
 {
-	m_Vertices = ModelLoader::GetMeshVertexVector(*m_GltfModel, m_MeshIndex);
+	m_VerticesSemi = ModelLoader::GetMeshVertexVector(*m_GltfModel, m_MeshIndex);
 	m_Indices = ModelLoader::GetMeshIndexVector(*m_GltfModel, m_MeshIndex);
 
 	InitBuffers();
@@ -31,8 +28,8 @@ Mesh::Mesh(int meshIndex, const fastgltf::Asset& gltfModel, const DX::XMMATRIX& 
 Mesh::Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transform, DX::XMFLOAT3 color, std::unique_ptr<Material> material, const std::string& filepath)
 	: Drawable(transform, color), m_MeshIndex(meshIndex), m_FbxModel(&fbxModel), m_Material(std::move(material)), m_Filepath(filepath)
 {
-	m_Vertices = ModelLoader::GetMeshVertexVector(*m_FbxModel, m_MeshIndex);
-	m_Indices = ModelLoader::GetMeshIndexVector(*m_FbxModel, m_Vertices, m_MeshIndex);
+	m_VerticesSemi = ModelLoader::GetMeshVertexVector(*m_FbxModel, m_MeshIndex);
+	m_Indices = ModelLoader::GetMeshIndexVector(*m_FbxModel, m_VerticesSemi, m_MeshIndex);
 
 	InitBuffers();
 }
@@ -70,44 +67,64 @@ void Mesh::InitBuffers()
 
 	bool hasSpecular = m_Material->HasMaterialMap(Material::Specular);
 	bool hasNormal = m_Material->HasMaterialMap(Material::Normal);
+
+
 	std::string vertexShaderPath;
 	std::string pixelShaderPath;
 
-	vertexShaderPath = "assets/shaders/NormalMapVS.hlsl";
 
 	if (hasSpecular && hasNormal)
 	{
+		vertexShaderPath = "assets/shaders/NormalMapVS.hlsl";
 		pixelShaderPath = "assets/shaders/BPhongNormMapSpecMap.hlsl";
 	}
 	else if (hasSpecular)
 	{
+		vertexShaderPath = "assets/shaders/BPhongTexVS.hlsl";
 		pixelShaderPath = "assets/shaders/BPhongSpecMapPS.hlsl";
 	}
 	else if (hasNormal)
 	{
+		vertexShaderPath = "assets/shaders/NormalMapVS.hlsl";
 		pixelShaderPath = "assets/shaders/BPhongNormalMapPS.hlsl";
 	}
 	else
 	{
+		vertexShaderPath = "assets/shaders/BPhongTexVS.hlsl";
 		pixelShaderPath = "assets/shaders/BPhongTexPS.hlsl";
 	}
 	m_VertexShader = Shader::Resolve(vertexShaderPath, Shader::VERTEX_SHADER);
 	m_PixelShader = Shader::Resolve(pixelShaderPath, Shader::PIXEL_SHADER);
 
-	m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_Vertices, m_VertexShader.get());
+	if (hasNormal)
+	{
+		m_VerticesFull = ModelLoader::GetMeshVertexVectorFull(*m_AssimpModel, m_MeshIndex);
+		m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_VerticesFull, m_VertexShader.get());
+		m_VertexBuffer->CreateLayout({
+			{"POSITION", 0, ShaderDataType::Float3},
+			{"NORMAL", 0, ShaderDataType::Float3},
+			{"TANGENT", 0, ShaderDataType::Float3},
+			{"BITANGENT", 0, ShaderDataType::Float3},
+			{"TEXCOORD", 0, ShaderDataType::Float2},
+			});
+	}
+	else
+	{
+		m_VerticesSemi = ModelLoader::GetMeshVertexVectorSemi(*m_AssimpModel, m_MeshIndex);
+		m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_VerticesSemi, m_VertexShader.get());
+		m_VertexBuffer->CreateLayout({
+			{"POSITION", 0, ShaderDataType::Float3},
+			{"NORMAL", 0, ShaderDataType::Float3},
+			{"TEXCOORD", 0, ShaderDataType::Float2},
+			});
+	}
+	m_VertexBuffer->SetLayout();
+	m_Indices = ModelLoader::GetMeshIndexVector(*m_AssimpModel, m_MeshIndex);
+
 	m_IndexBuffer = IndexBuffer::Resolve(meshTag, m_Indices);
 
 	m_VertexShader->Bind();
 	m_PixelShader->Bind();
-
-	m_VertexBuffer->CreateLayout({
-		{"POSITION", 0, ShaderDataType::Float3},
-		{"NORMAL", 0, ShaderDataType::Float3},
-		{"TANGENT", 0, ShaderDataType::Float3},
-		{"BITANGENT", 0, ShaderDataType::Float3},
-		{"TEXCOORD", 0, ShaderDataType::Float2},
-		});
-	m_VertexBuffer->SetLayout();
 
 	bool blending = false;
 	for (int i = 0; i < m_Material->NumSupportedMaps; i++)

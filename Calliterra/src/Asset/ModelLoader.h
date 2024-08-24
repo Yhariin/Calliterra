@@ -16,7 +16,7 @@
 
 class Model;
 
-struct ModelVertex
+struct ModelVertexFull
 {
 	DX::XMFLOAT3 Position;
 	DX::XMFLOAT3 Normal;
@@ -24,6 +24,14 @@ struct ModelVertex
 	DX::XMFLOAT3 Bitangent;
 	DX::XMFLOAT2 Texture;
 };
+
+struct ModelVertexSemi
+{
+	DX::XMFLOAT3 Position;
+	DX::XMFLOAT3 Normal;
+	DX::XMFLOAT2 Texture;
+};
+
 
 class ModelLoader
 {
@@ -38,15 +46,16 @@ public:
 	static ModelAPI LoadModel(const std::filesystem::path& filepath);
 	static Model GetModel(const std::filesystem::path& filepath, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
 
-	static std::vector<ModelVertex> GetMeshVertexVector(const aiScene& objModel, int meshIndex);
-	static std::vector<ModelVertex> GetMeshVertexVector(const rapidobj::Result& objModel, int meshIndex);
-	static std::vector<ModelVertex> GetMeshVertexVector(const fastgltf::Asset& objModel, int meshIndex);
-	static std::vector<ModelVertex> GetMeshVertexVector(const UfbxScene& objModel, int meshIndex);
+	static std::vector<ModelVertexFull> GetMeshVertexVectorFull(const aiScene& objModel, int meshIndex);
+	static std::vector<ModelVertexSemi> GetMeshVertexVectorSemi(const aiScene& objModel, int meshIndex);
+	static std::vector<ModelVertexSemi> GetMeshVertexVector(const rapidobj::Result& objModel, int meshIndex);
+	static std::vector<ModelVertexSemi> GetMeshVertexVector(const fastgltf::Asset& objModel, int meshIndex);
+	static std::vector<ModelVertexSemi> GetMeshVertexVector(const UfbxScene& objModel, int meshIndex);
 
 	static std::vector<uint32_t> GetMeshIndexVector(const aiScene& objModel, int meshIndex);
 	static std::vector<uint32_t> GetMeshIndexVector(const rapidobj::Result& objModel, int meshIndex);
 	static std::vector<uint32_t> GetMeshIndexVector(const fastgltf::Asset& objModel, int meshIndex);
-	static std::vector<uint32_t> GetMeshIndexVector(const UfbxScene& objModel, std::vector<ModelVertex>& vertices, int meshIndex);
+	static std::vector<uint32_t> GetMeshIndexVector(const UfbxScene& objModel, std::vector<ModelVertexSemi>& vertices, int meshIndex);
 
 private:
 	static std::shared_ptr<aiScene> LoadModelAssimp(const std::filesystem::path& filepath);
