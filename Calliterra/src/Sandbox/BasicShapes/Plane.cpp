@@ -18,7 +18,7 @@ void Plane::Draw()
 
 	Renderer::UpdateConstantBuffer(m_TransformConstantBufferVS, cb);
 	Renderer::UpdateConstantBuffer(m_TransformConstantBufferPS, cb);
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBufferVS, m_TransformConstantBufferPS, m_PixelConstantBuffer });
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBufferVS, m_TransformConstantBufferPS, m_PixelConstantBuffer }, m_Blender);
 	Renderer::Draw();
 }
 
@@ -102,6 +102,7 @@ void Plane::InitBuffers()
 	};
 	m_PixelConstantBuffer = ConstantBuffer::Resolve<PixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 
+	m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
 }
 
 void Plane::CalculateNormals()

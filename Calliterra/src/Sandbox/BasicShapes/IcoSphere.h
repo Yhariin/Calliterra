@@ -38,6 +38,7 @@ private:
 	std::shared_ptr<Shader> m_PixelShader = nullptr;
 	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
 	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
+	std::shared_ptr<Blender> m_Blender = nullptr;
 	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
 	std::shared_ptr<ConstantBuffer> m_ColorConstantBuffer = nullptr;
 

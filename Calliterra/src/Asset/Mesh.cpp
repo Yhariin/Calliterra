@@ -48,11 +48,11 @@ void Mesh::Draw()
 	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, cb);
 	if (m_Material->HasMaterialMap(Material::Specular))
 	{
-		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer });
+		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer }, m_Blender);
 	}
 	else 
 	{
-		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer, m_PixelConstantBuffer });
+		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer, m_PixelConstantBuffer }, m_Blender);
 	}
 	Renderer::Draw();
 }
@@ -109,11 +109,16 @@ void Mesh::InitBuffers()
 		});
 	m_VertexBuffer->SetLayout();
 
+	bool blending = false;
 	for (int i = 0; i < m_Material->NumSupportedMaps; i++)
 	{
 		if (m_Material->HasMaterialMap(static_cast<Material::MapTypes>(i)))
 		{
 			m_Textures.emplace_back(Texture::Resolve(m_Material->GetMaterialMaps()[i], i));
+			if (m_Textures.back()->HasBlending())
+			{
+				blending = true;
+			}
 		}
 	}
 
@@ -127,5 +132,14 @@ void Mesh::InitBuffers()
 		};
 
 		m_PixelConstantBuffer = ConstantBuffer::Resolve<PixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
+	}
+
+	if (blending)
+	{
+		m_Blender = Blender::Resolve(true, Blender::BlendFunc::BLEND_SRC_ALPHA, Blender::BlendFunc::BLEND_INV_SRC_ALPHA, Blender::BlendOp::ADD);
+	}
+	else
+	{
+		m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
 	}
 }

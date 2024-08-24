@@ -5,6 +5,7 @@
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 #include "ConstantBuffer.h"
+#include "Blender.h"
 
 // Keeps a unordered map containing bindables. Calling resolve will create a new
 // bindable and store it in the map if it's not already inside. If it already exists
@@ -61,6 +62,10 @@ public:
 				const auto& constants = std::get<2>(std::tie(p...));
 				const auto& slot = std::get<3>(std::tie(p...));
 				bind = Renderer::CreateConstantBuffer(shaderType, constants, slot);
+			}
+			else if constexpr (std::is_same<Type, Blender>::value)
+			{
+				bind = Renderer::CreateBlendState(p...);
 			}
 
 			m_Bindables[key] = bind;

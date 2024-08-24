@@ -123,6 +123,7 @@ private:
 	inline static std::shared_ptr<VertexBuffer> s_VertexBuffer = nullptr;
 	inline static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
 	inline static std::shared_ptr<Texture> s_Texture = nullptr;
+	inline static std::shared_ptr<Blender> s_Blender = nullptr;
 	inline static std::shared_ptr<ConstantBuffer> s_TransformConstantBuffer = nullptr;
 	inline static std::shared_ptr<ConstantBuffer> s_PixelConstantBuffer = nullptr;
 

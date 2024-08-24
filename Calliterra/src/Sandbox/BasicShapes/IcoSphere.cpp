@@ -11,7 +11,7 @@ IcoSphere::IcoSphere(const uint32_t resolution, DX::XMMATRIX transform, DX::XMFL
 void IcoSphere::Draw()
 {
 	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix));
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, { m_TransformConstantBuffer, m_ColorConstantBuffer });
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, { m_TransformConstantBuffer, m_ColorConstantBuffer }, m_Blender);
 	Renderer::Draw();
 }
 
@@ -140,6 +140,8 @@ void IcoSphere::InitBuffers()
 	m_VertexBuffer->SetLayout();
 
 	m_TransformConstantBuffer = ConstantBuffer::Resolve<DX::XMMATRIX>(Shader::VERTEX_SHADER, {});
+
+	m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
 }
 
 int IcoSphere::AddVertex(DX::XMFLOAT3 point)

@@ -63,6 +63,7 @@ void Cube::InitBuffers()
 
 	s_PixelConstantBuffer = ConstantBuffer::Resolve<CubePixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 
+	s_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
 }
 
 void Cube::Update(float dt)
@@ -92,7 +93,7 @@ void Cube::Draw()
 	};
 
 	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, cb);
-	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_Texture }, { s_TransformConstantBuffer, s_PixelConstantBuffer });
+	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_Texture }, { s_TransformConstantBuffer, s_PixelConstantBuffer }, s_Blender);
 	Renderer::Draw();
 
 }

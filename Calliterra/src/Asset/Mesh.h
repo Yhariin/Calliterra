@@ -80,5 +80,6 @@ private:
 	std::vector<std::shared_ptr<Texture>> m_Textures;
 	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
 	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
+	std::shared_ptr<Blender> m_Blender = nullptr;
 };
 

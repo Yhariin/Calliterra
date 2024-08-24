@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include "ConstantBuffer.h"
 #include "Texture.h"
+#include "Blender.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
 #include "Platform/DX11/DX11VertexBuffer.h"
 
@@ -22,7 +23,8 @@ public:
 					 const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr,
 					 const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr,
 					 const std::vector<std::shared_ptr<Texture>>& textures = {},
-					 const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList = {}
+					 const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList = {},
+					 const std::shared_ptr<Blender>& blender = nullptr
 	);
 	static void Draw();
 
@@ -156,6 +158,7 @@ public:
 	}
 
 	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0);
+	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
 
 	static RendererResourceLibrary& GetResourceLibrary();
 

@@ -9,6 +9,8 @@ public:
 	
 	void Bind(std::optional<uint32_t> slot) override;
 
+	bool HasBlending() override { return m_HasAlpha; }
+
 private:
 	DX11Context& m_DX11Context;
 	uint32_t m_Slot;
