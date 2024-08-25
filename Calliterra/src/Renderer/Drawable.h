@@ -13,6 +13,7 @@ public:
 	}
 
 	virtual void Draw() = 0;
+	virtual void DrawOutline() {} // Temporary, used to test stencil buffer, remove later.
 
 	virtual void Update(float dt) = 0;
 

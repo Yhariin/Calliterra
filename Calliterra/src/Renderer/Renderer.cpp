@@ -33,7 +33,8 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 					const std::shared_ptr<IndexBuffer>& indexBuffer, 
 					const std::vector<std::shared_ptr<Texture>>& textureList, 
 					const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList,
-					const std::shared_ptr<Blender>& blender)
+					const std::shared_ptr<Blender>& blender,
+					const std::shared_ptr<DepthStencil>& depthStencil)
 {
 	for (auto& shader : shaderList)
 	{
@@ -65,6 +66,11 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 	if (blender != nullptr)
 	{
 		blender->Bind();
+	}
+
+	if (depthStencil != nullptr)
+	{
+		depthStencil->Bind();
 	}
 }
 

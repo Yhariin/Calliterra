@@ -16,9 +16,6 @@ void Cube::InitBuffers()
 	s_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_IndependentCubeVertices, s_VertexShader.get());
 	s_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_IndependentCubeIndices);
 
-	s_VertexShader->Bind();
-	s_PixelShader->Bind();
-
 	s_VertexBuffer->CreateLayout({
 		{"POSITION", 0, ShaderDataType::Float3},
 		{"NORMAL", 0, ShaderDataType::Float3},
@@ -38,6 +35,26 @@ void Cube::InitBuffers()
 	s_PixelConstantBuffer = ConstantBuffer::Resolve<CubePixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 
 	s_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
+	s_DepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Write);
+
+	// Outline effect
+	s_OutlineVS = Shader::Resolve("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
+	s_OutlinePS = Shader::Resolve("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
+
+	using namespace std::string_literals;
+	s_OutlineVertexBuffer = VertexBuffer::Resolve(geometryTag + "Outline"s, m_CubeVertices, s_OutlineVS.get());
+	s_OutlineIndexBuffer = IndexBuffer::Resolve(geometryTag + "Outline"s, m_CubeIndices);
+
+	s_OutlineVertexBuffer->CreateLayout({
+		{"POSITION", 0, ShaderDataType::Float3}
+		});
+	s_OutlineVertexBuffer->SetLayout();
+
+	s_OutlineTransformConstantBuffer = ConstantBuffer::Resolve<DX::XMMATRIX>(Shader::VERTEX_SHADER, {});
+	s_OutlinePixelConstantBuffer = ConstantBuffer::Resolve(Shader::PIXEL_SHADER, DX::XMFLOAT4(1.f, 0.4f, 0.4f, 1.0f), 0, geometryTag + "Outline"s);
+
+	s_OutlineDepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Mask);
+	
 }
 
 void Cube::Update(float dt)
@@ -54,7 +71,17 @@ void Cube::Draw()
 	};
 
 	Renderer::UpdateConstantBuffer(s_TransformConstantBuffer, cb);
-	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_Texture }, { s_TransformConstantBuffer, s_PixelConstantBuffer }, s_Blender);
+	Renderer::Bind({ s_VertexShader, s_PixelShader }, s_VertexBuffer, s_IndexBuffer, { s_Texture }, { s_TransformConstantBuffer, s_PixelConstantBuffer }, s_Blender, s_DepthStencil);
+	Renderer::Draw();
+
+}
+
+void Cube::DrawOutline()
+{
+	auto outlineTransform = DX::XMMatrixTranspose(DX::XMMatrixScaling(1.03f, 1.03f, 1.03f) * m_Transform * m_ViewMatrix * m_ProjectionMatrix);
+	
+	Renderer::UpdateConstantBuffer(s_OutlineTransformConstantBuffer, outlineTransform);
+	Renderer::Bind({ s_OutlineVS, s_OutlinePS }, s_OutlineVertexBuffer, s_OutlineIndexBuffer, {}, { s_OutlineTransformConstantBuffer, s_OutlinePixelConstantBuffer}, s_Blender, s_OutlineDepthStencil);
 	Renderer::Draw();
 
 }

@@ -14,7 +14,7 @@ public:
 
 	void LoadSandboxPreset();
 
-	void CreateCube();
+	void CreateCube(const DX::XMMATRIX& transform = DX::XMMatrixIdentity());
 	void CreateRadialSphere();
 	void CreateIcoSphere();
 	void CreatePlane();

@@ -25,6 +25,10 @@ void Sandbox::OnUpdate(float dt)
 		drawable->Update(dt);
 		drawable->Draw();
 	}
+	for (auto& drawable : m_Drawables)
+	{
+		drawable->DrawOutline();
+	}
 
 }
 
@@ -36,10 +40,7 @@ void Sandbox::OnEvent(Event& e)
 void Sandbox::LoadSandboxPreset()
 {
 	//CreatePlane();
-	for(int i = 0; i < 300; i++)
-	{ 
-		//CreateCube();
-	}
+
 	CreatePointLight();
 
 	//std::shared_ptr<rapidobj::Result> dragonModel = ModelLoader::LoadModelObj("assets/models/dragon.obj");
@@ -52,6 +53,8 @@ void Sandbox::LoadSandboxPreset()
 
 	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nano_textured/nanosuit.obj", transform2, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
 	m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f) * DX::XMMatrixTranslation(6.f, 0.f, 0.f));
+	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f));
 	
 	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nanosuit_hierarchical.gltf", transform, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
 
@@ -61,9 +64,9 @@ void Sandbox::LoadSandboxPreset()
 
 }
 
-void Sandbox::CreateCube()
+void Sandbox::CreateCube(const DX::XMMATRIX& transform)
 {
-	m_Drawables.emplace_back(std::make_unique<Cube>());
+	m_Drawables.emplace_back(std::make_unique<Cube>(transform));
 }
 
 void Sandbox::CreateRadialSphere()

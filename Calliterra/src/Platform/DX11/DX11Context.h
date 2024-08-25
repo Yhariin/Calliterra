@@ -13,7 +13,6 @@
 
 struct DX11ContextProps
 {
-	bool Enabled4xMSAA = false;
 	D3D11_FILL_MODE FillMode = D3D11_FILL_SOLID;
 	D3D11_CULL_MODE CullMode = D3D11_CULL_BACK;
 	
@@ -37,21 +36,17 @@ public:
 
 	void DrawIndexed(uint32_t indexCount);
 
-	void EnableBlending();
-	void DisableBlending();
-
 	ID3D11Device& GetDevice() const { return *m_Device.Get(); }
 	ID3D11DeviceContext& GetDeviceContext() const { return *m_DeviceContext.Get(); }
 
 private:
-	void ClearBuffer(float r, float g, float b);
 	void CreateDeviceContext();
 	void CreateSwapChain();
 	void CreateRenderTargetView();
 	void CreateDepthStencilBuffer();
 	void CreateRasterizerState();
-	void CreateBlendState();
 	void SetRenderViewport(float x, float y, float width, float height);
+
 private:
 	HWND* m_Hwnd;
 	WindowProps& m_WindowProps;
@@ -64,10 +59,8 @@ private:
 	ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
 	ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
 	ComPtr<ID3D11RasterizerState> m_RasterizerState;
-	ComPtr<ID3D11DepthStencilState> m_DepthStencilState;
 
 	float m_BufferClearColor[4] = { 1.f, 1.f, 1.f, 1.f };
-	UINT m_4xMSAAQuality = 0;
 	bool m_VSyncEnabled = true;
 	DX11ContextProps m_DX11ContextProps;
 };

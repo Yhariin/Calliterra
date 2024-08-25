@@ -11,7 +11,7 @@ RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX tra
 void RadialSphere::Draw()
 {
 	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix));
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, {m_TransformConstantBuffer, m_ColorConstantBuffer}, m_Blender);
+	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, {m_TransformConstantBuffer, m_ColorConstantBuffer}, m_Blender, m_DepthStencil);
 	Renderer::Draw();
 }
 
@@ -119,5 +119,6 @@ void RadialSphere::InitBuffers()
 	m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
 
 	m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
+	m_DepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Off);
 }
 

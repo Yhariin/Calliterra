@@ -83,5 +83,6 @@ private:
 	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
 	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
 	std::shared_ptr<Blender> m_Blender = nullptr;
+	std::shared_ptr<DepthStencil> m_DepthStencil = nullptr;
 };
 

@@ -11,6 +11,7 @@ public:
 	void Update(float dt) override;
 
 	void Draw() override;
+	void DrawOutline() override;
 private:
 	static void CalculateNormals();
 private:
@@ -108,8 +109,16 @@ private:
 	inline static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
 	inline static std::shared_ptr<Texture> s_Texture = nullptr;
 	inline static std::shared_ptr<Blender> s_Blender = nullptr;
+	inline static std::shared_ptr<DepthStencil> s_DepthStencil = nullptr;
 	inline static std::shared_ptr<ConstantBuffer> s_TransformConstantBuffer = nullptr;
 	inline static std::shared_ptr<ConstantBuffer> s_PixelConstantBuffer = nullptr;
 
+	inline static std::shared_ptr<Shader> s_OutlineVS = nullptr;
+	inline static std::shared_ptr<Shader> s_OutlinePS = nullptr;
+	inline static std::shared_ptr<VertexBuffer> s_OutlineVertexBuffer = nullptr;
+	inline static std::shared_ptr<IndexBuffer> s_OutlineIndexBuffer = nullptr;
+	inline static std::shared_ptr<ConstantBuffer> s_OutlineTransformConstantBuffer = nullptr;
+	inline static std::shared_ptr<ConstantBuffer> s_OutlinePixelConstantBuffer = nullptr;
+	inline static std::shared_ptr<DepthStencil> s_OutlineDepthStencil = nullptr;
 };
 

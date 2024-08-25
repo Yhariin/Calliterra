@@ -9,8 +9,8 @@ DX11DepthStencil::DX11DepthStencil(const DX11Context& context, Mode mode)
 
 	if (m_Mode == Mode::Write)
 	{
-		stencilDesc.DepthEnable = false;
-		stencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		stencilDesc.DepthEnable = true;
+		stencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		stencilDesc.StencilEnable = true;
 		stencilDesc.StencilWriteMask = 0xFF;
 		stencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
@@ -27,7 +27,7 @@ DX11DepthStencil::DX11DepthStencil(const DX11Context& context, Mode mode)
 	}
 	else if (m_Mode == Mode::DepthOff)
 	{
-		stencilDesc.DepthEnable = true;
+		stencilDesc.DepthEnable = false;
 		stencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	}
 	else if (m_Mode == Mode::DepthReversed)

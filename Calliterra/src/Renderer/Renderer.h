@@ -25,7 +25,8 @@ public:
 					 const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr,
 					 const std::vector<std::shared_ptr<Texture>>& textures = {},
 					 const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList = {},
-					 const std::shared_ptr<Blender>& blender = nullptr
+					 const std::shared_ptr<Blender>& blender = nullptr,
+					 const std::shared_ptr<DepthStencil>& depthStencil = nullptr
 	);
 	static void Draw();
 

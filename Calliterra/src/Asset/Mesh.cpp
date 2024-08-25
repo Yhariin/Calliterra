@@ -45,11 +45,11 @@ void Mesh::Draw()
 	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, cb);
 	if (m_Material->HasMaterialMap(Material::Specular))
 	{
-		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer }, m_Blender);
+		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer }, m_Blender, m_DepthStencil);
 	}
 	else 
 	{
-		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer, m_PixelConstantBuffer }, m_Blender);
+		Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBuffer, m_PixelConstantBuffer }, m_Blender, m_DepthStencil);
 	}
 	Renderer::Draw();
 }
@@ -159,4 +159,6 @@ void Mesh::InitBuffers()
 	{
 		m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
 	}
+
+	m_DepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Off);
 }
