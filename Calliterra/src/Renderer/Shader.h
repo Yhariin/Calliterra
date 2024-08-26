@@ -20,8 +20,6 @@ public:
 public:
 	virtual ~Shader() = default;
 
-	virtual void Bind() = 0;
-
 	static const std::string GenerateUID(const std::string& filepath, Shader::ShaderType type);
 
 	static std::shared_ptr<Shader> Resolve(const std::string& filepath, Shader::ShaderType type);

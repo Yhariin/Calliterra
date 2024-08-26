@@ -87,17 +87,9 @@ class DX11VertexConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind(std::optional<uint32_t> slot) override
+	void Bind() override
 	{
-		
-		if (slot.has_value())
-		{
-			m_Context.GetDeviceContext().VSSetConstantBuffers(slot.value(), 1, m_ConstantBuffer.GetAddressOf());
-		}
-		else
-		{
-			m_Context.GetDeviceContext().VSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
-		}
+		m_Context.GetDeviceContext().VSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
 	
 };
@@ -110,16 +102,9 @@ class DX11PixelConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind(std::optional<uint32_t> slot) override
+	void Bind() override
 	{
-		if (slot.has_value())
-		{
-			m_Context.GetDeviceContext().PSSetConstantBuffers(slot.value(), 1, m_ConstantBuffer.GetAddressOf());
-		}
-		else
-		{
-			m_Context.GetDeviceContext().PSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
-		}
+		m_Context.GetDeviceContext().PSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 };
@@ -132,16 +117,9 @@ class DX11ComputeConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind(std::optional<uint32_t> slot) override
+	void Bind() override
 	{
-		if (slot.has_value())
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(slot.value(), 1, m_ConstantBuffer.GetAddressOf());
-		}
-		else
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
-		}
+		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 };
@@ -154,16 +132,9 @@ class DX11GeometryConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind(std::optional<uint32_t> slot) override
+	void Bind() override
 	{
-		if (slot.has_value())
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(slot.value(), 1, m_ConstantBuffer.GetAddressOf());
-		}
-		else
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
-		}
+		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 };
@@ -176,16 +147,9 @@ class DX11HullConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind(std::optional<uint32_t> slot) override
+	void Bind() override
 	{
-		if (slot.has_value())
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(slot.value(), 1, m_ConstantBuffer.GetAddressOf());
-		}
-		else
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
-		}
+		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 };
@@ -198,16 +162,9 @@ class DX11DomainConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind(std::optional<uint32_t> slot) override
+	void Bind() override
 	{
-		if (slot.has_value())
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(slot.value(), 1, m_ConstantBuffer.GetAddressOf());
-		}
-		else
-		{
-			m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
-		}
+		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 };

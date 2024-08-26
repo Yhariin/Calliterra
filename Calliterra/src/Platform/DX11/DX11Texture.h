@@ -7,7 +7,7 @@ class DX11Texture : public Texture
 public:
 	DX11Texture(DX11Context& context, const std::string& filepath, uint32_t slot = 0);
 	
-	void Bind(std::optional<uint32_t> slot) override;
+	void Bind() override;
 
 	bool HasBlending() override { return m_HasAlpha; }
 

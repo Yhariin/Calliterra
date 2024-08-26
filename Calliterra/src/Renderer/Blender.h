@@ -32,8 +32,6 @@ public:
 
 	virtual ~Blender() = default;
 
-	virtual void Bind() = 0;
-
 	static const std::string GenerateUID(bool enableBlending, BlendFunc srcBlend, BlendFunc destBlend, BlendOp blendOp);
 	static std::shared_ptr<Blender> Resolve(bool enableBlending, BlendFunc srcBlend, BlendFunc destBlend, BlendOp blendOp);
 

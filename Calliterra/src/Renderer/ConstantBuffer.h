@@ -20,7 +20,4 @@ public:
 		return Renderer::GetResourceLibrary().Resolve<ConstantBuffer>(tag, shaderType, constants, slot);
 	}
 
-	virtual void Bind(std::optional<uint32_t> slot) = 0;
-
-protected:
 };

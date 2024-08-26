@@ -15,8 +15,6 @@ public:
 
 	static std::shared_ptr<IndexBuffer> Resolve(const std::string& tag, const std::vector<uint32_t>& indices);
 
-	virtual void Bind() = 0;
-
 	virtual uint32_t GetCount() const = 0;
 
 };

@@ -55,12 +55,12 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 
 	for (auto& texture : textureList)
 	{
-		texture->Bind({});
+		texture->Bind();
 	}
 
 	for (auto& buffer : constantBufferList)
 	{
-		buffer->Bind({});
+		buffer->Bind();
 	}
 
 	if (blender != nullptr)

@@ -8,8 +8,6 @@ class Texture : public Bindable
 public:
 	virtual ~Texture() = default;
 
-	virtual void Bind(std::optional<uint32_t> slot) = 0;
-
 	virtual bool HasBlending() = 0;
 
 	static const std::string GenerateUID(const std::string& filepath, uint32_t slot = 0);

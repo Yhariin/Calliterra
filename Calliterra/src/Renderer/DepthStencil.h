@@ -16,8 +16,6 @@ public:
 
 	virtual ~DepthStencil() = default;
 
-	virtual void Bind() = 0;
-
 	static const std::string GenerateUID(Mode mode);
 	static std::shared_ptr<DepthStencil> Resolve(Mode mode);
 	

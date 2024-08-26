@@ -63,15 +63,8 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	m_DX11Context.GetDeviceContext().GenerateMips(m_TextureView.Get());
 }
 
-void DX11Texture::Bind(std::optional<uint32_t> slot)
+void DX11Texture::Bind()
 {
 	m_DX11Context.GetDeviceContext().PSSetSamplers(0, 1, m_SamplerState.GetAddressOf());
-	if (slot.has_value())
-	{
-		m_DX11Context.GetDeviceContext().PSSetShaderResources(slot.value(), 1, m_TextureView.GetAddressOf());
-	}
-	else
-	{
-		m_DX11Context.GetDeviceContext().PSSetShaderResources(m_Slot, 1, m_TextureView.GetAddressOf());
-	}
+	m_DX11Context.GetDeviceContext().PSSetShaderResources(m_Slot, 1, m_TextureView.GetAddressOf());
 }

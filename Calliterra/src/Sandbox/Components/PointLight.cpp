@@ -28,7 +28,7 @@ void PointLight::Draw()
 	};
 	Renderer::UpdateConstantBuffer(m_PositionConstantBuffer, cb);
 
-	m_PositionConstantBuffer->Bind({});
+	m_PositionConstantBuffer->Bind();
 }
 
 void PointLight::OnSettingsUpdate(SettingsType type)
