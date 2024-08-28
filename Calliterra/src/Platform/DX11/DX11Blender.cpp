@@ -18,7 +18,7 @@ DX11Blender::DX11Blender(const DX11Context& context, bool enableBlending, BlendF
 	ASSERT_HR(m_Context.GetDevice().CreateBlendState(&blendDesc, &m_BlendState));
 }
 
-void DX11Blender::Bind()
+void DX11Blender::Bind() const
 {
 	m_Context.GetDeviceContext().OMSetBlendState(m_BlendState.Get(), nullptr, 0xFFFFFFFF);
 }

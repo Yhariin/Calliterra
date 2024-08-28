@@ -103,7 +103,7 @@ void DX11Context::DrawIndexed(uint32_t indexCount)
 	m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_DeviceContext->RSSetState(m_RasterizerState.Get());
 
-	m_DeviceContext->DrawIndexed(indexCount, 0, 0);
+m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 }
 
 void DX11Context::CreateDeviceContext()

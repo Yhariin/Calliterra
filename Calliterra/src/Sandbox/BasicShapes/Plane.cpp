@@ -75,7 +75,7 @@ void Plane::InitBuffers()
 
 	m_VertexShader = Shader::Resolve("assets/shaders/NormalMapVS.hlsl", Shader::VERTEX_SHADER);
 	m_PixelShader = Shader::Resolve("assets/shaders/BPhongNormalMapPS.hlsl", Shader::PIXEL_SHADER);
-	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices, m_VertexShader.get());
+	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices);
 	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
 
 	m_VertexShader->Bind();
@@ -87,8 +87,7 @@ void Plane::InitBuffers()
 		{"TANGENT", 0, ShaderDataType::Float3},
 		{"BITANGENT", 0, ShaderDataType::Float3},
 		{"TEXCOORD", 0, ShaderDataType::Float2},
-		});
-	m_VertexBuffer->SetLayout();
+		}, m_VertexShader.get());
 
 	m_Textures.emplace_back(Texture::Resolve("assets/textures/brickwall.jpg", 0));
 	m_Textures.emplace_back(Texture::Resolve("assets/textures/brickwall_normal.jpg", 2));

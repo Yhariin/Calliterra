@@ -87,7 +87,7 @@ class DX11VertexConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind() override
+	void Bind() const override
 	{
 		m_Context.GetDeviceContext().VSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
@@ -102,7 +102,7 @@ class DX11PixelConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind() override
+	void Bind() const override
 	{
 		m_Context.GetDeviceContext().PSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
@@ -117,7 +117,7 @@ class DX11ComputeConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind() override
+	void Bind() const override
 	{
 		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
@@ -132,7 +132,7 @@ class DX11GeometryConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind() override
+	void Bind() const override
 	{
 		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
@@ -147,7 +147,7 @@ class DX11HullConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind() override
+	void Bind() const override
 	{
 		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
@@ -162,7 +162,7 @@ class DX11DomainConstantBuffer : public DX11ConstantBuffer<Type>
 	using DX11ConstantBuffer<Type>::m_Slot;
 public:
 	using DX11ConstantBuffer<Type>::DX11ConstantBuffer;
-	void Bind() override
+	void Bind() const override
 	{
 		m_Context.GetDeviceContext().CSSetConstantBuffers(m_Slot, 1, m_ConstantBuffer.GetAddressOf());
 	}

@@ -46,8 +46,7 @@ public:
 				// Since CreateVertexBuffer() doesn't need this tag we'll use this std::tie trick to
 				// get the other parameters we need.
 				const auto& vertices = std::get<1>(std::tie(p...));
-				const auto& shader = std::get<2>(std::tie(p...));
-				bind = Renderer::CreateVertexBuffer(vertices, shader);
+				bind = Renderer::CreateVertexBuffer(vertices);
 			}
 			else if constexpr(std::is_same<Type, IndexBuffer>::value)
 			{

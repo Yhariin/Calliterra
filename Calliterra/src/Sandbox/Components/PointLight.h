@@ -8,6 +8,7 @@ class PointLight : public Drawable, public SettingsSubscriber
 public:
 	PointLight(DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 	void Draw() override;
+	void Submit() const override;
 
 	void OnSettingsUpdate(SettingsType setting) override;
 	void Update(float dt) override;
@@ -31,6 +32,6 @@ private:
 	IcoSphere m_Sphere;
 	DX::XMFLOAT3 m_Position;
 	std::shared_ptr<Shader> m_PixelShader;
-	std::shared_ptr<ConstantBuffer> m_PositionConstantBuffer;
+	std::shared_ptr<ConstantBuffer> m_LightConstantBuffer;
 };
 

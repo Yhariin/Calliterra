@@ -6,19 +6,18 @@ class Cube : public Drawable
 public:
 	Cube(DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
     
-	static void InitBuffers();
+	void InitBuffers();
 
 	void Update(float dt) override;
 
+	//void Submit() const override;
 	void Draw() override;
 	void DrawOutline() override;
 private:
 	static void CalculateNormals();
 private:
-	// Positional
-	
-	inline static const uint32_t m_VERTEXCOUNT= 8 * 3 * 3;
-	inline static const uint32_t m_INDEXCOUNT = 36;
+	inline static constexpr uint32_t m_VERTEXCOUNT= 8 * 3 * 3;
+	inline static constexpr uint32_t m_INDEXCOUNT = 36;
 
 	struct CubeVertex
 	{
@@ -103,22 +102,20 @@ private:
 		20,23,21, 20,22,23
 	};
 
-	inline static std::shared_ptr<Shader> s_VertexShader = nullptr;
-	inline static std::shared_ptr<Shader> s_PixelShader = nullptr;
-	inline static std::shared_ptr<VertexBuffer> s_VertexBuffer = nullptr;
-	inline static std::shared_ptr<IndexBuffer> s_IndexBuffer = nullptr;
-	inline static std::shared_ptr<Texture> s_Texture = nullptr;
-	inline static std::shared_ptr<Blender> s_Blender = nullptr;
-	inline static std::shared_ptr<DepthStencil> s_DepthStencil = nullptr;
-	inline static std::shared_ptr<ConstantBuffer> s_TransformConstantBuffer = nullptr;
-	inline static std::shared_ptr<ConstantBuffer> s_PixelConstantBuffer = nullptr;
+	std::shared_ptr<Shader> m_VertexShader = nullptr;
+	std::shared_ptr<Shader> m_PixelShader = nullptr;
+	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
+	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
+	std::shared_ptr<Texture> m_Texture = nullptr;
+	std::shared_ptr<Blender> m_Blender = nullptr;
+	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
 
-	inline static std::shared_ptr<Shader> s_OutlineVS = nullptr;
-	inline static std::shared_ptr<Shader> s_OutlinePS = nullptr;
-	inline static std::shared_ptr<VertexBuffer> s_OutlineVertexBuffer = nullptr;
-	inline static std::shared_ptr<IndexBuffer> s_OutlineIndexBuffer = nullptr;
-	inline static std::shared_ptr<ConstantBuffer> s_OutlineTransformConstantBuffer = nullptr;
-	inline static std::shared_ptr<ConstantBuffer> s_OutlinePixelConstantBuffer = nullptr;
-	inline static std::shared_ptr<DepthStencil> s_OutlineDepthStencil = nullptr;
+	std::shared_ptr<Shader> m_OutlineVS = nullptr;
+	std::shared_ptr<Shader> m_OutlinePS = nullptr;
+	std::shared_ptr<VertexBuffer> m_OutlineVertexBuffer = nullptr;
+	std::shared_ptr<IndexBuffer> m_OutlineIndexBuffer = nullptr;
+	std::shared_ptr<ConstantBuffer> m_OutlineTransformConstantBuffer = nullptr;
+	std::shared_ptr<ConstantBuffer> m_OutlinePixelConstantBuffer = nullptr;
+	std::shared_ptr<DepthStencil> m_OutlineDepthStencil = nullptr;
 };
 

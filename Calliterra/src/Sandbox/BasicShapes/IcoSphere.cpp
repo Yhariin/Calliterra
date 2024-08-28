@@ -10,9 +10,9 @@ IcoSphere::IcoSphere(const uint32_t resolution, DX::XMMATRIX transform, DX::XMFL
 
 void IcoSphere::Draw()
 {
-	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix));
-	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, { m_TransformConstantBuffer, m_ColorConstantBuffer }, m_Blender, m_DepthStencil);
-	Renderer::Draw();
+	//Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix));
+	//Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, { m_TransformConstantBuffer, m_ColorConstantBuffer }, m_Blender, m_DepthStencil);
+	//Renderer::Draw();
 }
 
 void IcoSphere::Update(float dt)
@@ -105,44 +105,48 @@ int IcoSphere::GetMidPoint(uint32_t p1, uint32_t p2)
 
 void IcoSphere::InitBuffers()
 {
+	Technique solid;
+	Step only(0);
+
 	const auto geometryTag = "$IcoSphere." + std::to_string(m_Resolution);
+
+	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices);
+	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
+
 	if(DX::XMVector3Equal(DX::XMLoadFloat3(&m_Color), {-1.f, -1.f, -1.f}))
 	{ 
 		m_VertexShader = Shader::Resolve("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
 		m_PixelShader = Shader::Resolve("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
 
-		m_VertexShader->Bind();
-		m_PixelShader->Bind();
-
-		m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
+		m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, s_ColorsBuffer);
 	}
 	else
 	{
 		m_VertexShader = Shader::Resolve("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
 		m_PixelShader = Shader::Resolve("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
 
-		m_VertexShader->Bind();
-		m_PixelShader->Bind();
-
 		m_ColorConstantBuffer = ConstantBuffer::Resolve<DX::XMFLOAT4>(Shader::PIXEL_SHADER, DX::XMFLOAT4(m_Color.x, m_Color.y, m_Color.z, 1.f));
 	}
 
-	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices, m_VertexShader.get());
-	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
-
-
-	m_VertexShader->Bind();
-	m_PixelShader->Bind();
-
 	m_VertexBuffer->CreateLayout({
 		{"POSITION", 0, ShaderDataType::Float3},
-		});
-	m_VertexBuffer->SetLayout();
+		}, m_VertexShader.get());
 
-	m_TransformConstantBuffer = ConstantBuffer::Resolve<DX::XMMATRIX>(Shader::VERTEX_SHADER, {});
+	m_TransformConstantBuffer = std::make_shared<TransformConstantBuffer>();
 
 	m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
-	m_DepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Off);
+
+	only.AddBindable(m_VertexShader);
+	only.AddBindable(m_PixelShader);
+	only.AddBindable(m_VertexBuffer);
+	only.AddBindable(m_IndexBuffer);
+	only.SetIndexCount(m_IndexBuffer->GetCount());
+	only.AddBindable(m_TransformConstantBuffer);
+	only.AddBindable(m_ColorConstantBuffer);
+	only.AddBindable(m_Blender);
+
+	solid.AddStep(std::move(only));
+	AddTechnique(std::move(solid));
 }
 
 int IcoSphere::AddVertex(DX::XMFLOAT3 point)

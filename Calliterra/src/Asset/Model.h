@@ -9,6 +9,7 @@ public:
 	Model(std::unique_ptr<Node> root, std::unordered_map<int, std::unique_ptr<Mesh>> meshes, const DX::XMMATRIX& transform, DX::XMFLOAT3 color);
 
 	void Draw() override;
+	void Submit() const override {}
 
 	void Update(float dt) override;
 

@@ -21,3 +21,25 @@ public:
 	}
 
 };
+
+class Drawable;
+
+class TransformConstantBuffer : public Bindable
+{
+public:
+	struct Transforms
+	{
+		DX::XMMATRIX ModelView;
+		DX::XMMATRIX ModelViewProj;
+		DX::XMMATRIX NormalMatrix;
+	};
+public:
+	TransformConstantBuffer();
+	void InitializeParentReference(const Drawable& parent) override;
+	virtual Transforms GetTransforms() const;
+	void Bind() const override;
+
+protected:
+	inline static std::shared_ptr<ConstantBuffer> m_ConstantBuffer = nullptr;
+	const Drawable* m_Parent = nullptr;
+};

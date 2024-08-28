@@ -99,26 +99,25 @@ void Mesh::InitBuffers()
 	if (hasNormal)
 	{
 		m_VerticesFull = ModelLoader::GetMeshVertexVectorFull(*m_AssimpModel, m_MeshIndex);
-		m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_VerticesFull, m_VertexShader.get());
+		m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_VerticesFull);
 		m_VertexBuffer->CreateLayout({
 			{"POSITION", 0, ShaderDataType::Float3},
 			{"NORMAL", 0, ShaderDataType::Float3},
 			{"TANGENT", 0, ShaderDataType::Float3},
 			{"BITANGENT", 0, ShaderDataType::Float3},
 			{"TEXCOORD", 0, ShaderDataType::Float2},
-			});
+			}, m_VertexShader.get());
 	}
 	else
 	{
 		m_VerticesSemi = ModelLoader::GetMeshVertexVectorSemi(*m_AssimpModel, m_MeshIndex);
-		m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_VerticesSemi, m_VertexShader.get());
+		m_VertexBuffer = VertexBuffer::Resolve(meshTag, m_VerticesSemi);
 		m_VertexBuffer->CreateLayout({
 			{"POSITION", 0, ShaderDataType::Float3},
 			{"NORMAL", 0, ShaderDataType::Float3},
 			{"TEXCOORD", 0, ShaderDataType::Float2},
 			});
 	}
-	m_VertexBuffer->SetLayout();
 	m_Indices = ModelLoader::GetMeshIndexVector(*m_AssimpModel, m_MeshIndex);
 
 	m_IndexBuffer = IndexBuffer::Resolve(meshTag, m_Indices);

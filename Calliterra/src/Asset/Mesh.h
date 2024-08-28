@@ -41,6 +41,7 @@ public:
 		 const std::string& filepath = "");
 
 	void Draw() override;
+	void Submit() const override {}
 
 	void Update(float dt) override;
 

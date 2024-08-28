@@ -5,7 +5,7 @@ RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX tra
 	: m_LatDiv(latDiv), m_LongDiv(longDiv), Drawable(transform, color)
 {
 	CalculateSphere(latDiv, longDiv);
-	InitBuffers();
+	//InitBuffers();
 }
 
 void RadialSphere::Draw()
@@ -104,7 +104,7 @@ void RadialSphere::InitBuffers()
 
 	m_VertexShader = Shader::Resolve("assets/shaders/ColorIndexVS.hlsl", Shader::VERTEX_SHADER);
 	m_PixelShader = Shader::Resolve("assets/shaders/ColorIndexPS.hlsl", Shader::PIXEL_SHADER);
-	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices, m_VertexShader.get());
+	m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_Vertices);
 	m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_Indices);
 
 	m_VertexShader->Bind();
@@ -112,11 +112,10 @@ void RadialSphere::InitBuffers()
 
 	m_VertexBuffer->CreateLayout({
 		{"POSITION", 0, ShaderDataType::Float4},
-		});
-	m_VertexBuffer->SetLayout();
+		}, m_VertexShader.get());
 
 	m_TransformConstantBuffer = ConstantBuffer::Resolve<DX::XMMATRIX>(Shader::VERTEX_SHADER, {});
-	m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, m_ColorsBuffer);
+	m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, s_ColorsBuffer);
 
 	m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
 	m_DepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Off);

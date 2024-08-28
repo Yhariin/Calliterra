@@ -7,6 +7,7 @@ public:
 	RadialSphere(const int latDiv = 12, const int longDiv = 24, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 
 	void Draw() override;
+	void Submit() const override {}
 
 	void Update(float dt) override;
 

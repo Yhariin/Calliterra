@@ -7,7 +7,7 @@ class DX11IndexBuffer : public IndexBuffer
 public:
 	DX11IndexBuffer(const DX11Context& context, const std::vector<uint32_t>& indices);
 
-	void Bind() override;
+	void Bind() const override;
 
 	uint32_t GetCount() const { return m_Count; }
 

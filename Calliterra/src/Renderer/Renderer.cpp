@@ -12,10 +12,12 @@ void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 	s_GraphicsContext = graphicsContext;
 
 	s_RendererAPI->Init(s_GraphicsContext);
+	s_RenderQueue = std::make_unique<RenderQueue>();
 }
 
 void Renderer::Shutdown()
 {
+	s_RenderQueue.reset();
 }
 
 void Renderer::SetClearColor(float r, float g, float b, float a)
@@ -28,6 +30,7 @@ void Renderer::Clear()
 	s_GraphicsContext->Clear();
 }
 
+// TODO: Remove this
 void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList, 
 					const std::shared_ptr<VertexBuffer>& vertexBuffer, 
 					const std::shared_ptr<IndexBuffer>& indexBuffer, 
@@ -43,7 +46,6 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 
 	if (vertexBuffer != nullptr)
 	{
-		vertexBuffer->SetLayout();
 		vertexBuffer->Bind();
 	}
 
@@ -71,6 +73,15 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 	if (depthStencil != nullptr)
 	{
 		depthStencil->Bind();
+	}
+}
+
+void Renderer::Bind(const std::vector<std::shared_ptr<Bindable>>& bindables, uint32_t indexCount)
+{
+	s_IndexCount = indexCount;
+	for (const auto& bind : bindables)
+	{
+		bind->Bind();
 	}
 }
 
@@ -160,5 +171,10 @@ std::shared_ptr<DepthStencil> Renderer::CreateDepthStencilState(DepthStencil::Mo
 RendererResourceLibrary& Renderer::GetResourceLibrary()
 {
 	return s_ResourceLibrary;
+}
+
+RenderQueue& Renderer::GetRenderQueue()
+{
+	return *s_RenderQueue;
 }
 

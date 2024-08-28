@@ -6,6 +6,7 @@ class IcoSphere : public Drawable
 public:
 	IcoSphere(const uint32_t resolution, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = DX::XMFLOAT3(-1.f, -1.f, -1.f));
 	
+	//void Submit() const override;
 	void Draw() override;
 
 	void Update(float dt) override;
@@ -39,8 +40,6 @@ private:
 	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
 	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
 	std::shared_ptr<Blender> m_Blender = nullptr;
-	std::shared_ptr<DepthStencil> m_DepthStencil = nullptr;
-	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
 	std::shared_ptr<ConstantBuffer> m_ColorConstantBuffer = nullptr;
 
 	std::unordered_map<long long, uint32_t> m_MiddlePointCache;

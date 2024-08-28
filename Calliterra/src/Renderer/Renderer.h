@@ -2,6 +2,7 @@
 
 #include "RendererAPI.h"
 #include "RendererResourceLibrary.h"
+#include "RenderQueue/RenderQueue.h"
 #include "GraphicsContext.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -28,10 +29,11 @@ public:
 					 const std::shared_ptr<Blender>& blender = nullptr,
 					 const std::shared_ptr<DepthStencil>& depthStencil = nullptr
 	);
+	static void Bind(const std::vector<std::shared_ptr<Bindable>>& bindables, uint32_t indexCount);
 	static void Draw();
 
 	template<typename Type>
-	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<Type>& vertices, Shader* shader = nullptr)
+	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<Type>& vertices)
 	{
 		switch(GetAPI())
 		{
@@ -39,8 +41,7 @@ public:
 			ASSERT(false, "RendererAPI is set to None!");
 			return nullptr;
 		case RendererAPI::DX11:
-			ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
-			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), vertices, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), vertices);
 		}
 
 		LOG_ERROR("Unknown RendererAPI");
@@ -48,7 +49,7 @@ public:
 	}
 
 	template<typename Type>
-	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<std::vector<Type>>& listOfVertexArrays, Shader* shader = nullptr)
+	static std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::vector<std::vector<Type>>& listOfVertexArrays)
 	{
 		switch(GetAPI())
 		{
@@ -56,8 +57,7 @@ public:
 			ASSERT(false, "RendererAPI is set to None!");
 			return nullptr;
 		case RendererAPI::DX11:
-			ASSERT(shader != nullptr, "Attempting to create DX11VertexBuffer with a Null shader paramater!");
-			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), listOfVertexArrays, dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode());
+			return std::make_shared<DX11VertexBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), listOfVertexArrays);
 		}
 
 		LOG_ERROR("Unknown RendererAPI");
@@ -121,7 +121,7 @@ public:
 				break;
 			case Shader::VERTEX_SHADER:
 				return std::make_shared<DX11VertexConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
-			case Shader::PIXEL_SHADER:
+			case Shader::PIXEL_SHADER: 
 				return std::make_shared<DX11PixelConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
 			case Shader::COMPUTE_SHADER:
 				return std::make_shared<DX11ComputeConstantBuffer<Type>>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), shaderType, slot);
@@ -164,12 +164,14 @@ public:
 	static std::shared_ptr<DepthStencil> CreateDepthStencilState(DepthStencil::Mode mode);
 
 	static RendererResourceLibrary& GetResourceLibrary();
+	static RenderQueue& GetRenderQueue();
 
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 private:
 	inline static std::shared_ptr<RendererAPI> s_RendererAPI = RendererAPI::Create();
 	inline static std::shared_ptr<GraphicsContext> s_GraphicsContext = nullptr;
 	inline static RendererResourceLibrary s_ResourceLibrary;
+	inline static std::unique_ptr<RenderQueue> s_RenderQueue = nullptr;
 	inline static uint32_t s_IndexCount = 0;
 };
 

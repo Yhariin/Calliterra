@@ -7,7 +7,7 @@ DX11IndexBuffer::DX11IndexBuffer(const DX11Context& context, const std::vector<u
 	CreateBuffer(indices);
 }
 
-void DX11IndexBuffer::Bind()
+void DX11IndexBuffer::Bind() const
 {
 	m_DX11Context.GetDeviceContext().IASetIndexBuffer(m_IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }

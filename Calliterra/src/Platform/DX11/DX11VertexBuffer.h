@@ -26,21 +26,23 @@ template<typename Type>
 class DX11VertexBuffer : public VertexBuffer
 {
 public:
-	DX11VertexBuffer(const DX11Context& context, const std::vector<Type>& vertices, ComPtr<ID3DBlob> shaderByteCode)
-		: m_DX11Context(context), m_VertexLists(std::vector<std::vector<Type>>{vertices}), m_BufferCount(1), m_ShaderByteCode(shaderByteCode)
+	DX11VertexBuffer(const DX11Context& context, const std::vector<Type>& vertices)
+		: m_DX11Context(context), m_VertexLists(std::vector<std::vector<Type>>{vertices}), m_BufferCount(1)
 	{
 		InitSingleVertexBuffer();
 	}
 
-	DX11VertexBuffer(const DX11Context& context, const std::vector<std::vector<Type>>& listOfVertexArrays, ComPtr<ID3DBlob> shaderByteCode)
-		: m_DX11Context(context), m_VertexLists(listOfVertexArrays), m_BufferCount(listOfVertexArrays.size()), m_ShaderByteCode(shaderByteCode)
+	DX11VertexBuffer(const DX11Context& context, const std::vector<std::vector<Type>>& listOfVertexArrays)
+		: m_DX11Context(context), m_VertexLists(listOfVertexArrays), m_BufferCount(listOfVertexArrays.size())
 	{
 		InitMultiVertexBuffers();
 	}
 
-	void DX11VertexBuffer<Type>::Bind() override
+	void DX11VertexBuffer<Type>::Bind() const override
 	{
 		ASSERT(m_HasLayout, "Attempting to bind vertex buffer before a layout has been created.");
+		m_DX11Context.GetDeviceContext().IASetInputLayout(m_D3DBufferLayout.Get());
+
 		std::vector<UINT> strideList;
 		strideList.reserve(m_BufferCount);
 		std::vector<UINT> offsets;
@@ -52,21 +54,16 @@ public:
 		}
 
 		m_DX11Context.GetDeviceContext().IASetVertexBuffers(0, static_cast<UINT>(m_BufferCount), m_D3DVertexBufferArray[0].GetAddressOf(), &strideList[0], offsets.data());
-		
+			
 	}
 
-	void DX11VertexBuffer<Type>::SetLayout(int index) override
-	{
-		ASSERT(index < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Layout Index out of bounds!");
-		m_DX11Context.GetDeviceContext().IASetInputLayout(m_D3DBufferLayoutArray[index].Get());
-	}
-
-	void DX11VertexBuffer<Type>::CreateLayout(const VertexBufferLayout& layout) override
+	void DX11VertexBuffer<Type>::CreateLayout(const VertexBufferLayout& layout, Shader* shader) override
 	{
 		m_BufferLayoutArray[0] = layout;
 		std::vector<D3D11_INPUT_ELEMENT_DESC> desc;
 		std::vector<BufferElement> layoutElements = layout.GetElements();
 
+		ComPtr<ID3DBlob> shaderByteCode = dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode();
 
 		for (int i = 0; i < layoutElements.size(); i++)
 		{
@@ -86,9 +83,9 @@ public:
 			m_DX11Context.GetDevice().CreateInputLayout(
 				&desc[0],
 				static_cast<UINT>(desc.size()),
-				m_ShaderByteCode->GetBufferPointer(),
-				m_ShaderByteCode->GetBufferSize(),
-				&m_D3DBufferLayoutArray[0]
+				shaderByteCode->GetBufferPointer(),
+				shaderByteCode->GetBufferSize(),
+				&m_D3DBufferLayout
 			)
 		);
 
@@ -96,9 +93,10 @@ public:
 
 	}
 
-	void DX11VertexBuffer<Type>::CreateLayoutList(const std::vector<VertexBufferLayout>& layoutList) override
+	void DX11VertexBuffer<Type>::CreateLayoutList(const std::vector<VertexBufferLayout>& layoutList, Shader* shader) override
 	{
 		std::vector<D3D11_INPUT_ELEMENT_DESC> desc;
+		ComPtr<ID3DBlob> shaderByteCode = dynamic_cast<DX11Shader*>(shader)->GetCompiledShaderByteCode();
 
 		for (int i = 0; i < layoutList.size(); i++)
 		{
@@ -124,9 +122,9 @@ public:
 			m_DX11Context.GetDevice().CreateInputLayout(
 				&desc[0],
 				static_cast<UINT>(desc.size()),
-				m_ShaderByteCode->GetBufferPointer(),
-				m_ShaderByteCode->GetBufferSize(),
-				&m_D3DBufferLayoutArray[0]
+				shaderByteCode->GetBufferPointer(),
+				shaderByteCode->GetBufferSize(),
+				&m_D3DBufferLayout
 			)
 		);
 
@@ -193,11 +191,10 @@ private:
 	const uint32_t m_BufferCount;
 
 	ComPtr<ID3D11Buffer> m_D3DVertexBufferArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
-	ComPtr<ID3D11InputLayout> m_D3DBufferLayoutArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+	ComPtr<ID3D11InputLayout> m_D3DBufferLayout;
 	VertexBufferLayout m_BufferLayoutArray[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 
 	bool m_HasLayout = false;
 
-	ComPtr<ID3DBlob> m_ShaderByteCode;
 };
 

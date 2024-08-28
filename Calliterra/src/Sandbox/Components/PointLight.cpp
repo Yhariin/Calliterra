@@ -13,8 +13,26 @@ PointLight::PointLight(DX::XMMATRIX transform, DX::XMFLOAT3 color)
 
 void PointLight::Draw()
 {
-	m_Sphere.Draw();
-	m_PixelShader->Bind();
+	//m_Sphere.Draw();
+	//m_PixelShader->Bind();
+	//DX::XMFLOAT3 posViewSpace;
+	//DX::XMStoreFloat3(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat3(&m_Position), m_ViewMatrix));
+	//PointLightConstantBuffer cb = {
+	//	posViewSpace,
+	//	{ 0.05f, 0.05f, 0.05f },
+	//	{ 1.f, 1.f, 1.f },
+	//	1.f,
+	//	1.f,
+	//	0.015f,
+	//	0.0015f
+	//};
+	//Renderer::UpdateConstantBuffer(m_LightConstantBuffer, cb);
+
+	//m_LightConstantBuffer->Bind();
+}
+
+void PointLight::Submit() const
+{
 	DX::XMFLOAT3 posViewSpace;
 	DX::XMStoreFloat3(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat3(&m_Position), m_ViewMatrix));
 	PointLightConstantBuffer cb = {
@@ -26,9 +44,11 @@ void PointLight::Draw()
 		0.015f,
 		0.0015f
 	};
-	Renderer::UpdateConstantBuffer(m_PositionConstantBuffer, cb);
+	Renderer::UpdateConstantBuffer(m_LightConstantBuffer, cb);
 
-	m_PositionConstantBuffer->Bind();
+	m_LightConstantBuffer->Bind();
+	m_Sphere.Submit();
+	SubmitTechniques();
 }
 
 void PointLight::OnSettingsUpdate(SettingsType type)
@@ -38,13 +58,11 @@ void PointLight::OnSettingsUpdate(SettingsType type)
 
 void PointLight::Update(float dt)
 {
-
 	m_Transform = DX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 	m_Sphere.SetTransform(m_Transform);
 }
 
 void PointLight::InitBuffers()
 {
-	m_PixelShader = Renderer::CreateShader("assets/shaders/BPhongPS.hlsl", Shader::PIXEL_SHADER);
-	m_PositionConstantBuffer = Renderer::CreateConstantBuffer<PointLightConstantBuffer>(Shader::PIXEL_SHADER, 2);
+	m_LightConstantBuffer = Renderer::CreateConstantBuffer<PointLightConstantBuffer>(Shader::PIXEL_SHADER, 2);
 }

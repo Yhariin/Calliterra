@@ -7,7 +7,7 @@ class DX11DepthStencil : public DepthStencil
 public:
 	DX11DepthStencil(const DX11Context& context, Mode mode);
 
-	void Bind() override;
+	void Bind() const override;
 
 private:
 	const DX11Context& m_Context;

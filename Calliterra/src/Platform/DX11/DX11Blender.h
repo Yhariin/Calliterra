@@ -7,7 +7,7 @@ class DX11Blender : public Blender
 public:
 	DX11Blender(const DX11Context& context, bool enableBlending, BlendFunc srcBlend, BlendFunc destBlend, BlendOp blendOp);
 
-	void Bind() override;
+	void Bind() const override;
 
 private:
 	D3D11_BLEND GetDX11BlendFunc(BlendFunc blendFunc);
