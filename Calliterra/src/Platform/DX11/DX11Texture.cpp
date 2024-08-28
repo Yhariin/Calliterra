@@ -2,12 +2,12 @@
 #include "DX11Texture.h"
 #include "stb_image.h"
 
-DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint32_t slot)
+DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint32_t slot, Filter filter)
 	: m_DX11Context(context), m_Filepath(filepath), m_Slot(slot)
 {
 	LOG_DEBUG("Loading {}", filepath);
 	m_TextureData = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_NumChannels, m_DesiredChannels);
-	ASSERT(m_TextureData);
+ASSERT(m_TextureData);
 
 	if (m_NumChannels == 1 || m_NumChannels == 4)
 	{
@@ -20,7 +20,7 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = m_Width;
 	textureDesc.Height = m_Height;
-	textureDesc.MipLevels = 0; // 0 will generate all mip levels
+	textureDesc.MipLevels = 1; // 0 will generate all mip levels
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
@@ -40,14 +40,14 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 	srvDesc.Format = textureDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = -1; // -1 will use all mip levels
+	srvDesc.Texture2D.MipLevels = 1; // -1 will use all mip levels
 
-	ASSERT_HR(
+ASSERT_HR(
 		m_DX11Context.GetDevice().CreateShaderResourceView(m_Texture.Get(), &srvDesc, &m_TextureView)
 	);
 
 	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.Filter = FilterToD3D(filter);
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -67,4 +67,19 @@ void DX11Texture::Bind() const
 {
 	m_DX11Context.GetDeviceContext().PSSetSamplers(0, 1, m_SamplerState.GetAddressOf());
 	m_DX11Context.GetDeviceContext().PSSetShaderResources(m_Slot, 1, m_TextureView.GetAddressOf());
+}
+
+D3D11_FILTER DX11Texture::FilterToD3D(Filter filter)
+{
+	switch (filter)
+	{
+	case Filter::Point:
+		return D3D11_FILTER_MIN_MAG_MIP_POINT;
+	case Filter::Linear:
+		return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	case Filter::Anisotropic:
+		return D3D11_FILTER_ANISOTROPIC;
+	}
+
+	ASSERT(false, "Filter not supported");
 }

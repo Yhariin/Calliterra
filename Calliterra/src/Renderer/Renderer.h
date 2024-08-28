@@ -159,7 +159,7 @@ public:
 
 	}
 
-	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0);
+	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0, Texture::Filter filter = Texture::Filter::Anisotropic);
 	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
 	static std::shared_ptr<DepthStencil> CreateDepthStencilState(DepthStencil::Mode mode);
 

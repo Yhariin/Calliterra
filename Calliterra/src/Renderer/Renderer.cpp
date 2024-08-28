@@ -123,7 +123,7 @@ std::shared_ptr<Shader> Renderer::CreateShader(const std::string& filepath, Shad
 
 }
 
-std::shared_ptr<Texture> Renderer::CreateTexture(const std::string& filepath, uint32_t slot)
+std::shared_ptr<Texture> Renderer::CreateTexture(const std::string& filepath, uint32_t slot, Texture::Filter filter)
 {
 	switch(GetAPI())
 	{
@@ -131,7 +131,7 @@ std::shared_ptr<Texture> Renderer::CreateTexture(const std::string& filepath, ui
 		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case RendererAPI::DX11:
-		return std::make_shared<DX11Texture>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), filepath, slot);
+		return std::make_shared<DX11Texture>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), filepath, slot, filter);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
