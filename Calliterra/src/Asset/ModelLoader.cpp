@@ -113,6 +113,19 @@ Model ModelLoader::GetModel(const std::filesystem::path& filepath, const DX::XMM
 
 std::shared_ptr<aiScene> ModelLoader::LoadModelAssimp(const std::filesystem::path& filepath)
 {
+	// Each importer should be responsible for one model, so before loading a model we'll 
+	// free the old one and instantiate a new one. We need to do this because we need the 
+	// lifetime of the importer to be longer than the scope of this function. 
+	// Not doing this results in an exception thrown upon application exit.
+	if (!s_AssimpImporter)
+	{
+		s_AssimpImporter = std::make_unique<Assimp::Importer>();
+	}
+	else
+	{
+		s_AssimpImporter.release();
+		s_AssimpImporter = std::make_unique<Assimp::Importer>();
+	}
 	ASSERT(s_AssimpImporter, "ModelLoader must be initialized before trying to load model!");
 
 	const auto flags = 
@@ -134,6 +147,8 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 {
 	std::unordered_map<int, std::unique_ptr<Mesh>> meshes;
 	std::string parentPath = filepath.parent_path().string() + "/";
+	std::string missingTex = "assets/textures/missing_textures/missing_texture.png";
+	std::string missingMap = "assets/textures/missing_textures/missing_map.png";
 
 	for (unsigned int i = 0; i < model.mNumMeshes; i++)
 	{
@@ -144,38 +159,42 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 
 		// Get the albedo/diffuse map
 		bool hasAlbedoMap = aiMaterial.GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &aiTexturePath) == AI_SUCCESS;
+		material->SetMaterialMap(Material::Albedo, missingTex, false);
 		if (!hasAlbedoMap)
 		{
 			hasAlbedoMap = aiMaterial.GetTexture(aiTextureType_DIFFUSE, 0, &aiTexturePath) == AI_SUCCESS;
 			if (hasAlbedoMap)
 			{
-				material->AddMaterialMap(Material::Albedo, parentPath + aiTexturePath.C_Str());
+				material->SetMaterialMap(Material::Albedo, parentPath + aiTexturePath.C_Str(), true);
 			}
 		}
 		else
 		{
-			material->AddMaterialMap(Material::Albedo, parentPath + aiTexturePath.C_Str());
+			material->SetMaterialMap(Material::Albedo, parentPath + aiTexturePath.C_Str(), true);
 		}
 	
-		bool hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexturePath) == AI_SUCCESS;
-		if (hasNormalMap)
-		{
-			material->AddMaterialMap(Material::Normal, parentPath + aiTexturePath.C_Str());
-		}
-
 		// Get the specular map, otherwise default the shininess
+		material->SetMaterialMap(Material::Specular, missingMap, false);
 		bool hasSpecularMap = aiMaterial.GetTexture(aiTextureType_SPECULAR, 0, &aiTexturePath) == AI_SUCCESS;
 		if (hasSpecularMap)
 		{
-			material->AddMaterialMap(Material::Specular, parentPath + aiTexturePath.C_Str());
+			material->SetMaterialMap(Material::Specular, parentPath + aiTexturePath.C_Str(), true);
 		}
 		else
 		{
-			float shininess = 1;
+			float shininess = 1.f;
 			if (aiMaterial.Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS)
 			{
 				material->SetShininess(shininess);
 			}
+		}
+
+		// Normal map
+		material->SetMaterialMap(Material::Normal, missingMap, false);
+		bool hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexturePath) == AI_SUCCESS;
+		if (hasNormalMap)
+		{
+			material->SetMaterialMap(Material::Normal, parentPath + aiTexturePath.C_Str(), true);
 		}
 
 		meshes[i] = std::make_unique<Mesh>(i, model, transform, color, std::move(material), filepath.string());
@@ -283,11 +302,11 @@ std::unordered_map<int, std::unique_ptr<Mesh>> ModelLoader::GetModelMeshes(const
 
 		if (model.materials[materialIndex].diffuse_texname != "")
 		{
-			material->AddMaterialMap(Material::Albedo, filepath.parent_path().string() + "/" + model.materials[materialIndex].diffuse_texname);
+			material->SetMaterialMap(Material::Albedo, filepath.parent_path().string() + "/" + model.materials[materialIndex].diffuse_texname, true);
 		}
 		if (model.materials[materialIndex].specular_texname != "")
 		{
-			material->AddMaterialMap(Material::Specular, filepath.parent_path().string() + "/" + model.materials[materialIndex].specular_texname);
+			material->SetMaterialMap(Material::Specular, filepath.parent_path().string() + "/" + model.materials[materialIndex].specular_texname, true);
 		}
 		else
 		{

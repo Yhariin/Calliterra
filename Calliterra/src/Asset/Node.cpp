@@ -13,19 +13,16 @@ Node::Node()
 {
 }
 
-void Node::Draw() 
+void Node::Submit() const
 {
 	for (const auto& mesh : m_Meshes)
 	{
-		if (!m_Meshes.empty())
-		{
-			mesh->Draw();
-		}
+		mesh->Submit();
 	}
 
 	for (const auto& child : m_Children)
 	{
-		child->Draw();
+		child->Submit();
 	}
 }
 

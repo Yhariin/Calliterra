@@ -8,6 +8,7 @@ Plane::Plane(uint32_t resolution, DX::XMMATRIX transform, DX::XMFLOAT3 color )
 	InitBuffers();
 }
 
+/*
 void Plane::Draw()
 {
 	TransformConstantBuffer cb = { 
@@ -21,6 +22,7 @@ void Plane::Draw()
 	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, m_Textures, { m_TransformConstantBufferVS, m_TransformConstantBufferPS, m_PixelConstantBuffer }, m_Blender, m_DepthStencil);
 	Renderer::Draw();
 }
+*/
 
 void Plane::Update(float dt)
 {
@@ -36,7 +38,7 @@ void Plane::CalculatePlane(uint32_t resolution)
 	{
 		for (uint32_t z = 0; z <= resolution; z++)
 		{
-			m_Vertices.emplace_back(PlaneVertex(DX::XMFLOAT3(x * div, 0.f, z * div), DX::XMFLOAT3(0.f, 0.f, 0.f), {}, {}, DX::XMFLOAT2(z, x)));
+			m_Vertices.emplace_back(PlaneVertex(DX::XMFLOAT3(x * div, 0.f, z * div), DX::XMFLOAT3(0.f, 0.f, 0.f), {}, {}, DX::XMFLOAT2((float)z, (float)x)));
 		}
 	}
 	
@@ -69,6 +71,7 @@ void Plane::CalculatePlane(uint32_t resolution)
 
 }
 
+// TODO: Convert to using render queue
 void Plane::InitBuffers()
 {
 	const auto geometryTag = "$Plane." + std::to_string(m_Resolution);

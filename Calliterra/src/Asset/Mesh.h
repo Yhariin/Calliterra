@@ -40,26 +40,19 @@ public:
 		 std::unique_ptr<Material> material = nullptr,
 		 const std::string& filepath = "");
 
-	void Draw() override;
-	void Submit() const override {}
+	void Submit() const override { Drawable::Submit(); }
 
 	void Update(float dt) override;
 
 private:
 	void InitBuffers();
 
-	struct TransformConstantBuffer
-	{
-		DX::XMMATRIX ModelView;
-		DX::XMMATRIX ModelViewProj;
-		DX::XMMATRIX NormalMatrix;
-	};
-
 	struct PixelConstantBuffer
 	{
-		float SpecularIntensity;
 		float SpecularPower;
-		float padding[2];
+		BOOL hasNormalMap;
+		BOOL hasSpecMap;
+		float padding[1];
 	};
 
 private:
@@ -75,15 +68,5 @@ private:
 	std::vector<ModelVertexSemi> m_VerticesSemi;
 	std::vector<uint32_t> m_Indices;
 	std::unique_ptr<Material> m_Material;
-
-	std::shared_ptr<Shader> m_VertexShader = nullptr;
-	std::shared_ptr<Shader> m_PixelShader = nullptr;
-	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
-	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
-	std::vector<std::shared_ptr<Texture>> m_Textures;
-	std::shared_ptr<ConstantBuffer> m_TransformConstantBuffer = nullptr;
-	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
-	std::shared_ptr<Blender> m_Blender = nullptr;
-	std::shared_ptr<DepthStencil> m_DepthStencil = nullptr;
 };
 

@@ -11,26 +11,6 @@ PointLight::PointLight(DX::XMMATRIX transform, DX::XMFLOAT3 color)
 	m_Position = DX::XMFLOAT3(GlobalSettings::Rendering::LightPos().x, GlobalSettings::Rendering::LightPos().y, GlobalSettings::Rendering::LightPos().z);
 }
 
-void PointLight::Draw()
-{
-	//m_Sphere.Draw();
-	//m_PixelShader->Bind();
-	//DX::XMFLOAT3 posViewSpace;
-	//DX::XMStoreFloat3(&posViewSpace, DX::XMVector3Transform(DX::XMLoadFloat3(&m_Position), m_ViewMatrix));
-	//PointLightConstantBuffer cb = {
-	//	posViewSpace,
-	//	{ 0.05f, 0.05f, 0.05f },
-	//	{ 1.f, 1.f, 1.f },
-	//	1.f,
-	//	1.f,
-	//	0.015f,
-	//	0.0015f
-	//};
-	//Renderer::UpdateConstantBuffer(m_LightConstantBuffer, cb);
-
-	//m_LightConstantBuffer->Bind();
-}
-
 void PointLight::Submit() const
 {
 	DX::XMFLOAT3 posViewSpace;

@@ -8,13 +8,6 @@ IcoSphere::IcoSphere(const uint32_t resolution, DX::XMMATRIX transform, DX::XMFL
 	InitBuffers();
 }
 
-void IcoSphere::Draw()
-{
-	//Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix));
-	//Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, { m_TransformConstantBuffer, m_ColorConstantBuffer }, m_Blender, m_DepthStencil);
-	//Renderer::Draw();
-}
-
 void IcoSphere::Update(float dt)
 {
 

@@ -13,6 +13,20 @@ void Step::AddBindable(std::shared_ptr<Bindable> bindable)
 	m_Bindables.push_back(bindable);
 }
 
+void Step::AddBindable(std::shared_ptr<IndexBuffer> bindable)
+{
+	m_Bindables.push_back(bindable);
+	m_IndexCount = bindable->GetCount();
+}
+
+void Step::AddBindables(const std::vector<std::shared_ptr<Bindable>>& bindables)
+{
+	for (const auto bindable : bindables)
+	{
+		m_Bindables.push_back(bindable);
+	}
+}
+
 void Step::SetIndexCount(uint32_t indexCount)
 {
 	m_IndexCount = indexCount;

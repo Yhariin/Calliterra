@@ -8,12 +8,14 @@ RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX tra
 	//InitBuffers();
 }
 
+/*
 void RadialSphere::Draw()
 {
 	Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix));
 	Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, {}, {m_TransformConstantBuffer, m_ColorConstantBuffer}, m_Blender, m_DepthStencil);
 	Renderer::Draw();
 }
+*/
 
 void RadialSphere::Update(float dt)
 {
@@ -98,6 +100,7 @@ void RadialSphere::CalculateSphere(const int longDiv, const int latDiv)
 
 }
 
+// TODO: Convert to render queue
 void RadialSphere::InitBuffers()
 {
 	const auto geometryTag = "$RadialSphere." + std::to_string(m_LatDiv) + "." + std::to_string(m_LongDiv);

@@ -7,7 +7,6 @@ Cube::Cube(DX::XMMATRIX transform, DX::XMFLOAT3 color)
 	InitBuffers();
 }
 
-
 void Cube::InitBuffers()
 {
 	using namespace std::string_literals;
@@ -16,24 +15,25 @@ void Cube::InitBuffers()
 	CalculateNormals();
 
 	{
-		Technique standard;
+		Technique standardTech;
 		{
-			Step only(0);
+			Step onlyStep(0);
 
-			m_VertexShader = Shader::Resolve("assets/shaders/BPhongTexVS.hlsl", Shader::VERTEX_SHADER);
-			m_PixelShader = Shader::Resolve("assets/shaders/BPhongTexPS.hlsl", Shader::PIXEL_SHADER);
-			m_VertexBuffer = VertexBuffer::Resolve(geometryTag, m_IndependentCubeVertices);
-			m_IndexBuffer = IndexBuffer::Resolve(geometryTag, m_IndependentCubeIndices);
+			auto vShader = Shader::Resolve("assets/shaders/BPhongTexVS.hlsl", Shader::VERTEX_SHADER);
+			onlyStep.AddBindable(Shader::Resolve("assets/shaders/BPhongTexPS.hlsl", Shader::PIXEL_SHADER));
+			onlyStep.AddBindable(vShader);
+			auto vBuff = VertexBuffer::Resolve(geometryTag, m_IndependentCubeVertices);
+			onlyStep.AddBindable(IndexBuffer::Resolve(geometryTag, m_IndependentCubeIndices));
 
-			m_VertexBuffer->CreateLayout({
+			vBuff->CreateLayout({
 				{"POSITION", 0, ShaderDataType::Float3},
 				{"NORMAL", 0, ShaderDataType::Float3},
 				{"TEXCOORD", 0, ShaderDataType::Float2},
-				}, m_VertexShader.get());
+				}, vShader.get());
 
-			m_Texture = Texture::Resolve("assets/textures/brickwall.jpg");
+			onlyStep.AddBindable(vBuff);
+			onlyStep.AddBindable(Texture::Resolve("assets/textures/brickwall.jpg"));
 
-			//m_TransformConstantBuffer = ConstantBuffer::Resolve<CubeTransformConstantBuffer>(Shader::VERTEX_SHADER, {});
 			m_TransformConstantBuffer = std::make_shared<TransformConstantBuffer>();
 
 			CubePixelConstantBuffer pcb = {
@@ -41,49 +41,41 @@ void Cube::InitBuffers()
 				128.f
 			};
 
-			m_PixelConstantBuffer = ConstantBuffer::Resolve<CubePixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
+			onlyStep.AddBindable(ConstantBuffer::Resolve<CubePixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1));
 
-			m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
+			onlyStep.AddBindable(Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE));
 
-			only.AddBindable(m_VertexShader);
-			only.AddBindable(m_PixelShader);
-			only.AddBindable(m_VertexBuffer);
-			only.AddBindable(m_IndexBuffer);
-			only.SetIndexCount(m_IndexBuffer->GetCount());
-			only.AddBindable(m_Texture);
-			only.AddBindable(m_TransformConstantBuffer);
-			only.AddBindable(m_PixelConstantBuffer);
-			only.AddBindable(m_Blender);
+			onlyStep.AddBindable(m_TransformConstantBuffer);
 
-			standard.AddStep(std::move(only));
+			standardTech.AddStep(std::move(onlyStep));
 		}
-		AddTechnique(std::move(standard));
+		AddTechnique(std::move(standardTech));
 	}
 	{
-		Technique outline;
+		Technique outlineTech;
 		{
-			Step mask(1);
+			Step maskStep(1);
 
-			m_OutlineVS = Shader::Resolve("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
-			m_OutlinePS = Shader::Resolve("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
-			m_OutlineVertexBuffer = VertexBuffer::Resolve(outlineTag, m_CubeVertices);
-			m_OutlineIndexBuffer = IndexBuffer::Resolve(outlineTag, m_CubeIndices);
-			m_OutlineVertexBuffer->CreateLayout({
+			auto vShader = Shader::Resolve("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
+			auto pShader = Shader::Resolve("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
+			maskStep.AddBindable(vShader);
+
+			auto vBuff = VertexBuffer::Resolve(outlineTag, m_CubeVertices);
+			auto iBuff = IndexBuffer::Resolve(outlineTag, m_CubeIndices);
+			vBuff->CreateLayout({
 				{"POSITION", 0, ShaderDataType::Float3}
-				}, m_OutlineVS.get());
+				}, vShader.get());
 
-			//m_TransformConstantBuffer = std::make_shared<TransformConstantBuffer>();
+			maskStep.AddBindable(vBuff);
+			maskStep.AddBindable(iBuff);
 
-			mask.AddBindable(m_OutlineVS);
-			mask.AddBindable(m_OutlineVertexBuffer);
-			mask.AddBindable(m_OutlineIndexBuffer);
-			mask.SetIndexCount(m_OutlineIndexBuffer->GetCount());
-			mask.AddBindable(m_TransformConstantBuffer);
+			maskStep.AddBindable(m_TransformConstantBuffer);
 
-			outline.AddStep(std::move(mask));
-		}
-		{
-			Step draw(2);
+			outlineTech.AddStep(std::move(maskStep));
+
+			//======================================================
+
+			Step drawStep(2);
 
 			class TransformCBuffScaling : public TransformConstantBuffer
 			{
@@ -107,49 +99,22 @@ void Cube::InitBuffers()
 			};
 
 
-			m_OutlinePixelConstantBuffer = ConstantBuffer::Resolve(Shader::PIXEL_SHADER, DX::XMFLOAT4(1.f, 0.4f, 0.4f, 1.0f), 0, outlineTag);
+			drawStep.AddBindable(ConstantBuffer::Resolve(Shader::PIXEL_SHADER, DX::XMFLOAT4(1.f, 0.4f, 0.4f, 1.0f), 0, outlineTag));
 
-			draw.AddBindable(m_OutlineVS);
-			draw.AddBindable(m_OutlinePS);
-			draw.AddBindable(m_OutlineVertexBuffer);
-			draw.AddBindable(m_OutlineIndexBuffer);
-			draw.SetIndexCount(m_OutlineIndexBuffer->GetCount());
-			draw.AddBindable(std::make_shared<TransformCBuffScaling>());
-			draw.AddBindable(m_OutlinePixelConstantBuffer);
+			drawStep.AddBindable(vShader);
+			drawStep.AddBindable(pShader);
+			drawStep.AddBindable(vBuff);
+			drawStep.AddBindable(iBuff);
+			drawStep.AddBindable(std::make_shared<TransformCBuffScaling>());
 
-			outline.AddStep(std::move(draw));
+			outlineTech.AddStep(std::move(drawStep));
 		}
-		AddTechnique(std::move(outline));
+		AddTechnique(std::move(outlineTech));
 	}
 }
 
 void Cube::Update(float dt)
 {
-
-}
-
-void Cube::Draw()
-{
-	CubeTransformConstantBuffer cb = { 
-		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix),
-		DX::XMMatrixTranspose(m_Transform * m_ViewMatrix * m_ProjectionMatrix),
-		DX::XMMatrixInverse(nullptr, m_Transform * m_ViewMatrix)
-	};
-
-	//Renderer::UpdateConstantBuffer(m_TransformConstantBuffer, cb);
-	//Renderer::Bind({ m_VertexShader, m_PixelShader }, m_VertexBuffer, m_IndexBuffer, { m_Texture }, { m_TransformConstantBuffer, m_PixelConstantBuffer }, m_Blender, m_DepthStencil);
-	Renderer::Draw();
-
-}
-
-void Cube::DrawOutline()
-{
-	auto outlineTransform = DX::XMMatrixTranspose(DX::XMMatrixScaling(1.03f, 1.03f, 1.03f) * m_Transform * m_ViewMatrix * m_ProjectionMatrix);
-	
-	Renderer::UpdateConstantBuffer(m_OutlineTransformConstantBuffer, outlineTransform);
-	Renderer::Bind({ m_OutlineVS, m_OutlinePS }, m_OutlineVertexBuffer, m_OutlineIndexBuffer, {}, { m_OutlineTransformConstantBuffer, m_OutlinePixelConstantBuffer}, m_Blender, m_OutlineDepthStencil);
-	Renderer::Draw();
-
 }
 
 void Cube::CalculateNormals()

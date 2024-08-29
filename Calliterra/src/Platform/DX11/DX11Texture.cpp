@@ -20,7 +20,7 @@ ASSERT(m_TextureData);
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = m_Width;
 	textureDesc.Height = m_Height;
-	textureDesc.MipLevels = 1; // 0 will generate all mip levels
+	textureDesc.MipLevels = 0; // 0 will generate all mip levels
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
@@ -40,7 +40,7 @@ ASSERT(m_TextureData);
 	srvDesc.Format = textureDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = 1; // -1 will use all mip levels
+	srvDesc.Texture2D.MipLevels = -1; // -1 will use all mip levels
 
 ASSERT_HR(
 		m_DX11Context.GetDevice().CreateShaderResourceView(m_Texture.Get(), &srvDesc, &m_TextureView)

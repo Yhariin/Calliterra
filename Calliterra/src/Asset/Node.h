@@ -8,7 +8,7 @@ public:
 	Node(int id, const std::string& name,  const DX::XMMATRIX& relativeTransform, std::vector<Mesh*> meshes);
 	Node();
 
-	void Draw();
+	void Submit() const;
 
 	void ApplyTransformations(const DX::XMMATRIX& transform = DX::XMMatrixIdentity());
 	void SetModelTransform(const DX::XMMATRIX& transform);

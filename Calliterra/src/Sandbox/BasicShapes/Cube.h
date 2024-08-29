@@ -10,11 +10,9 @@ public:
 
 	void Update(float dt) override;
 
-	//void Submit() const override;
-	void Draw() override;
-	void DrawOutline() override;
 private:
 	static void CalculateNormals();
+
 private:
 	inline static constexpr uint32_t m_VERTEXCOUNT= 8 * 3 * 3;
 	inline static constexpr uint32_t m_INDEXCOUNT = 36;
@@ -24,13 +22,6 @@ private:
 		DX::XMFLOAT3 Position;
 		DX::XMFLOAT3 Normal;
 		DX::XMFLOAT2 Texture;
-	};
-
-	struct CubeTransformConstantBuffer
-	{
-		DX::XMMATRIX ModelView;
-		DX::XMMATRIX ModelViewProj;
-		DX::XMMATRIX NormalMatrix;
 	};
 
 	struct CubePixelConstantBuffer
@@ -102,20 +93,5 @@ private:
 		20,23,21, 20,22,23
 	};
 
-	std::shared_ptr<Shader> m_VertexShader = nullptr;
-	std::shared_ptr<Shader> m_PixelShader = nullptr;
-	std::shared_ptr<VertexBuffer> m_VertexBuffer = nullptr;
-	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
-	std::shared_ptr<Texture> m_Texture = nullptr;
-	std::shared_ptr<Blender> m_Blender = nullptr;
-	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;
-
-	std::shared_ptr<Shader> m_OutlineVS = nullptr;
-	std::shared_ptr<Shader> m_OutlinePS = nullptr;
-	std::shared_ptr<VertexBuffer> m_OutlineVertexBuffer = nullptr;
-	std::shared_ptr<IndexBuffer> m_OutlineIndexBuffer = nullptr;
-	std::shared_ptr<ConstantBuffer> m_OutlineTransformConstantBuffer = nullptr;
-	std::shared_ptr<ConstantBuffer> m_OutlinePixelConstantBuffer = nullptr;
-	std::shared_ptr<DepthStencil> m_OutlineDepthStencil = nullptr;
 };
 

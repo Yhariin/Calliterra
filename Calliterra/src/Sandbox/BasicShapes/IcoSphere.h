@@ -6,9 +6,6 @@ class IcoSphere : public Drawable
 public:
 	IcoSphere(const uint32_t resolution, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = DX::XMFLOAT3(-1.f, -1.f, -1.f));
 	
-	//void Submit() const override;
-	void Draw() override;
-
 	void Update(float dt) override;
 
 private:

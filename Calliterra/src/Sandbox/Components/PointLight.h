@@ -7,7 +7,7 @@ class PointLight : public Drawable, public SettingsSubscriber
 {
 public:
 	PointLight(DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
-	void Draw() override;
+
 	void Submit() const override;
 
 	void OnSettingsUpdate(SettingsType setting) override;

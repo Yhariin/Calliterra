@@ -7,9 +7,9 @@ Model::Model(std::unique_ptr<Node> root, std::unordered_map<int, std::unique_ptr
 	m_Root->ApplyTransformations(m_Transform);
 }
 
-void Model::Draw()
+void Model::Submit() const
 {
-	m_Root->Draw();
+	m_Root->Submit();
 }
 
 void Model::Update(float dt)

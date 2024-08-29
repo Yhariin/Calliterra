@@ -14,8 +14,6 @@ public:
 	}
 
 	virtual void Submit() const { SubmitTechniques(); }
-	virtual void Draw() = 0;
-	virtual void DrawOutline() {} // Temporary, used to test stencil buffer, remove later.
 
 	virtual void Update(float dt) = 0;
 
@@ -54,7 +52,7 @@ protected:
 		} faceColors[8];
 	};
 
-	inline static const FaceColorsBuffer s_ColorsBuffer =
+	inline static constexpr FaceColorsBuffer s_ColorsBuffer =
 	{
 		{
 			{ 1.f, 1.f, 1.f },
@@ -73,7 +71,6 @@ protected:
 	DX::XMMATRIX m_ProjectionMatrix = DX::XMMatrixIdentity();
 	DX::XMFLOAT3 m_Color;
 
-	std::vector<Bindable> m_Bindables;
 	std::shared_ptr<TransformConstantBuffer> m_TransformConstantBuffer;
 
 private:
