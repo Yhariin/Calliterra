@@ -5,6 +5,45 @@
 #include <backends/imgui_impl_dx11.h>
 #include "Core/GlobalSettings.h"
 
+static std::string YawToDirection(float yawInDegrees)
+{
+	if (yawInDegrees > -22.5f && yawInDegrees < 22.5f)
+	{
+		return "North";
+	}
+	else if (yawInDegrees > 22.5f && yawInDegrees < 67.5f)
+	{
+		return "North East";
+	}
+	else if (yawInDegrees > 67.5f && yawInDegrees < 112.5f)
+	{
+		return "East";
+	}
+	else if (yawInDegrees > 112.5f && yawInDegrees < 157.5f)
+	{
+		return "South East";
+	}
+	else if (yawInDegrees > 157.5f && yawInDegrees < 180.f || yawInDegrees > -180.f && yawInDegrees < -157.5f)
+	{
+		return "South";
+	}
+	else if (yawInDegrees > -157.5f && yawInDegrees < -112.5f)
+	{
+		return "South West";
+	}
+	else if (yawInDegrees > -112.5f && yawInDegrees < -67.5f)
+	{
+		return "West";
+	}
+	else if (yawInDegrees > -67.5f && yawInDegrees < -22.5f)
+	{
+		return "North West";
+	}
+
+	ASSERT(false, "Invalid direction!");
+	return "Null";
+}
+
 ImGuiManager::ImGuiManager()
 {
 	IMGUI_CHECKVERSION();
@@ -21,17 +60,18 @@ ImGuiManager::~ImGuiManager()
 
 void ImGuiManager::Begin()
 {
-	if (m_IsImGuiEnabled)
+	if (m_IsSettingsGuiEnabled || m_IsDebugGuiEnabled)
 	{
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+
 	}
 }
 
 void ImGuiManager::SettingsGui()
 {
-	if (m_IsImGuiEnabled)
+	if (m_IsSettingsGuiEnabled)
 	{
 		ImVec2 guiSize = { 250.f, 250.f };
 		ImGui::SetNextWindowPos({ 0,0 });
@@ -57,20 +97,28 @@ void ImGuiManager::SettingsGui()
 	}
 }
 
-void ImGuiManager::DebugGui(DeltaTime dt)
+void ImGuiManager::DebugGui(DeltaTime dt, const Camera& camera)
 {
-	if (m_IsImGuiEnabled)
+	if (m_IsDebugGuiEnabled)
 	{
-		ImVec2 guiSize = { 175.f, 100.f };
+		// TODO: Implement .ttf font file for high quality font for higher font scaling
+		// https://github.com/ocornut/imgui/issues/1018#issuecomment-1891041578 
+
+		ImVec2 guiSize = { 175.f, 150.f };
 
 		ImGui::SetNextWindowPos({ m_WindowWidth - guiSize.x, 0 });
 		ImGui::SetNextWindowSize(guiSize);
 		ImGui::SetNextWindowBgAlpha(0.35f);
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
 		ImGui::Begin("Debug Info", nullptr, flags);
 
 		ImGui::Text("FPS: %d", static_cast<int>(1 / dt.GetSeconds()));
 		ImGui::Text("Frame Time: %.3lf ms", dt.GetMilliseconds());
+
+		ImGui::Text("Position:");
+		DX::XMFLOAT3 cameraPos = camera.GetPosition();
+		ImGui::Text("(%.2f, %.2f, %.2f)", cameraPos.x, cameraPos.y, cameraPos.z);
+		ImGui::Text(YawToDirection(DX::XMConvertToDegrees(camera.GetYaw())).c_str());
 
 		ImGui::End();
 	}
@@ -78,16 +126,15 @@ void ImGuiManager::DebugGui(DeltaTime dt)
 
 void ImGuiManager::DemoWindow()
 {
-	if (m_IsImGuiEnabled)
+	if (m_IsSettingsGuiEnabled || m_IsDebugGuiEnabled)
 	{
 		ImGui::ShowDemoWindow();
-
 	}
 }
 
 void ImGuiManager::End()
 {
-	if (m_IsImGuiEnabled)
+	if (m_IsSettingsGuiEnabled || m_IsDebugGuiEnabled)
 	{
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -113,17 +160,32 @@ void ImGuiManager::SetWindowSize(float width, float height)
 	m_WindowHeight = height;
 }
 
-void ImGuiManager::EnableImGui()
+void ImGuiManager::EnableSettingsGui()
 {
-	m_IsImGuiEnabled = true;
+	m_IsSettingsGuiEnabled = true;
 }
 
-void ImGuiManager::DisableImGui()
+void ImGuiManager::DisableSettingsGui()
 {
-	m_IsImGuiEnabled = false;
+	m_IsSettingsGuiEnabled = false;
 }
 
-bool ImGuiManager::IsImGuiEnabled()
+void ImGuiManager::EnableDebugGui()
 {
-	return m_IsImGuiEnabled;
+	m_IsDebugGuiEnabled = true;
+}
+
+void ImGuiManager::DisableDebugGui()
+{
+	m_IsDebugGuiEnabled = false;
+}
+
+bool ImGuiManager::IsSettingsGuiEnabled()
+{
+	return m_IsSettingsGuiEnabled;
+}
+
+bool ImGuiManager::IsDebugGuiEnabled()
+{
+	return m_IsDebugGuiEnabled;
 }

@@ -95,3 +95,9 @@ void Sandbox::CreatePointLight()
 {
 	m_Drawables.emplace_back(std::make_unique<PointLight>(DX::XMMatrixTranslation(0.f, 20.f, 10.f), DX::XMFLOAT3(1.f, 1.f, 1.f) ));
 }
+
+const Camera& Sandbox::GetCamera() const
+{
+	return m_Camera;
+}
+

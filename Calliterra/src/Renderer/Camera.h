@@ -17,6 +17,10 @@ public:
 	const DX::XMMATRIX& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 	const DX::XMMATRIX& GetViewMatrix() const { return m_ViewMatrix; }
 	const DX::XMMATRIX& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
+
+	DX::XMFLOAT3 GetPosition() const { return m_Position; }
+	float GetYaw() const { return m_Yaw; }
+
 private:
 	bool OnWindowResize(WindowResizeEvent& e);
 	void Translate(DX::XMFLOAT3 translation);

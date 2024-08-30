@@ -12,7 +12,6 @@ Application::Application()
 	Timer::SetApplicationTimer(&s_ApplicationTimer);
 	s_ApplicationTimer.Reset();
 
-	// Create Window here
 	m_Window = std::make_unique<Window>();
 
 	// Set Window Callback here
@@ -45,7 +44,6 @@ void Application::OnEvent(Event& e)
 
 	m_Sandbox->OnEvent(e);
 	m_ImGui.OnEvent(e);
-	//LOG_INFO(e.ToString());
 }
 
 void Application::Run()
@@ -68,9 +66,8 @@ void Application::Run()
 
 
 		m_ImGui.Begin();
-		//m_ImGui.DemoWindow();
 		m_ImGui.SettingsGui();
-		m_ImGui.DebugGui(s_DeltaTime);
+		m_ImGui.DebugGui(s_DeltaTime, m_Sandbox->GetCamera());
 		m_ImGui.End();
 
 
@@ -87,26 +84,37 @@ bool Application::OnWindowClose(WindowCloseEvent& e)
 
 bool Application::OnKeyPressed(KeyPressedEvent& e)
 {
-	if (e.GetKeyCode() == VK_ESCAPE)
+	if (e.GetKeyCode() == VK_ESCAPE) // Settings GUI
 	{
 		m_Window->ToggleCursor();
 		if (Input::IsMouseRawInputEnabled())
 		{
 			Input::DisableMouseRawInput();
 			Input::EnableMousePositionInput();
-			m_ImGui.EnableImGui();
+			m_ImGui.EnableSettingsGui();
 		}
 		else
 		{
 			Input::EnableMouseRawInput();
 			Input::DisableMousePositionInput();
-			m_ImGui.DisableImGui();
+			m_ImGui.DisableSettingsGui();
 		}
 		
 	}
 	if (e.GetKeyCode() == VK_F1)
 	{
 		m_Window->GetGraphicsContext()->ToggleWireFrame();
+	}
+	if (e.GetKeyCode() == VK_F3) // Debug GUI
+	{
+		if (m_ImGui.IsDebugGuiEnabled())
+		{
+			m_ImGui.DisableDebugGui();
+		}
+		else
+		{
+			m_ImGui.EnableDebugGui();
+		}
 	}
 	return true;
 }

@@ -2,6 +2,7 @@
 #include "Core/DeltaTime.h"
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
+#include "Renderer/Camera.h"
 
 class ImGuiManager
 {
@@ -11,7 +12,7 @@ public:
 
 	void Begin();
 	void SettingsGui();
-	void DebugGui(DeltaTime dt);
+	void DebugGui(DeltaTime dt, const Camera& camera);
 	void DemoWindow();
 	void End();
 
@@ -19,12 +20,19 @@ public:
 	bool OnWindowResize(WindowResizeEvent& e);
 
 	void SetWindowSize(float width, float height);
-	void EnableImGui();
-	void DisableImGui();
-	bool IsImGuiEnabled();
+
+	void EnableSettingsGui();
+	void DisableSettingsGui();
+
+	void EnableDebugGui();
+	void DisableDebugGui();
+
+	bool IsSettingsGuiEnabled();
+	bool IsDebugGuiEnabled();
 
 private:
-	bool m_IsImGuiEnabled = false;
+	bool m_IsDebugGuiEnabled = false;
+	bool m_IsSettingsGuiEnabled = false;
 	float m_WindowWidth;
 	float m_WindowHeight;
 };

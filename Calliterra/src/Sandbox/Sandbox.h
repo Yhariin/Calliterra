@@ -20,6 +20,8 @@ public:
 	void CreatePlane();
 	void CreatePointLight();
 
+	const Camera& GetCamera() const;
+
 private:
 	std::vector<std::unique_ptr<Drawable>> m_Drawables;
 	Camera m_Camera;
