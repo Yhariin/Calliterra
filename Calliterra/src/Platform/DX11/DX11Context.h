@@ -28,16 +28,25 @@ public:
 	void OnWindowResize() override;
 	void Clear() override;
 	void SetClearColor(float r, float g, float b, float a) override;
+	DX::XMFLOAT4 GetClearColor();
 
-	void OnSettingsUpdate(SettingsType type) override;
+	void BindSwapBuffer() override;
+	void BindSwapBufferDepth() override;
+
+	uint32_t GetWidth() const override;
+	uint32_t GetHeight() const override;
 
 	void ToggleFullscreen() override;
 	void ToggleWireFrame() override;
 
+	void OnSettingsUpdate(SettingsType type) override;
+
 	void DrawIndexed(uint32_t indexCount);
+
 
 	ID3D11Device& GetDevice() const { return *m_Device.Get(); }
 	ID3D11DeviceContext& GetDeviceContext() const { return *m_DeviceContext.Get(); }
+	ID3D11DepthStencilView& GetDepthStencilView() const { return *m_DepthStencilView.Get(); }
 
 private:
 	void CreateDeviceContext();

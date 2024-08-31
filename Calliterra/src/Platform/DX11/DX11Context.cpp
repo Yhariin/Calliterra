@@ -31,16 +31,13 @@ void DX11Context::Init()
 
 void DX11Context::SwapBuffers()
 {
-
 	ASSERT_HR(m_SwapChain->Present(m_VSyncEnabled, 0));
-
 }
 
 void DX11Context::Clear()
 {
 	m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_BufferClearColor);
 	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 }
 
 void DX11Context::SetClearColor(float r, float g, float b, float a)
@@ -49,6 +46,11 @@ void DX11Context::SetClearColor(float r, float g, float b, float a)
 	m_BufferClearColor[1] = g;
 	m_BufferClearColor[2] = b;
 	m_BufferClearColor[3] = a;
+}
+
+DX::XMFLOAT4 DX11Context::GetClearColor()
+{
+	return DX::XMFLOAT4(m_BufferClearColor[0], m_BufferClearColor[1], m_BufferClearColor[2], m_BufferClearColor[3]);
 }
 
 void DX11Context::OnSettingsUpdate(SettingsType type)
@@ -99,11 +101,30 @@ void DX11Context::OnSettingsUpdate(SettingsType type)
 
 void DX11Context::DrawIndexed(uint32_t indexCount)
 {
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_DeviceContext->RSSetState(m_RasterizerState.Get());
 
-m_DeviceContext->DrawIndexed(indexCount, 0, 0);
+	m_DeviceContext->DrawIndexed(indexCount, 0, 0);
+}
+
+void DX11Context::BindSwapBuffer()
+{
+	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+}
+
+void DX11Context::BindSwapBufferDepth()
+{
+	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+}
+
+uint32_t DX11Context::GetWidth() const
+{
+	return m_WindowProps.Width;
+}
+
+uint32_t DX11Context::GetHeight() const
+{
+	return m_WindowProps.Height;
 }
 
 void DX11Context::CreateDeviceContext()
@@ -156,10 +177,6 @@ void DX11Context::CreateDeviceContext()
 
 void DX11Context::CreateSwapChain()
 {
-	// NOTE: If we want to change the multisampling settings at runtime,
-	// we would have to destroy and recreate the swap chain.
-	// https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-flush	
-	
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = 0;
 	swapChainDesc.Height = 0;

@@ -69,6 +69,7 @@ void DX11Texture::Bind() const
 	m_DX11Context.GetDeviceContext().PSSetShaderResources(m_Slot, 1, m_TextureView.GetAddressOf());
 }
 
+#pragma warning(disable:4715)
 D3D11_FILTER DX11Texture::FilterToD3D(Filter filter)
 {
 	switch (filter)
@@ -82,4 +83,5 @@ D3D11_FILTER DX11Texture::FilterToD3D(Filter filter)
 	}
 
 	ASSERT(false, "Filter not supported");
+	#pragma warning(default:4715)
 }

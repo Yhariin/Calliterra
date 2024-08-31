@@ -162,11 +162,13 @@ public:
 	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0, Texture::Filter filter = Texture::Filter::Anisotropic);
 	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
 	static std::shared_ptr<DepthStencil> CreateDepthStencilState(DepthStencil::Mode mode);
+	static std::unique_ptr<RenderTarget> CreateRenderTarget(uint32_t width = s_GraphicsContext->GetWidth(), uint32_t height = s_GraphicsContext->GetHeight());
 
 	static RendererResourceLibrary& GetResourceLibrary();
 	static RenderQueue& GetRenderQueue();
 
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+
 private:
 	inline static std::shared_ptr<RendererAPI> s_RendererAPI = RendererAPI::Create();
 	inline static std::shared_ptr<GraphicsContext> s_GraphicsContext = nullptr;
