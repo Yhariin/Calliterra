@@ -6,6 +6,8 @@
 
 #include <backends/imgui_impl_dx11.cpp>
 
+#include "Platform/DX11/DX11RenderTarget.h"
+
 DX11Context::DX11Context(HWND* hWnd, WindowProps& windowProps)
 	: m_Hwnd(hWnd), m_WindowProps(windowProps)
 {
@@ -36,7 +38,9 @@ void DX11Context::SwapBuffers()
 
 void DX11Context::Clear()
 {
-	m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_BufferClearColor);
+	m_RenderTarget->Clear();
+	//m_DeviceContext->ClearRenderTargetView(m_RenderTarget->GetRenderTargetView().Get(), m_BufferClearColor);
+	//m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_BufferClearColor);
 	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
@@ -107,14 +111,21 @@ void DX11Context::DrawIndexed(uint32_t indexCount)
 	m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 }
 
+std::shared_ptr<RenderTarget> DX11Context::GetBackBufferTarget() const
+{
+	return m_RenderTarget;
+}
+
 void DX11Context::BindSwapBuffer()
 {
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), nullptr);
 }
 
 void DX11Context::BindSwapBufferDepth()
 {
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), m_DepthStencilView.Get());
 }
 
 uint32_t DX11Context::GetWidth() const
@@ -223,7 +234,8 @@ void DX11Context::CreateRenderTargetView()
 	ComPtr<ID3D11Texture2D> backBuffer;
 	m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
 
-	m_Device->CreateRenderTargetView(backBuffer.Get(), 0, &m_RenderTargetView);
+	//m_Device->CreateRenderTargetView(backBuffer.Get(), 0, &m_RenderTargetView);
+	m_RenderTarget = std::make_shared<DX11RenderTarget>(*this, backBuffer.Get());
 }
 
 void DX11Context::CreateDepthStencilBuffer()
@@ -249,7 +261,8 @@ void DX11Context::CreateDepthStencilBuffer()
 	descDSV.Texture2D.MipSlice = 0;
 	ASSERT_HR(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &descDSV, &m_DepthStencilView));
 
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), m_DepthStencilView.Get());
 }
 
 void DX11Context::SetRenderViewport(float x, float y, float width, float height)
@@ -271,7 +284,8 @@ void DX11Context::OnWindowResize()
 	ASSERT(m_Device);
 	ASSERT(m_SwapChain);
 
-	m_RenderTargetView.Reset();
+	//m_RenderTargetView.Reset();
+	m_RenderTarget.reset();
 	m_DepthStencilView.Reset();
 	m_DepthStencilBuffer.Reset();
 
@@ -319,7 +333,8 @@ void DX11Context::ToggleFullscreen()
 
 		ASSERT_HR(m_SwapChain->ResizeTarget(&modeDesc));
 
-		m_RenderTargetView.Reset();
+		//m_RenderTargetView.Reset();
+		m_RenderTarget.reset();
 		m_DepthStencilView.Reset();
 		m_DepthStencilBuffer.Reset();
 		ASSERT_HR(m_SwapChain->ResizeBuffers(

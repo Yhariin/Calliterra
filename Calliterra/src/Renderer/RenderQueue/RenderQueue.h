@@ -1,6 +1,7 @@
 #pragma once
 #include "RenderPass.h"
 #include "Renderer/RenderTarget.h"
+#include "Renderer/DepthStencilBuffer.h"
 #include "Sandbox/Components/ScreenSpaceQuad.h"
 
 class RenderQueue
@@ -16,6 +17,7 @@ private:
 	std::array<RenderPass, 3> m_Passes;
 	GraphicsContext& m_Context;
 	std::unique_ptr<RenderTarget> m_RenderTarget;
+	std::unique_ptr<DepthStencilBuffer> m_DepthStencilBuffer;
 	ScreenSpaceQuad m_SSQuad;
 };
 

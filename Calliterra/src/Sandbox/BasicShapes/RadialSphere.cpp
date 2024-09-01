@@ -121,6 +121,6 @@ void RadialSphere::InitBuffers()
 	m_ColorConstantBuffer = ConstantBuffer::Resolve<FaceColorsBuffer>(Shader::PIXEL_SHADER, s_ColorsBuffer);
 
 	m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
-	m_DepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Off);
+	m_DepthStencil = DepthStencilMask::Resolve(DepthStencilMask::Mode::Off);
 }
 

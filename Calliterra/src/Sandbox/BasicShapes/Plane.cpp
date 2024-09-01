@@ -105,7 +105,7 @@ void Plane::InitBuffers()
 	m_PixelConstantBuffer = ConstantBuffer::Resolve<PixelConstantBuffer>(Shader::PIXEL_SHADER, pcb, 1);
 
 	m_Blender = Blender::Resolve(false, Blender::BlendFunc::NONE, Blender::BlendFunc::NONE, Blender::BlendOp::NONE);
-	m_DepthStencil = DepthStencil::Resolve(DepthStencil::Mode::Off);
+	m_DepthStencil = DepthStencilMask::Resolve(DepthStencilMask::Mode::Off);
 }
 
 void Plane::CalculateNormals()

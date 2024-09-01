@@ -5,8 +5,9 @@
 #include "Platform/DX11/DX11Shader.h"
 #include "Platform/DX11/DX11Texture.h"
 #include "Platform/DX11/DX11Blender.h"
-#include "Platform/DX11/DX11DepthStencil.h"
+#include "Platform/DX11/DX11DepthStencilMask.h"
 #include "Platform/DX11/DX11RenderTarget.h"
+#include "Platform/DX11/DX11DepthStencilBuffer.h"
 
 void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 {
@@ -38,7 +39,7 @@ void Renderer::Bind(const std::vector<std::shared_ptr<Shader>>& shaderList,
 					const std::vector<std::shared_ptr<Texture>>& textureList, 
 					const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList,
 					const std::shared_ptr<Blender>& blender,
-					const std::shared_ptr<DepthStencil>& depthStencil)
+					const std::shared_ptr<DepthStencilMask>& depthStencil)
 {
 	for (auto& shader : shaderList)
 	{
@@ -154,7 +155,7 @@ std::shared_ptr<Blender> Renderer::CreateBlendState(bool enableBlending, Blender
 	return nullptr;
 }
 
-std::shared_ptr<DepthStencil> Renderer::CreateDepthStencilState(DepthStencil::Mode mode)
+std::shared_ptr<DepthStencilMask> Renderer::CreateDepthStencilMask(DepthStencilMask::Mode mode)
 {
 	switch(GetAPI())
 	{
@@ -162,7 +163,7 @@ std::shared_ptr<DepthStencil> Renderer::CreateDepthStencilState(DepthStencil::Mo
 		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case RendererAPI::DX11:
-		return std::make_shared<DX11DepthStencil>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), mode);
+		return std::make_shared<DX11DepthStencilMask>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), mode);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
@@ -171,6 +172,15 @@ std::shared_ptr<DepthStencil> Renderer::CreateDepthStencilState(DepthStencil::Mo
 
 std::unique_ptr<RenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint32_t height)
 {
+	if (width == 0)
+	{
+		width = s_GraphicsContext->GetWidth();
+	}
+	if (height == 0)
+	{
+		height = s_GraphicsContext->GetHeight();
+	}
+
 	switch(GetAPI())
 	{
 	case RendererAPI::None: 
@@ -178,6 +188,30 @@ std::unique_ptr<RenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint3
 		return nullptr;
 	case RendererAPI::DX11:
 		return std::make_unique<DX11RenderTarget>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), width, height);
+	}
+
+	LOG_ERROR("Unknown RendererAPI");
+	return nullptr;
+}
+
+std::unique_ptr<DepthStencilBuffer> Renderer::CreateDepthStencilBuffer(uint32_t width, uint32_t height, bool canBindShaderInput)
+{
+	if (width == 0)
+	{
+		width = s_GraphicsContext->GetWidth();
+	}
+	if (height == 0)
+	{
+		height = s_GraphicsContext->GetHeight();
+	}
+
+	switch(GetAPI())
+	{
+	case RendererAPI::None: 
+		ASSERT(false, "RendererAPI is set to None!");
+		return nullptr;
+	case RendererAPI::DX11:
+		return std::make_unique<DX11DepthStencilBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), width, height, canBindShaderInput);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");

@@ -1,7 +1,7 @@
 #pragma once
 #include "Bindable.h"
 
-class DepthStencil : public Bindable
+class DepthStencilMask : public Bindable
 {
 public:
 	enum class Mode
@@ -14,10 +14,9 @@ public:
 		DepthFirst
 	};
 
-	virtual ~DepthStencil() = default;
-
+	virtual ~DepthStencilMask() = default;
 
 	static const std::string GenerateUID(Mode mode);
-	static std::shared_ptr<DepthStencil> Resolve(Mode mode);
-	
+	static std::shared_ptr<DepthStencilMask> Resolve(Mode mode);
+
 };

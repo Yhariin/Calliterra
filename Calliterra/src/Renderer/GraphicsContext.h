@@ -1,6 +1,7 @@
 #pragma once
 
 struct WindowProps;
+class RenderTarget;
 
 class GraphicsContext
 {
@@ -13,6 +14,7 @@ public:
 	virtual void Clear() = 0;
 	virtual void SetClearColor(float r, float g, float b, float a = 1.f) = 0;
 
+	virtual std::shared_ptr<RenderTarget> GetBackBufferTarget() const = 0;
 	virtual void BindSwapBuffer() = 0;
 	virtual void BindSwapBufferDepth() = 0;
 

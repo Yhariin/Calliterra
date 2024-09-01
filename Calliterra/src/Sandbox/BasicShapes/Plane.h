@@ -50,7 +50,7 @@ private:
 	std::shared_ptr<IndexBuffer> m_IndexBuffer = nullptr;
 	std::vector<std::shared_ptr<Texture>> m_Textures;
 	std::shared_ptr<Blender> m_Blender = nullptr;
-	std::shared_ptr<DepthStencil> m_DepthStencil = nullptr;
+	std::shared_ptr<DepthStencilMask> m_DepthStencil = nullptr;
 	std::shared_ptr<ConstantBuffer> m_TransformConstantBufferVS = nullptr;
 	std::shared_ptr<ConstantBuffer> m_TransformConstantBufferPS = nullptr;
 	std::shared_ptr<ConstantBuffer> m_PixelConstantBuffer = nullptr;

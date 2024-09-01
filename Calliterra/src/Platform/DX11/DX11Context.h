@@ -11,6 +11,8 @@
 #include "Core/GlobalSettings.h"
 #include "DX11OutputDevices.h"
 
+class DX11RenderTarget;
+
 struct DX11ContextProps
 {
 	D3D11_FILL_MODE FillMode = D3D11_FILL_SOLID;
@@ -30,6 +32,7 @@ public:
 	void SetClearColor(float r, float g, float b, float a) override;
 	DX::XMFLOAT4 GetClearColor();
 
+	std::shared_ptr<RenderTarget> GetBackBufferTarget() const override;
 	void BindSwapBuffer() override;
 	void BindSwapBufferDepth() override;
 
@@ -64,10 +67,11 @@ private:
 	ComPtr<IDXGISwapChain1> m_SwapChain;
 	ComPtr<ID3D11DeviceContext> m_DeviceContext;
 
-	ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
+	//ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
 	ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
 	ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
 	ComPtr<ID3D11RasterizerState> m_RasterizerState;
+	std::shared_ptr<DX11RenderTarget> m_RenderTarget;
 
 	float m_BufferClearColor[4] = { 1.f, 1.f, 1.f, 1.f };
 	bool m_VSyncEnabled = true;

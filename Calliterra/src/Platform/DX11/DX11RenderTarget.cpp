@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "DX11RenderTarget.h"
-#include "DX11DepthStencil.h"
+#include "DX11DepthStencilBuffer.h"
 
 DX11RenderTarget::DX11RenderTarget(DX11Context& context, uint32_t width, uint32_t height)
 	: m_Context(context)
@@ -41,6 +41,20 @@ DX11RenderTarget::DX11RenderTarget(DX11Context& context, uint32_t width, uint32_
 	ASSERT_HR(m_Context.GetDevice().CreateRenderTargetView(texture.Get(), &rtvDesc, &m_TargetView));
 }
 
+DX11RenderTarget::DX11RenderTarget(DX11Context& context, ID3D11Texture2D* texture)
+	: m_Context(context)
+{
+	D3D11_TEXTURE2D_DESC textureDesc;
+	texture->GetDesc(&textureDesc);
+
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	rtvDesc.Format = textureDesc.Format;
+	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	rtvDesc.Texture2D = D3D11_TEX2D_RTV{ 0 };
+
+	ASSERT_HR(m_Context.GetDevice().CreateRenderTargetView(texture, &rtvDesc, &m_TargetView));
+}
+
 void DX11RenderTarget::Clear() const
 {
 	const auto color = m_Context.GetClearColor();
@@ -53,20 +67,33 @@ void DX11RenderTarget::BindAsTexture(uint32_t slot) const
 	m_Context.GetDeviceContext().PSSetShaderResources(slot, 1, m_TextureView.GetAddressOf());
 }
 
-void DX11RenderTarget::BindAsTarget() const
+void DX11RenderTarget::BindAsBuffer() const
 {
-	// We need to unbind the texture from the shader before binding it as a render target
-	ID3D11ShaderResourceView* nullView = nullptr;
-	m_Context.GetDeviceContext().PSSetShaderResources(0, 1, &nullView);
-
-	m_Context.GetDeviceContext().OMSetRenderTargets(1, m_TargetView.GetAddressOf(), nullptr);
+	ID3D11DepthStencilView* const null = nullptr;
+	BindAsBuffer(null);
 }
 
-void DX11RenderTarget::BindAsTargetDepth() const
+void DX11RenderTarget::BindAsBuffer(BufferResource* depthStencil) const
+{
+	ASSERT(dynamic_cast<DX11DepthStencilBuffer*>(depthStencil) != nullptr);
+	BindAsBuffer(static_cast<DX11DepthStencilBuffer*>(depthStencil));
+}
+
+void DX11RenderTarget::BindAsBuffer(const DX11DepthStencilBuffer* depthStencil) const
+{
+	BindAsBuffer(depthStencil ? depthStencil->GetView().Get() : nullptr);
+}
+
+ComPtr<ID3D11RenderTargetView> DX11RenderTarget::GetRenderTargetView() const
+{
+	return m_TargetView;
+}
+
+void DX11RenderTarget::BindAsBuffer(ID3D11DepthStencilView* depthStencilView) const
 {
 	// We need to unbind the texture from the shader before binding it as a render target
 	ID3D11ShaderResourceView* nullView = nullptr;
 	m_Context.GetDeviceContext().PSSetShaderResources(0, 1, &nullView);
 
-	m_Context.GetDeviceContext().OMSetRenderTargets(1, m_TargetView.GetAddressOf(), &m_Context.GetDepthStencilView());
+	m_Context.GetDeviceContext().OMSetRenderTargets(1, m_TargetView.GetAddressOf(), depthStencilView);
 }

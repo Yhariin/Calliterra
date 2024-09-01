@@ -6,7 +6,7 @@
 #include "VertexBuffer.h"
 #include "ConstantBuffer.h"
 #include "Blender.h"
-#include "DepthStencil.h"
+#include "DepthStencilMask.h"
 
 // Keeps a unordered map containing bindables. Calling resolve will create a new
 // bindable and store it in the map if it's not already inside. If it already exists
@@ -67,9 +67,9 @@ public:
 			{
 				bind = Renderer::CreateBlendState(p...);
 			}
-			else if constexpr (std::is_same<Type, DepthStencil>::value)
+			else if constexpr (std::is_same<Type, DepthStencilMask>::value)
 			{
-				bind = Renderer::CreateDepthStencilState(p...);
+				bind = Renderer::CreateDepthStencilMask(p...);
 			}
 
 			m_Bindables[key] = bind;

@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "DX11DepthStencil.h"
+#include "DX11DepthStencilMask.h"
 
-DX11DepthStencil::DX11DepthStencil(const DX11Context& context, Mode mode)
+DX11DepthStencilMask::DX11DepthStencilMask(const DX11Context& context, Mode mode)
 	: m_Context(context), m_Mode(mode)
 {
 	// Default parameters will enable depth buffer and disable stencil
@@ -43,7 +43,7 @@ DX11DepthStencil::DX11DepthStencil(const DX11Context& context, Mode mode)
 	ASSERT_HR(m_Context.GetDevice().CreateDepthStencilState(&stencilDesc, &m_Stencil));
 }
 
-void DX11DepthStencil::Bind() const
+void DX11DepthStencilMask::Bind() const
 {
 	m_Context.GetDeviceContext().OMSetDepthStencilState(m_Stencil.Get(), 0xFF);
 }

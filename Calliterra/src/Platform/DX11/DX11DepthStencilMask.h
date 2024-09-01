@@ -1,11 +1,11 @@
 #pragma once
-#include "Renderer/DepthStencil.h"
+#include "Renderer/DepthStencilMask.h"
 #include "DX11Context.h"
 
-class DX11DepthStencil : public DepthStencil
+class DX11DepthStencilMask : public DepthStencilMask
 {
 public:
-	DX11DepthStencil(const DX11Context& context, Mode mode);
+	DX11DepthStencilMask(const DX11Context& context, Mode mode);
 
 	void Bind() const override;
 

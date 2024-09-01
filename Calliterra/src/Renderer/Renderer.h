@@ -10,7 +10,7 @@
 #include "ConstantBuffer.h"
 #include "Texture.h"
 #include "Blender.h"
-#include "DepthStencil.h"
+#include "DepthStencilMask.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
 #include "Platform/DX11/DX11VertexBuffer.h"
 
@@ -27,7 +27,7 @@ public:
 					 const std::vector<std::shared_ptr<Texture>>& textures = {},
 					 const std::vector<std::shared_ptr<ConstantBuffer>>& constantBufferList = {},
 					 const std::shared_ptr<Blender>& blender = nullptr,
-					 const std::shared_ptr<DepthStencil>& depthStencil = nullptr
+					 const std::shared_ptr<DepthStencilMask>& depthStencil = nullptr
 	);
 	static void Bind(const std::vector<std::shared_ptr<Bindable>>& bindables, uint32_t indexCount);
 	static void Draw();
@@ -161,8 +161,10 @@ public:
 
 	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0, Texture::Filter filter = Texture::Filter::Anisotropic);
 	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
-	static std::shared_ptr<DepthStencil> CreateDepthStencilState(DepthStencil::Mode mode);
-	static std::unique_ptr<RenderTarget> CreateRenderTarget(uint32_t width = s_GraphicsContext->GetWidth(), uint32_t height = s_GraphicsContext->GetHeight());
+	static std::shared_ptr<DepthStencilMask> CreateDepthStencilMask(DepthStencilMask::Mode mode);
+
+	static std::unique_ptr<RenderTarget> CreateRenderTarget(uint32_t width = 0, uint32_t height = 0);
+	static std::unique_ptr<DepthStencilBuffer> CreateDepthStencilBuffer(uint32_t width = 0, uint32_t height = 0, bool canBindShaderInput = false);
 
 	static RendererResourceLibrary& GetResourceLibrary();
 	static RenderQueue& GetRenderQueue();
