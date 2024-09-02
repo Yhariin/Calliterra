@@ -17,7 +17,7 @@ void Cube::InitBuffers()
 	{
 		Technique standardTech;
 		{
-			Step onlyStep(0);
+			Step onlyStep("lambertian");
 
 			auto vShader = Shader::Resolve("assets/shaders/BPhongTexVS.hlsl", Shader::VERTEX_SHADER);
 			onlyStep.AddBindable(Shader::Resolve("assets/shaders/BPhongTexPS.hlsl", Shader::PIXEL_SHADER));
@@ -52,6 +52,7 @@ void Cube::InitBuffers()
 		AddTechnique(std::move(standardTech));
 	}
 	{
+		/*
 		Technique outlineTech;
 		{
 			Step maskStep(1);
@@ -110,11 +111,20 @@ void Cube::InitBuffers()
 			outlineTech.AddStep(std::move(drawStep));
 		}
 		AddTechnique(std::move(outlineTech));
+	*/
 	}
 }
 
 void Cube::Update(float dt)
 {
+}
+
+void Cube::LinkTechniques() 
+{
+	for (auto& tech : GetTechniques())
+	{
+		tech.Link();
+	}
 }
 
 void Cube::CalculateNormals()

@@ -12,6 +12,11 @@ void Model::Submit() const
 	m_Root->Submit();
 }
 
+void Model::LinkTechniques() 
+{
+	m_Root->LinkTechniques();
+}
+
 void Model::Update(float dt)
 {
 }

@@ -28,6 +28,7 @@ using Microsoft::WRL::ComPtr;
 #include <format>
 #include <cmath>
 #include <algorithm>
+#include <cctype>
 
 #include "Core/Assert.h"
 #include "Core/Log.h"

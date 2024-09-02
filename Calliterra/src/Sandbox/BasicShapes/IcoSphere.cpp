@@ -13,6 +13,14 @@ void IcoSphere::Update(float dt)
 
 }
 
+void IcoSphere::LinkTechniques()
+{
+	for (auto& tech : GetTechniques())
+	{
+		tech.Link();
+	}
+}
+
 // http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 void IcoSphere::CalculateSphere(const int resolution)
 {
@@ -99,7 +107,7 @@ int IcoSphere::GetMidPoint(uint32_t p1, uint32_t p2)
 void IcoSphere::InitBuffers()
 {
 	Technique solid;
-	Step only(0);
+	Step only("lambertian");
 
 	const auto geometryTag = "$IcoSphere." + std::to_string(m_Resolution);
 

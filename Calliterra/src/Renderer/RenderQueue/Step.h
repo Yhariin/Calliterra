@@ -3,11 +3,12 @@
 #include "Renderer/IndexBuffer.h"
 
 class Drawable;
+class RenderQueuePass;
 
 class Step
 {
 public:
-	Step(uint32_t targetPass);
+	Step(std::string m_TargetPassName);
 	
 	void AddBindable(std::shared_ptr<Bindable> bindable);
 	void AddBindable(std::shared_ptr<IndexBuffer> bindable);
@@ -16,10 +17,12 @@ public:
 	void Submit() const ;
 	void Execute() const;
 	void InitializeParentReferences(const Drawable& parent);
+	void Link();
 
 private:
-	uint32_t m_TargetPass;
-	uint32_t m_IndexCount = 0;
+	RenderQueuePass* m_TargetPass = nullptr;
+	std::string m_TargetPassName;
 	std::vector<std::shared_ptr<Bindable>> m_Bindables;
+	uint32_t m_IndexCount = 0;
 };
 

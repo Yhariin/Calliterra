@@ -16,8 +16,8 @@ public:
 private:
 	std::array<RenderPass, 3> m_Passes;
 	GraphicsContext& m_Context;
-	std::unique_ptr<RenderTarget> m_RenderTarget;
-	std::unique_ptr<DepthStencilBuffer> m_DepthStencilBuffer;
+	std::shared_ptr<RenderTarget> m_RenderTarget;
+	std::shared_ptr<DepthStencilBuffer> m_DepthStencilBuffer;
 	ScreenSpaceQuad m_SSQuad;
 };
 

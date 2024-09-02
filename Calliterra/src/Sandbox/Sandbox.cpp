@@ -26,8 +26,10 @@ void Sandbox::OnUpdate(float dt)
 		drawable->Submit();
 	}
 
-	Renderer::GetRenderQueue().Execute();
-	Renderer::GetRenderQueue().Reset();
+	Renderer::GetRenderGraph().Execute();
+	Renderer::GetRenderGraph().Reset();
+	//Renderer::GetRenderQueue().Execute();
+	//Renderer::GetRenderQueue().Reset();
 }
 
 void Sandbox::OnEvent(Event& e)
@@ -60,6 +62,10 @@ void Sandbox::LoadSandboxPreset()
 	//m_Drawables.emplace_back(std::make_unique<Model>(vaseClayModel, DX::XMMatrixTranslation(0.f, 0.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
 	//m_Drawables.emplace_back(std::make_unique<Model>(heartModel, DX::XMMatrixTranslation(5.f, 10.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
 
+	for (const auto& drawable : m_Drawables)
+	{
+		drawable->LinkTechniques();
+	}
 }
 
 void Sandbox::CreateCube(const DX::XMMATRIX& transform)

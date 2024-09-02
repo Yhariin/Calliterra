@@ -14,6 +14,7 @@ public:
 	}
 
 	virtual void Submit() const { SubmitTechniques(); }
+	virtual void LinkTechniques() = 0;
 
 	virtual void Update(float dt) = 0;
 
@@ -39,8 +40,9 @@ public:
 	const DX::XMMATRIX& GetViewTransform() const { return m_ViewMatrix; }
 	const DX::XMMATRIX& GetProjectionTransform() const { return m_ProjectionMatrix; }
 
-protected:
+	std::vector<Technique>& GetTechniques() { return m_Techniques; }
 
+protected:
 	struct FaceColorsBuffer
 	{
 		struct
@@ -72,7 +74,6 @@ protected:
 	DX::XMFLOAT3 m_Color;
 
 	std::shared_ptr<TransformConstantBuffer> m_TransformConstantBuffer;
-
 private:
 	std::vector<Technique> m_Techniques;
 };

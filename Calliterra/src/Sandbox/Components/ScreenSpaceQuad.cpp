@@ -27,7 +27,7 @@ ScreenSpaceQuad::ScreenSpaceQuad()
 
 	}
 
-void ScreenSpaceQuad::Bind()
+void ScreenSpaceQuad::Bind() const
 {
 
 	std::vector<std::shared_ptr<Bindable>> bindables = {
@@ -40,7 +40,7 @@ void ScreenSpaceQuad::Bind()
 	Renderer::Bind(bindables, m_IndexBuffer->GetCount());
 }
 
-void ScreenSpaceQuad::Draw()
+void ScreenSpaceQuad::Draw() const
 {
 	Renderer::Draw();
 }

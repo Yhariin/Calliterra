@@ -15,11 +15,13 @@ void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 
 	s_RendererAPI->Init(s_GraphicsContext);
 	s_RenderQueue = std::make_unique<RenderQueue>(*s_GraphicsContext);
+	s_RenderGraph = std::make_unique<RenderGraph>(*s_GraphicsContext);
 }
 
 void Renderer::Shutdown()
 {
 	s_RenderQueue.reset();
+	s_RenderGraph.reset();
 }
 
 void Renderer::SetClearColor(float r, float g, float b, float a)
@@ -170,7 +172,7 @@ std::shared_ptr<DepthStencilMask> Renderer::CreateDepthStencilMask(DepthStencilM
 	return nullptr;
 }
 
-std::unique_ptr<RenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint32_t height)
+std::shared_ptr<RenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint32_t height)
 {
 	if (width == 0)
 	{
@@ -194,7 +196,7 @@ std::unique_ptr<RenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint3
 	return nullptr;
 }
 
-std::unique_ptr<DepthStencilBuffer> Renderer::CreateDepthStencilBuffer(uint32_t width, uint32_t height, bool canBindShaderInput)
+std::shared_ptr<DepthStencilBuffer> Renderer::CreateDepthStencilBuffer(uint32_t width, uint32_t height, bool canBindShaderInput)
 {
 	if (width == 0)
 	{
@@ -211,7 +213,7 @@ std::unique_ptr<DepthStencilBuffer> Renderer::CreateDepthStencilBuffer(uint32_t 
 		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case RendererAPI::DX11:
-		return std::make_unique<DX11DepthStencilBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), width, height, canBindShaderInput);
+		return std::make_shared<DX11DepthStencilBuffer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), width, height, canBindShaderInput);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
@@ -228,3 +230,7 @@ RenderQueue& Renderer::GetRenderQueue()
 	return *s_RenderQueue;
 }
 
+RenderGraph& Renderer::GetRenderGraph()
+{
+	return *s_RenderGraph;
+}

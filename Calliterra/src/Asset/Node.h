@@ -9,6 +9,7 @@ public:
 	Node();
 
 	void Submit() const;
+	void LinkTechniques() const;
 
 	void ApplyTransformations(const DX::XMMATRIX& transform = DX::XMMatrixIdentity());
 	void SetModelTransform(const DX::XMMATRIX& transform);

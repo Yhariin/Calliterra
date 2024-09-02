@@ -34,6 +34,14 @@ Mesh::Mesh(int meshIndex, const UfbxScene& fbxModel, const DX::XMMATRIX& transfo
 	InitBuffers();
 }
 
+void Mesh::LinkTechniques() 
+{
+	for (auto& tech : GetTechniques())
+	{
+		tech.Link();
+	}
+}
+
 void Mesh::Update(float dt)
 {
 }
@@ -41,7 +49,7 @@ void Mesh::Update(float dt)
 void Mesh::InitBuffers()
 {
 	Technique drawTech;
-	Step onlyStep(0);
+	Step onlyStep("lambertian");
 
 	using namespace std::string_literals;
 	auto meshTag = m_Filepath + "%" + std::to_string(m_MeshIndex);

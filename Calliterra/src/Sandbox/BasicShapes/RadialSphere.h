@@ -6,7 +6,7 @@ class RadialSphere : public Drawable
 public:
 	RadialSphere(const int latDiv = 12, const int longDiv = 24, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 
-	void Submit() const override {}
+	void LinkTechniques() override;
 
 	void Update(float dt) override;
 

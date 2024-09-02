@@ -9,9 +9,9 @@ class ScreenSpaceQuad
 public:
 	ScreenSpaceQuad();
 	
-	void Bind();
+	void Bind() const;
 	
-	void Draw();
+	void Draw() const;
 	
 private:
 	std::shared_ptr<VertexBuffer> m_VertexBuffer;

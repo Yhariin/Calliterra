@@ -26,6 +26,19 @@ void Node::Submit() const
 	}
 }
 
+void Node::LinkTechniques() const
+{
+	for (const auto& mesh : m_Meshes)
+	{
+		mesh->LinkTechniques();
+	}
+
+	for (const auto& child : m_Children)
+	{
+		child->LinkTechniques();
+	}
+}
+
 void Node::ApplyTransformations(const DX::XMMATRIX& transform)
 {
 	const DX::XMMATRIX newTransform = m_RelativeTransform * m_ModelTransform * transform;

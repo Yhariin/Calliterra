@@ -24,6 +24,14 @@ void Plane::Draw()
 }
 */
 
+void Plane::LinkTechniques()
+{
+	for (auto& tech : GetTechniques())
+	{
+		tech.Link();
+	}
+}
+
 void Plane::Update(float dt)
 {
 
