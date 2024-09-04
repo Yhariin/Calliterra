@@ -52,10 +52,9 @@ void Cube::InitBuffers()
 		AddTechnique(std::move(standardTech));
 	}
 	{
-		/*
-		Technique outlineTech;
+		Technique outlineTech("Outline");
 		{
-			Step maskStep(1);
+			Step maskStep("outlineMask");
 
 			auto vShader = Shader::Resolve("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
 			auto pShader = Shader::Resolve("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
@@ -76,7 +75,7 @@ void Cube::InitBuffers()
 
 			//======================================================
 
-			Step drawStep(2);
+			Step drawStep("outlineDraw");
 
 			class TransformCBuffScaling : public TransformConstantBuffer
 			{
@@ -111,7 +110,6 @@ void Cube::InitBuffers()
 			outlineTech.AddStep(std::move(drawStep));
 		}
 		AddTechnique(std::move(outlineTech));
-	*/
 	}
 }
 

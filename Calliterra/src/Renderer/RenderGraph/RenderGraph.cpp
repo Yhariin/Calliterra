@@ -11,6 +11,7 @@
 
 #include "Passes/BufferClearPass.h"
 #include "Passes/LambertianPass.h"
+#include "Passes/OutlineMaskGenerationPass.h"
 #include "Passes/OutlineDrawingPass.h"
 
 RenderGraph::RenderGraph(const GraphicsContext& context)
@@ -36,11 +37,18 @@ RenderGraph::RenderGraph(const GraphicsContext& context)
 		pass->SetSinkLinkage("depthStencil", "clearDS.buffer");
 		AppendPass(std::move(pass));
 	}
-	//{
-	//	auto pass = std::make_unique<OutLine>("lambertian");
-	//	pass->SetSinkLinkage("depthStencil", "lambertian.depthStencil");
-	//	AppendPass(std::move(pass));
-	//}
+	{
+		auto pass = std::make_unique<OutlineMaskGenerationPass>("outlineMask");
+		pass->SetSinkLinkage("depthStencil", "lambertian.depthStencil");
+		AppendPass(std::move(pass));
+	}
+	{
+		auto pass = std::make_unique<OutlineDrawingPass>("outlineDraw");
+		pass->SetSinkLinkage("renderTarget", "lambertian.renderTarget");
+		pass->SetSinkLinkage("depthStencil", "outlineMask.depthStencil");
+		AppendPass(std::move(pass));
+	}
+	SetSinkTarget("backBuffer", "outlineDraw.renderTarget");
 
 	Finalize();
 }
@@ -160,20 +168,23 @@ void RenderGraph::LinkSinks(Pass& pass)
 				}
 			}
 
-			ASSERT(bound, "Output name not found in globals");
+			ASSERT(bound, "Source name not found in globals");
 		}
-		else
+		else // Otherwise find the source within existing passes
 		{
+			bool bound = false;
 			for (auto& existingPass : m_Passes)
 			{
 				if (existingPass->GetName() == inputSourcePassName)
 				{
 					auto& source = existingPass->GetSource(sink->GetSourceName());
 					sink->Bind(source);
+					bound = true;
 					break;
 				}
 			}
 
+			ASSERT(bound, "Source name not found in passes");
 		}
 	}
 }

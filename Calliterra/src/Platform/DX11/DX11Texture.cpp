@@ -7,7 +7,7 @@ DX11Texture::DX11Texture(DX11Context& context, const std::string& filepath, uint
 {
 	LOG_DEBUG("Loading {}", filepath);
 	m_TextureData = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_NumChannels, m_DesiredChannels);
-ASSERT(m_TextureData);
+	ASSERT(m_TextureData);
 
 	if (m_NumChannels == 1 || m_NumChannels == 4)
 	{

@@ -249,9 +249,9 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		UINT size = 0;
 
 		// Get size of input data
-		ASSERT_VERIFY(GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != -1);
+		ASSERT_VERIFY((GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != -1));
 		m_RawBuffer.resize(size);
-		ASSERT_VERIFY(GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, m_RawBuffer.data(), &size, sizeof(RAWINPUTHEADER)) == size);
+		ASSERT_VERIFY((GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, m_RawBuffer.data(), &size, sizeof(RAWINPUTHEADER)) == size));
 
 		auto& rawInput = reinterpret_cast<const RAWINPUT&>(*m_RawBuffer.data());
 		if (rawInput.header.dwType == RIM_TYPEMOUSE) 
