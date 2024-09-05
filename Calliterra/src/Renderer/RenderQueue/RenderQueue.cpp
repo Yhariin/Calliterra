@@ -8,6 +8,7 @@
 #include "Passes/OutlineMaskPass.h"
 #include "Passes/OutlineDrawPass.h"
 #include "Passes/ColorInvertPass.h"
+#include "Passes/PostProcessingPass.h"
 
 RenderQueue::RenderQueue(GraphicsContext& context)
 	: m_Context(context), m_BackBuffer(context.GetBackBufferTarget())
@@ -17,10 +18,13 @@ RenderQueue::RenderQueue(GraphicsContext& context)
 
 	m_Passes[(int)PassName::ClearRenderTarget] = std::make_unique<ClearBufferPass>(m_RenderTarget);
 	m_Passes[(int)PassName::ClearDepthStencilBuffer] = std::make_unique<ClearBufferPass>(m_MasterDepthStencilBuffer);
-	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_MasterDepthStencilBuffer);
+	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_MasterDepthStencilBuffer, m_FillMode, m_CullMode);
 	m_Passes[(int)PassName::OutlineMask] = std::make_unique<OutlineMaskPass>();
 	m_Passes[(int)PassName::OutlineDraw] = std::make_unique<OutlineDrawPass>();
-	m_Passes[(int)PassName::ColorInvert] = std::make_unique<ColorInvertPass>(m_Context, m_BackBuffer, m_RenderTarget);
+	m_Passes[(int)PassName::PostProcessing] = std::make_unique<PostProcessingPass>(m_Context, m_BackBuffer, m_RenderTarget);
+
+	std::vector<SettingsType> settings = { SettingsType::IsWireFrame, SettingsType::CullMode };
+	GlobalSettings::Register(settings, this);
 
 }
 
@@ -70,5 +74,42 @@ void RenderQueue::Reset()
 	{
 		pass->Reset();
 	}
+}
+
+void RenderQueue::OnSettingsUpdate(SettingsType type)
+{
+	switch (type)
+	{
+	case SettingsType::IsWireFrame:
+	{
+		if (GlobalSettings::Rendering::IsWireFrame())
+		{
+			m_FillMode = FillMode::Wireframe;
+		}
+		else
+		{
+			m_FillMode = FillMode::Solid;
+		}
+		dynamic_cast<LambertianPass*>(m_Passes[(int)PassName::Lambertian].get())->SetFillMode(m_FillMode);
+		break;
+	}
+	case SettingsType::CullMode:
+	{
+		switch (GlobalSettings::Rendering::CullType())
+		{
+		case GlobalSettings::Rendering::CullNone:
+			m_CullMode = CullMode::None;
+			break;
+		case GlobalSettings::Rendering::CullBack:
+			m_CullMode = CullMode::Back;
+			break;
+		case GlobalSettings::Rendering::CullFront:
+			m_CullMode = CullMode::Front;
+			break;
+		}
+		dynamic_cast<LambertianPass*>(m_Passes[(int)PassName::Lambertian].get())->SetCullMode(m_CullMode);
+	}
+	}
+
 }
 

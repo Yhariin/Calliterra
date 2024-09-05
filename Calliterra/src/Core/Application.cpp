@@ -98,7 +98,8 @@ bool Application::OnKeyPressed(KeyPressedEvent& e)
 	}
 	if (e.GetKeyCode() == VK_F1)
 	{
-		m_Window->GetGraphicsContext()->ToggleWireFrame();
+		GlobalSettings::Rendering::m_IsWireFrame = !GlobalSettings::Rendering::m_IsWireFrame;
+		GlobalSettings::Notify(true, SettingsType::IsWireFrame);
 	}
 	if (e.GetKeyCode() == VK_F3) // Debug GUI
 	{

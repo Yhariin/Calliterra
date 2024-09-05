@@ -20,15 +20,11 @@ void DX11Context::Init()
 	CreateSwapChain();
 	CreateRenderTargetView();
 	CreateDepthStencilBuffer();
-	CreateRasterizerState();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 
 	m_OutputDevices = DX11OutputDevices(m_Device);
 
 	ImGui_ImplDX11_Init(m_Device.Get(), m_DeviceContext.Get());
-
-	std::vector<SettingsType> settings = { SettingsType::IsWireFrame, SettingsType::CullMode };
-	GlobalSettings::Register(settings, this);
 }
 
 void DX11Context::SwapBuffers()
@@ -36,69 +32,8 @@ void DX11Context::SwapBuffers()
 	ASSERT_HR(m_SwapChain->Present(m_VSyncEnabled, 0));
 }
 
-void DX11Context::SetClearColor(float r, float g, float b, float a)
-{
-	m_BufferClearColor[0] = r;
-	m_BufferClearColor[1] = g;
-	m_BufferClearColor[2] = b;
-	m_BufferClearColor[3] = a;
-}
-
-DX::XMFLOAT4 DX11Context::GetClearColor() const
-{
-	return DX::XMFLOAT4(m_BufferClearColor[0], m_BufferClearColor[1], m_BufferClearColor[2], m_BufferClearColor[3]);
-}
-
-void DX11Context::OnSettingsUpdate(SettingsType type)
-{
-	switch (type)
-	{
-	case SettingsType::IsWireFrame:
-	{
-		if (GlobalSettings::Rendering::IsWireFrame())
-		{
-			m_DX11ContextProps.FillMode = D3D11_FILL_WIREFRAME;
-			CreateRasterizerState();
-		}
-		else
-		{
-			m_DX11ContextProps.FillMode = D3D11_FILL_SOLID;
-			CreateRasterizerState();
-		}
-		break;
-	}
-	case SettingsType::CullMode:
-	{
-		switch (GlobalSettings::Rendering::CullType())
-		{
-		case GlobalSettings::Rendering::CullNone:
-		{
-			m_DX11ContextProps.CullMode = D3D11_CULL_NONE;
-			CreateRasterizerState();
-			break;
-		}
-		case GlobalSettings::Rendering::CullFront:
-		{
-			m_DX11ContextProps.CullMode = D3D11_CULL_FRONT;
-			CreateRasterizerState();
-			break;
-		}
-		case GlobalSettings::Rendering::CullBack:
-		{
-			m_DX11ContextProps.CullMode = D3D11_CULL_BACK;
-			CreateRasterizerState();
-			break;
-		}
-		}
-		break;
-	}
-	}
-}
-
 void DX11Context::DrawIndexed(uint32_t indexCount)
 {
-	m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_DeviceContext->RSSetState(m_RasterizerState.Get());
 
 	m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 }
@@ -106,16 +41,6 @@ void DX11Context::DrawIndexed(uint32_t indexCount)
 std::shared_ptr<RenderTarget> DX11Context::GetBackBufferTarget() const
 {
 	return m_RenderTarget;
-}
-
-void DX11Context::BindSwapBuffer() const
-{
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), nullptr);
-}
-
-void DX11Context::BindSwapBufferDepth() const
-{
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), m_DepthStencilView.Get());
 }
 
 uint32_t DX11Context::GetWidth() const
@@ -224,8 +149,6 @@ void DX11Context::CreateRenderTargetView()
 	ComPtr<ID3D11Texture2D> backBuffer;
 	m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
 
-	//m_Device->CreateRenderTargetView(backBuffer.Get(), 0, &m_RenderTargetView);
-	//m_BackBuffer = std::make_shared<DX11OutputOnlyRenderTarget>(*this, backBuffer.Get());
 	m_RenderTarget = std::shared_ptr<DX11OutputOnlyRenderTarget>(new DX11OutputOnlyRenderTarget(*this, backBuffer.Get()));
 }
 
@@ -252,7 +175,6 @@ void DX11Context::CreateDepthStencilBuffer()
 	descDSV.Texture2D.MipSlice = 0;
 	ASSERT_HR(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &descDSV, &m_DepthStencilView));
 
-	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), m_DepthStencilView.Get());
 }
 
@@ -275,7 +197,6 @@ void DX11Context::OnWindowResize()
 	ASSERT(m_Device);
 	ASSERT(m_SwapChain);
 
-	//m_RenderTargetView.Reset();
 	m_RenderTarget.reset();
 	m_DepthStencilView.Reset();
 	m_DepthStencilBuffer.Reset();
@@ -286,15 +207,6 @@ void DX11Context::OnWindowResize()
 	CreateDepthStencilBuffer();
 
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
-}
-
-void DX11Context::CreateRasterizerState()
-{
-	D3D11_RASTERIZER_DESC rasterizerDesc = {};
-	rasterizerDesc.FillMode = m_DX11ContextProps.FillMode;
-	rasterizerDesc.CullMode = m_DX11ContextProps.CullMode;
-
-	ASSERT_HR(m_Device->CreateRasterizerState(&rasterizerDesc, &m_RasterizerState));
 }
 
 void DX11Context::ToggleFullscreen()
@@ -342,19 +254,4 @@ void DX11Context::ToggleFullscreen()
 
 		SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 	}
-}
-
-void DX11Context::ToggleWireFrame()
-{
-	if (m_DX11ContextProps.FillMode == D3D11_FILL_SOLID)
-	{
-		m_DX11ContextProps.FillMode = D3D11_FILL_WIREFRAME;
-		CreateRasterizerState();
-	}
-	else
-	{
-		m_DX11ContextProps.FillMode = D3D11_FILL_SOLID;
-		CreateRasterizerState();
-	}
-
 }

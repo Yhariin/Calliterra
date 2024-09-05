@@ -32,6 +32,7 @@ public:
 	{
 		friend class GlobalSettings;
 		friend class ImGuiManager;
+		friend class Application;
 		enum CullMode
 		{
 			CullNone = 0,

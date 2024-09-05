@@ -9,7 +9,7 @@ enum class PassName : int
 	Lambertian,
 	OutlineMask,
 	OutlineDraw,
-	ColorInvert,
+	PostProcessing,
 	NumPasses
 };
 

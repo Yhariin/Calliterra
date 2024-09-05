@@ -8,6 +8,7 @@
 #include "Blender.h"
 #include "DepthStencilMask.h"
 #include "Topology.h"
+#include "Rasterizer.h"
 
 // Keeps a unordered map containing bindables. Calling resolve will create a new
 // bindable and store it in the map if it's not already inside. If it already exists
@@ -75,6 +76,10 @@ public:
 			else if constexpr (std::is_same<Type, Topology>::value)
 			{
 				bind = Renderer::CreateTopology(p...);
+			}
+			else if constexpr (std::is_same<Type, Rasterizer>::value)
+			{
+				bind = Renderer::CreateRasterizer(p...);
 			}
 
 			m_Bindables[key] = bind;

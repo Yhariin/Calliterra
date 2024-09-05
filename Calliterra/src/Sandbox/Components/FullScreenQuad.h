@@ -4,10 +4,10 @@
 #include "Renderer/Shader.h"
 
 // TODO: Implement as a bindable
-class ScreenSpaceQuad
+class FullScreenQuad
 {
 public:
-	ScreenSpaceQuad();
+	FullScreenQuad();
 	
 	void Bind() const;
 	

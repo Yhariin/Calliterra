@@ -1,13 +1,12 @@
 #include "pch.h"
-#include "ScreenSpaceQuad.h"
+#include "FullScreenQuad.h"
 #include "Renderer/Renderer.h"
 
-ScreenSpaceQuad::ScreenSpaceQuad()
+FullScreenQuad::FullScreenQuad()
 {
 		std::string tag = "$ScreenSpaceQuad";
 
-		m_VertexShader = Shader::Resolve("assets/shaders/SSQuadVS.hlsl", Shader::VERTEX_SHADER);
-		m_PixelShader = Shader::Resolve("assets/shaders/ColorInvertPS.hlsl", Shader::PIXEL_SHADER);
+		m_VertexShader = Shader::Resolve("assets/shaders/FullScreenQuadVS.hlsl", Shader::VERTEX_SHADER);
 
 		std::vector<DX::XMFLOAT2> vBuff =
 		{
@@ -27,20 +26,19 @@ ScreenSpaceQuad::ScreenSpaceQuad()
 
 	}
 
-void ScreenSpaceQuad::Bind() const
+void FullScreenQuad::Bind() const
 {
 
 	std::vector<std::shared_ptr<Bindable>> bindables = {
 		m_VertexBuffer,
 		m_IndexBuffer,
 		m_VertexShader,
-		//m_PixelShader
 	};
 
 	Renderer::Bind(bindables, m_IndexBuffer->GetCount());
 }
 
-void ScreenSpaceQuad::Draw() const
+void FullScreenQuad::Draw() const
 {
 	Renderer::Draw();
 }

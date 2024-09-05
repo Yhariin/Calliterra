@@ -12,6 +12,7 @@
 #include "Blender.h"
 #include "DepthStencilMask.h"
 #include "Topology.h"
+#include "Rasterizer.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
 #include "Platform/DX11/DX11VertexBuffer.h"
 
@@ -164,6 +165,7 @@ public:
 	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
 	static std::shared_ptr<DepthStencilMask> CreateDepthStencilMask(DepthStencilMask::Mode mode);
 	static std::shared_ptr<Topology> CreateTopology(PrimitiveTopology primitiveTopology);
+	static std::shared_ptr<Rasterizer> CreateRasterizer(FillMode fillMode, CullMode cullMode);
 
 	static std::shared_ptr<ShaderInputRenderTarget> CreateRenderTarget(uint32_t width = 0, uint32_t height = 0, uint32_t slot = 0);
 	static std::shared_ptr<DepthStencilBuffer> CreateDepthStencilBuffer(uint32_t width = 0, uint32_t height = 0, bool canBindShaderInput = false);

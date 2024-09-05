@@ -9,6 +9,7 @@
 #include "Platform/DX11/DX11RenderTarget.h"
 #include "Platform/DX11/DX11DepthStencilBuffer.h"
 #include "Platform/DX11/DX11Topology.h"
+#include "Platform/DX11/DX11Rasterizer.h"
 
 void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 {
@@ -170,6 +171,21 @@ std::shared_ptr<Topology> Renderer::CreateTopology(PrimitiveTopology primitiveTo
 		return nullptr;
 	case RendererAPI::DX11:
 		return std::make_shared<DX11Topology>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), primitiveTopology);
+	}
+
+	LOG_ERROR("Unknown RendererAPI");
+	return nullptr;
+}
+
+std::shared_ptr<Rasterizer> Renderer::CreateRasterizer(FillMode fillMode, CullMode cullMode)
+{
+	switch(GetAPI())
+	{
+	case RendererAPI::None: 
+		ASSERT(false, "RendererAPI is set to None!");
+		return nullptr;
+	case RendererAPI::DX11:
+		return std::make_shared<DX11Rasterizer>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), fillMode, cullMode);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");

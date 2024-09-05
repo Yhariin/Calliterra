@@ -1,10 +1,10 @@
 #pragma once
 #include "Base/FullScreenPass.h"
 
-class ColorInvertPass : public FullScreenPass
+class PostProcessingPass : public FullScreenPass
 {
 public:
-	ColorInvertPass(const GraphicsContext& context, std::shared_ptr<RenderTarget> backBuffer, std::shared_ptr<RenderTarget> renderTarget)
+	PostProcessingPass(const GraphicsContext& context, std::shared_ptr<RenderTarget> backBuffer, std::shared_ptr<RenderTarget> renderTarget)
 		: m_Context(context), m_BackBuffer(backBuffer), m_RenderTarget(renderTarget)
 	{
 		
@@ -14,7 +14,7 @@ public:
 	{
 		m_BackBuffer->BindAsBuffer();
 		m_RenderTarget->Bind();
-		Shader::Resolve("assets/shaders/ColorInvertPS.hlsl", Shader::PIXEL_SHADER)->Bind();
+		Shader::Resolve("assets/shaders/DefaultFullScreenPS.hlsl", Shader::PIXEL_SHADER)->Bind();
 		Rasterizer::Resolve(FillMode::Solid, CullMode::Back)->Bind();
 		FullScreenPass::Execute();
 	}
