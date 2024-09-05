@@ -33,7 +33,7 @@ public:
 private:
 	bool m_IsDebugGuiEnabled = false;
 	bool m_IsSettingsGuiEnabled = false;
-	float m_WindowWidth;
-	float m_WindowHeight;
+	float m_WindowWidth = 0;
+	float m_WindowHeight = 0;
 };
 

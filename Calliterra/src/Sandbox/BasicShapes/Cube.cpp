@@ -85,9 +85,9 @@ void Cube::InitBuffers()
 				Transforms GetTransforms() const override
 				{
 					ASSERT(m_Parent != nullptr);
-					auto m = m_Parent->GetTransform();
-					auto v = m_Parent->GetViewTransform();
-					auto p = m_Parent->GetProjectionTransform();
+					auto& m = m_Parent->GetTransform();
+					auto& v = m_Parent->GetViewTransform();
+					auto& p = m_Parent->GetProjectionTransform();
 
 					auto newM = DX::XMMatrixScaling(1.03f, 1.03f, 1.03f) * m;
 					return {

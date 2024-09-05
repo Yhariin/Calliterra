@@ -12,7 +12,7 @@ RECT DX11OutputDevice::GetWorkArea()
 	MONITORINFOEX info;
 	info.cbSize = sizeof(info);
 
-	ASSERT_HR(GetMonitorInfo(m_Desc.Monitor, &info));
+	ASSERT(GetMonitorInfo(m_Desc.Monitor, &info));
 
 	return info.rcWork;
 }
@@ -22,7 +22,7 @@ RECT DX11OutputDevice::GetDesktopArea()
 	MONITORINFOEX info;
 	info.cbSize = sizeof(info);
 
-	ASSERT_HR(GetMonitorInfo(m_Desc.Monitor, &info));
+	ASSERT(GetMonitorInfo(m_Desc.Monitor, &info));
 
 	return info.rcMonitor;
 }
