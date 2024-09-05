@@ -9,7 +9,6 @@ public:
 	void InitBuffers();
 
 	void Update(float dt) override;
-	void LinkTechniques() override;
 
 private:
 	static void CalculateNormals();

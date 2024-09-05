@@ -31,11 +31,6 @@ void PointLight::Submit() const
 	SubmitTechniques();
 }
 
-void PointLight::LinkTechniques() 
-{
-	m_Sphere.LinkTechniques();
-}
-
 void PointLight::OnSettingsUpdate(SettingsType type)
 {
 	m_Position = DX::XMFLOAT3(GlobalSettings::Rendering::LightPos().x, GlobalSettings::Rendering::LightPos().y, GlobalSettings::Rendering::LightPos().z);

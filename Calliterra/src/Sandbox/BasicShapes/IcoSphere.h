@@ -7,7 +7,6 @@ public:
 	IcoSphere(const uint32_t resolution, DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = DX::XMFLOAT3(-1.f, -1.f, -1.f));
 	
 	void Update(float dt) override;
-	void LinkTechniques() override;
 
 private:
 	struct Indices

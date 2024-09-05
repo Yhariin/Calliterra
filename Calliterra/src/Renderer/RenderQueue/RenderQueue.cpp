@@ -3,53 +3,72 @@
 #include "Renderer/DepthStencilMask.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Renderer.h"
+#include "Passes/ClearBufferPass.h"
+#include "Passes/LambertianPass.h"
+#include "Passes/OutlineMaskPass.h"
+#include "Passes/OutlineDrawPass.h"
+#include "Passes/ColorInvertPass.h"
 
 RenderQueue::RenderQueue(GraphicsContext& context)
 	: m_Context(context)
 {
 	m_RenderTarget = Renderer::CreateRenderTarget();
 	m_DepthStencilBuffer = Renderer::CreateDepthStencilBuffer(0, 0, false);
+
+	m_Passes[(int)PassName::ClearRenderTarget] = std::make_unique<ClearBufferPass>(m_RenderTarget);
+	m_Passes[(int)PassName::ClearDepthStencilBuffer] = std::make_unique<ClearBufferPass>(m_DepthStencilBuffer);
+	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_DepthStencilBuffer);
+	m_Passes[(int)PassName::OutlineMask] = std::make_unique<OutlineMaskPass>();
+	m_Passes[(int)PassName::OutlineDraw] = std::make_unique<OutlineDrawPass>();
+	m_Passes[(int)PassName::ColorInvert] = std::make_unique<ColorInvertPass>(m_Context, m_RenderTarget);
+
 }
 
-void RenderQueue::Accept(const Step& step, uint32_t targetPass)
+void RenderQueue::Accept(const Step& step, PassName targetPass)
 {
-	ASSERT(targetPass < m_Passes.max_size());
-	m_Passes[targetPass].Accept(step);
+	// Only passes that inherit from StepPass should be allowed to accept a step
+	switch (targetPass)
+	{
+	case PassName::Lambertian:
+	{
+		auto p = dynamic_cast<LambertianPass*>(m_Passes[(int)targetPass].get());
+		ASSERT(p, "Cannot add Steps to this pass type");
+		p->Accept(step);
+		break;
+	}
+	case PassName::OutlineMask:
+	{
+		auto p = dynamic_cast<OutlineMaskPass*>(m_Passes[(int)targetPass].get());
+		ASSERT(p, "Cannot add Steps to this pass type");
+		p->Accept(step);
+		break;
+	}
+	case PassName::OutlineDraw:
+	{
+		auto p = dynamic_cast<OutlineDrawPass*>(m_Passes[(int)targetPass].get());
+		ASSERT(p, "Cannot add Steps to this pass type");
+		p->Accept(step);
+		break;
+	}
+	default:
+		ASSERT(false, "Cannot add Steps to this pass type");
+	}
+
 }
 
 void RenderQueue::Execute()
 {
-	// Setup render target used for all passes
-	//m_DepthStencilBuffer->Clear();
-	//m_RenderTarget->Clear();
-	//m_RenderTarget->BindAsBuffer(m_DepthStencilBuffer.get());
-	//m_DepthStencilBuffer->BindAsBuffer(m_RenderTarget.get());
-	m_Context.BindSwapBufferDepth();
-
-	// Phong lighting pass
-	DepthStencilMask::Resolve(DepthStencilMask::Mode::Off)->Bind();
-	m_Passes[0].Execute();
-
-	// Outline masking pass
-	DepthStencilMask::Resolve(DepthStencilMask::Mode::Write)->Bind();
-	Shader::Resolve("", Shader::PIXEL_SHADER)->Bind();
-	m_Passes[1].Execute();
-
-	// Outline drawing pass
-	DepthStencilMask::Resolve(DepthStencilMask::Mode::Mask)->Bind();
-	m_Passes[2].Execute();
-
-	//m_Context.BindSwapBuffer();
-	//m_RenderTarget->BindAsTexture(0);
-	//m_SSQuad.Bind();
-	//m_SSQuad.Draw();
+	for (const auto& pass : m_Passes)
+	{
+		pass->Execute();
+	}
 }
 
 void RenderQueue::Reset()
 {
 	for(auto& pass : m_Passes)
 	{
-		pass.Reset();
+		pass->Reset();
 	}
 }
 

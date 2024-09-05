@@ -41,7 +41,6 @@ public:
 		 const std::string& filepath = "");
 
 	void Submit() const override { Drawable::Submit(); }
-	void LinkTechniques() override;
 
 	void Update(float dt) override;
 

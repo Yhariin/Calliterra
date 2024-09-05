@@ -11,7 +11,7 @@
 #include "Core/GlobalSettings.h"
 #include "DX11OutputDevices.h"
 
-class DX11RenderTarget;
+class DX11OutputOnlyRenderTarget;
 
 struct DX11ContextProps
 {
@@ -30,11 +30,11 @@ public:
 	void OnWindowResize() override;
 	void Clear() override;
 	void SetClearColor(float r, float g, float b, float a) override;
-	DX::XMFLOAT4 GetClearColor();
+	DX::XMFLOAT4 GetClearColor() const;
 
 	std::shared_ptr<RenderTarget> GetBackBufferTarget() const override;
-	void BindSwapBuffer() override;
-	void BindSwapBufferDepth() override;
+	void BindSwapBuffer() const override;
+	void BindSwapBufferDepth() const override;
 
 	uint32_t GetWidth() const override;
 	uint32_t GetHeight() const override;
@@ -71,7 +71,7 @@ private:
 	ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
 	ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
 	ComPtr<ID3D11RasterizerState> m_RasterizerState;
-	std::shared_ptr<DX11RenderTarget> m_RenderTarget;
+	std::shared_ptr<DX11OutputOnlyRenderTarget> m_RenderTarget = nullptr;
 
 	float m_BufferClearColor[4] = { 1.f, 1.f, 1.f, 1.f };
 	bool m_VSyncEnabled = true;

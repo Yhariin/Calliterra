@@ -30,11 +30,11 @@ void DX11DepthStencilBuffer::BindAsBuffer() const
 
 void DX11DepthStencilBuffer::BindAsBuffer(BufferResource* renderTarget) const
 {
-	ASSERT(dynamic_cast<DX11RenderTarget*>(renderTarget) != nullptr);
-	BindAsBuffer(static_cast<DX11RenderTarget*>(renderTarget));
+	ASSERT(dynamic_cast<DX11ShaderInputRenderTarget*>(renderTarget) != nullptr);
+	BindAsBuffer(static_cast<DX11ShaderInputRenderTarget*>(renderTarget));
 }
 
-void DX11DepthStencilBuffer::BindAsBuffer(DX11RenderTarget* renderTarget) const
+void DX11DepthStencilBuffer::BindAsBuffer(DX11ShaderInputRenderTarget* renderTarget) const
 {
 	renderTarget->BindAsBuffer(this);
 }

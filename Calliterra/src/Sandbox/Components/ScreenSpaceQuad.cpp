@@ -34,7 +34,7 @@ void ScreenSpaceQuad::Bind() const
 		m_VertexBuffer,
 		m_IndexBuffer,
 		m_VertexShader,
-		m_PixelShader
+		//m_PixelShader
 	};
 
 	Renderer::Bind(bindables, m_IndexBuffer->GetCount());

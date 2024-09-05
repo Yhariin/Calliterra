@@ -26,10 +26,8 @@ void Sandbox::OnUpdate(float dt)
 		drawable->Submit();
 	}
 
-	Renderer::GetRenderGraph().Execute();
-	Renderer::GetRenderGraph().Reset();
-	//Renderer::GetRenderQueue().Execute();
-	//Renderer::GetRenderQueue().Reset();
+	Renderer::GetRenderQueue().Execute();
+	Renderer::GetRenderQueue().Reset();
 }
 
 void Sandbox::OnEvent(Event& e)
@@ -52,20 +50,16 @@ void Sandbox::LoadSandboxPreset()
 	DX::XMMATRIX transform3 = DX::XMMatrixScaling(0.05f, 0.05f, 0.05f);
 
 	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nano_textured/nanosuit.obj", transform2, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
-	m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
 	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f) * DX::XMMatrixTranslation(6.f, 0.f, 0.f));
 	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f));
-	
+
 	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nanosuit_hierarchical.gltf", transform, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
 
 	//m_Drawables.emplace_back(std::make_unique<Model>(dragonModel, DX::XMMatrixTranslation(10.f, 0.f, -10.f), DX::XMFLOAT3(0.8f, 0.3f, 0.8f )));
 	//m_Drawables.emplace_back(std::make_unique<Model>(vaseClayModel, DX::XMMatrixTranslation(0.f, 0.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
 	//m_Drawables.emplace_back(std::make_unique<Model>(heartModel, DX::XMMatrixTranslation(5.f, 10.f, -10.f), DX::XMFLOAT3(0.2f, 0.3f, 0.78f )));
 
-	for (const auto& drawable : m_Drawables)
-	{
-		drawable->LinkTechniques();
-	}
 }
 
 void Sandbox::CreateCube(const DX::XMMATRIX& transform)

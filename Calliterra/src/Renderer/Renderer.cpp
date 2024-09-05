@@ -15,13 +15,11 @@ void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 
 	s_RendererAPI->Init(s_GraphicsContext);
 	s_RenderQueue = std::make_unique<RenderQueue>(*s_GraphicsContext);
-	s_RenderGraph = std::make_unique<RenderGraph>(*s_GraphicsContext);
 }
 
 void Renderer::Shutdown()
 {
 	s_RenderQueue.reset();
-	s_RenderGraph.reset();
 }
 
 void Renderer::SetClearColor(float r, float g, float b, float a)
@@ -172,7 +170,7 @@ std::shared_ptr<DepthStencilMask> Renderer::CreateDepthStencilMask(DepthStencilM
 	return nullptr;
 }
 
-std::shared_ptr<RenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint32_t height)
+std::shared_ptr<ShaderInputRenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint32_t height, uint32_t slot)
 {
 	if (width == 0)
 	{
@@ -189,7 +187,7 @@ std::shared_ptr<RenderTarget> Renderer::CreateRenderTarget(uint32_t width, uint3
 		ASSERT(false, "RendererAPI is set to None!");
 		return nullptr;
 	case RendererAPI::DX11:
-		return std::make_unique<DX11RenderTarget>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), width, height);
+		return std::make_unique<DX11ShaderInputRenderTarget>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), width, height, slot);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");
@@ -228,9 +226,4 @@ RendererResourceLibrary& Renderer::GetResourceLibrary()
 RenderQueue& Renderer::GetRenderQueue()
 {
 	return *s_RenderQueue;
-}
-
-RenderGraph& Renderer::GetRenderGraph()
-{
-	return *s_RenderGraph;
 }

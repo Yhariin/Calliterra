@@ -2,10 +2,10 @@
 #include "Step.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Drawable.h"
-#include "Renderer/RenderGraph/Passes/Base/RenderQueuePass.h"
+#include "Renderer/RenderQueue/Passes/Base/RenderPass.h"
 
-Step::Step(std::string targetPassName)
-	: m_TargetPassName(std::move(targetPassName))
+Step::Step(PassName targetPass)
+	: m_TargetPass(targetPass)
 {
 }
 
@@ -35,9 +35,9 @@ void Step::SetIndexCount(uint32_t indexCount)
 
 void Step::Submit() const
 {
-	ASSERT(m_TargetPass != nullptr);
-	m_TargetPass->Accept(*this);
-	//Renderer::GetRenderQueue().Accept(*this, m_TargetPass);
+	//ASSERT(m_TargetPass != nullptr);
+	//m_TargetPass->Accept(*this);
+	Renderer::GetRenderQueue().Accept(*this, m_TargetPass);
 }
 
 void Step::Execute() const
@@ -53,10 +53,3 @@ void Step::InitializeParentReferences(const Drawable& parent)
 		bindable->InitializeParentReference(parent);
 	}
 }
-
-void Step::Link()
-{
-	ASSERT(m_TargetPass == nullptr);
-	m_TargetPass = &Renderer::GetRenderGraph().GetRenderQueue(m_TargetPassName);
-}
-

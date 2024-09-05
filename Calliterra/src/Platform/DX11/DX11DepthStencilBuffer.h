@@ -2,7 +2,7 @@
 #include "Renderer/DepthStencilBuffer.h"
 #include "DX11Context.h"
 
-class DX11RenderTarget;
+class DX11ShaderInputRenderTarget;
 
 class DX11DepthStencilBuffer : public DepthStencilBuffer
 {
@@ -15,7 +15,7 @@ public:
 	ComPtr<ID3D11DepthStencilView> GetView() const;
 	
 private:
-	void BindAsBuffer(DX11RenderTarget* renderTarget) const;
+	void BindAsBuffer(DX11ShaderInputRenderTarget* renderTarget) const;
 
 private:
 	DX11Context& m_Context;

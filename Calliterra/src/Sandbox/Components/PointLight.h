@@ -9,7 +9,6 @@ public:
 	PointLight(DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
 
 	void Submit() const override;
-	void LinkTechniques() override;
 
 	void OnSettingsUpdate(SettingsType setting) override;
 	void Update(float dt) override;

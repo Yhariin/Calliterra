@@ -2,7 +2,6 @@
 
 #include "RendererAPI.h"
 #include "RendererResourceLibrary.h"
-#include "RenderGraph/RenderGraph.h"
 #include "RenderQueue/RenderQueue.h"
 #include "GraphicsContext.h"
 #include "VertexBuffer.h"
@@ -166,12 +165,11 @@ public:
 	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
 	static std::shared_ptr<DepthStencilMask> CreateDepthStencilMask(DepthStencilMask::Mode mode);
 
-	static std::shared_ptr<RenderTarget> CreateRenderTarget(uint32_t width = 0, uint32_t height = 0);
+	static std::shared_ptr<ShaderInputRenderTarget> CreateRenderTarget(uint32_t width = 0, uint32_t height = 0, uint32_t slot = 0);
 	static std::shared_ptr<DepthStencilBuffer> CreateDepthStencilBuffer(uint32_t width = 0, uint32_t height = 0, bool canBindShaderInput = false);
 
 	static RendererResourceLibrary& GetResourceLibrary();
 	static RenderQueue& GetRenderQueue();
-	static RenderGraph& GetRenderGraph();
 
 	static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
@@ -180,7 +178,6 @@ private:
 	inline static std::shared_ptr<GraphicsContext> s_GraphicsContext = nullptr;
 	inline static RendererResourceLibrary s_ResourceLibrary;
 	inline static std::unique_ptr<RenderQueue> s_RenderQueue = nullptr;
-	inline static std::unique_ptr<RenderGraph> s_RenderGraph = nullptr;
 	inline static uint32_t s_IndexCount = 0;
 };
 

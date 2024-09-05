@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Cube.h"
+#include "Renderer/RenderQueue/Passes/Base/RenderPass.h"
 
 Cube::Cube(DX::XMMATRIX transform, DX::XMFLOAT3 color)
 	: Drawable(transform, color)
@@ -17,7 +18,7 @@ void Cube::InitBuffers()
 	{
 		Technique standardTech;
 		{
-			Step onlyStep("lambertian");
+			Step onlyStep(PassName::Lambertian);
 
 			auto vShader = Shader::Resolve("assets/shaders/BPhongTexVS.hlsl", Shader::VERTEX_SHADER);
 			onlyStep.AddBindable(Shader::Resolve("assets/shaders/BPhongTexPS.hlsl", Shader::PIXEL_SHADER));
@@ -52,9 +53,9 @@ void Cube::InitBuffers()
 		AddTechnique(std::move(standardTech));
 	}
 	{
-		Technique outlineTech("Outline");
+		Technique outlineTech;
 		{
-			Step maskStep("outlineMask");
+			Step maskStep(PassName::OutlineMask);
 
 			auto vShader = Shader::Resolve("assets/shaders/FlatColorVS.hlsl", Shader::VERTEX_SHADER);
 			auto pShader = Shader::Resolve("assets/shaders/FlatColorPS.hlsl", Shader::PIXEL_SHADER);
@@ -75,7 +76,7 @@ void Cube::InitBuffers()
 
 			//======================================================
 
-			Step drawStep("outlineDraw");
+			Step drawStep(PassName::OutlineDraw);
 
 			class TransformCBuffScaling : public TransformConstantBuffer
 			{
@@ -115,14 +116,6 @@ void Cube::InitBuffers()
 
 void Cube::Update(float dt)
 {
-}
-
-void Cube::LinkTechniques() 
-{
-	for (auto& tech : GetTechniques())
-	{
-		tech.Link();
-	}
 }
 
 void Cube::CalculateNormals()

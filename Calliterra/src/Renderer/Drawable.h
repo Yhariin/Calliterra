@@ -14,7 +14,6 @@ public:
 	}
 
 	virtual void Submit() const { SubmitTechniques(); }
-	virtual void LinkTechniques() = 0;
 
 	virtual void Update(float dt) = 0;
 

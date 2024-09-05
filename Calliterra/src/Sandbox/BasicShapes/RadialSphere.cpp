@@ -8,14 +8,6 @@ RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX tra
 	//InitBuffers();
 }
 
-void RadialSphere::LinkTechniques() 
-{
-	for (auto& tech : GetTechniques())
-	{
-		tech.Link();
-	}
-}
-
 /*
 void RadialSphere::Draw()
 {
