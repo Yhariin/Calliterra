@@ -28,7 +28,6 @@ public:
 	void Init() override;
 	void SwapBuffers() override;
 	void OnWindowResize() override;
-	void Clear() override;
 	void SetClearColor(float r, float g, float b, float a) override;
 	DX::XMFLOAT4 GetClearColor() const;
 

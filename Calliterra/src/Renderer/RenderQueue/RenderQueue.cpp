@@ -10,17 +10,17 @@
 #include "Passes/ColorInvertPass.h"
 
 RenderQueue::RenderQueue(GraphicsContext& context)
-	: m_Context(context)
+	: m_Context(context), m_BackBuffer(context.GetBackBufferTarget())
 {
 	m_RenderTarget = Renderer::CreateRenderTarget();
-	m_DepthStencilBuffer = Renderer::CreateDepthStencilBuffer(0, 0, false);
+	m_MasterDepthStencilBuffer = Renderer::CreateDepthStencilBuffer(0, 0, false);
 
 	m_Passes[(int)PassName::ClearRenderTarget] = std::make_unique<ClearBufferPass>(m_RenderTarget);
-	m_Passes[(int)PassName::ClearDepthStencilBuffer] = std::make_unique<ClearBufferPass>(m_DepthStencilBuffer);
-	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_DepthStencilBuffer);
+	m_Passes[(int)PassName::ClearDepthStencilBuffer] = std::make_unique<ClearBufferPass>(m_MasterDepthStencilBuffer);
+	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_MasterDepthStencilBuffer);
 	m_Passes[(int)PassName::OutlineMask] = std::make_unique<OutlineMaskPass>();
 	m_Passes[(int)PassName::OutlineDraw] = std::make_unique<OutlineDrawPass>();
-	m_Passes[(int)PassName::ColorInvert] = std::make_unique<ColorInvertPass>(m_Context, m_RenderTarget);
+	m_Passes[(int)PassName::ColorInvert] = std::make_unique<ColorInvertPass>(m_Context, m_BackBuffer, m_RenderTarget);
 
 }
 

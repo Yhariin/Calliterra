@@ -11,6 +11,7 @@
 #include "Texture.h"
 #include "Blender.h"
 #include "DepthStencilMask.h"
+#include "Topology.h"
 #include "Platform/DX11/DX11ConstantBuffer.h"
 #include "Platform/DX11/DX11VertexBuffer.h"
 
@@ -21,8 +22,6 @@ class Renderer
 public:
 	static void Init(std::shared_ptr<GraphicsContext> graphicsContext);
 	static void Shutdown();
-	static void SetClearColor(float r, float g, float b, float a = 1.f);
-	static void Clear();
 	static void Bind(const std::vector<std::shared_ptr<Shader>>& shaderList = {},
 					 const std::shared_ptr<VertexBuffer>& vertexBuffer = nullptr,
 					 const std::shared_ptr<IndexBuffer>& indexBuffer = nullptr,
@@ -164,6 +163,7 @@ public:
 	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath, uint32_t slot = 0, Texture::Filter filter = Texture::Filter::Anisotropic);
 	static std::shared_ptr<Blender> CreateBlendState(bool enableBlending, Blender::BlendFunc srcBlend, Blender::BlendFunc destBlend, Blender::BlendOp blendOp);
 	static std::shared_ptr<DepthStencilMask> CreateDepthStencilMask(DepthStencilMask::Mode mode);
+	static std::shared_ptr<Topology> CreateTopology(PrimitiveTopology primitiveTopology);
 
 	static std::shared_ptr<ShaderInputRenderTarget> CreateRenderTarget(uint32_t width = 0, uint32_t height = 0, uint32_t slot = 0);
 	static std::shared_ptr<DepthStencilBuffer> CreateDepthStencilBuffer(uint32_t width = 0, uint32_t height = 0, bool canBindShaderInput = false);

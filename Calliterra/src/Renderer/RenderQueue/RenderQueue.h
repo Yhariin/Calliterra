@@ -16,8 +16,8 @@ public:
 private:
 	std::array<std::unique_ptr<RenderPass>, (int)PassName::NumPasses> m_Passes;
 	GraphicsContext& m_Context;
+	std::shared_ptr<RenderTarget> m_BackBuffer;
+	std::shared_ptr<DepthStencilBuffer> m_MasterDepthStencilBuffer;
 	std::shared_ptr<RenderTarget> m_RenderTarget;
-	std::shared_ptr<DepthStencilBuffer> m_DepthStencilBuffer;
-	ScreenSpaceQuad m_SSQuad;
 };
 

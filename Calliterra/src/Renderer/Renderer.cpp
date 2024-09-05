@@ -8,6 +8,7 @@
 #include "Platform/DX11/DX11DepthStencilMask.h"
 #include "Platform/DX11/DX11RenderTarget.h"
 #include "Platform/DX11/DX11DepthStencilBuffer.h"
+#include "Platform/DX11/DX11Topology.h"
 
 void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 {
@@ -20,16 +21,6 @@ void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 void Renderer::Shutdown()
 {
 	s_RenderQueue.reset();
-}
-
-void Renderer::SetClearColor(float r, float g, float b, float a)
-{
-	s_GraphicsContext->SetClearColor(r, g, b, a);
-}
-
-void Renderer::Clear()
-{
-	s_GraphicsContext->Clear();
 }
 
 // TODO: Remove this
@@ -164,6 +155,21 @@ std::shared_ptr<DepthStencilMask> Renderer::CreateDepthStencilMask(DepthStencilM
 		return nullptr;
 	case RendererAPI::DX11:
 		return std::make_shared<DX11DepthStencilMask>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), mode);
+	}
+
+	LOG_ERROR("Unknown RendererAPI");
+	return nullptr;
+}
+
+std::shared_ptr<Topology> Renderer::CreateTopology(PrimitiveTopology primitiveTopology)
+{
+	switch(GetAPI())
+	{
+	case RendererAPI::None: 
+		ASSERT(false, "RendererAPI is set to None!");
+		return nullptr;
+	case RendererAPI::DX11:
+		return std::make_shared<DX11Topology>(*dynamic_cast<DX11Context*>(s_GraphicsContext.get()), primitiveTopology);
 	}
 
 	LOG_ERROR("Unknown RendererAPI");

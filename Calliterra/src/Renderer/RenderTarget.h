@@ -8,6 +8,7 @@ class RenderTarget : public Bindable, public BufferResource
 public:
 	virtual ~RenderTarget() = default;
 	
+	virtual void Clear(DX::XMFLOAT4 color) const = 0;
 	//void Bind() const override {}
 };
 

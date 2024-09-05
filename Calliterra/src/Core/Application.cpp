@@ -56,11 +56,6 @@ void Application::Run()
 		s_DeltaTime = time - m_LastFrameTime;
 		m_LastFrameTime = time;
 
-		// Clear previous frame
-		Renderer::SetClearColor(0.07f, 0.0f, 0.12f);
-		Renderer::Clear();
-
-
 		// Draw new frame
 		m_Sandbox->OnUpdate(static_cast<float>(s_DeltaTime.GetSeconds()));
 

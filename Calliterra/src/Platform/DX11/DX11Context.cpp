@@ -36,14 +36,6 @@ void DX11Context::SwapBuffers()
 	ASSERT_HR(m_SwapChain->Present(m_VSyncEnabled, 0));
 }
 
-void DX11Context::Clear()
-{
-	m_RenderTarget->Clear();
-	//m_DeviceContext->ClearRenderTargetView(m_RenderTarget->GetRenderTargetView().Get(), m_BufferClearColor);
-	//m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_BufferClearColor);
-	m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-}
-
 void DX11Context::SetClearColor(float r, float g, float b, float a)
 {
 	m_BufferClearColor[0] = r;
@@ -118,13 +110,11 @@ std::shared_ptr<RenderTarget> DX11Context::GetBackBufferTarget() const
 
 void DX11Context::BindSwapBuffer() const
 {
-	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
 	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), nullptr);
 }
 
 void DX11Context::BindSwapBufferDepth() const
 {
-	//m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), m_DepthStencilView.Get());
 }
 
@@ -235,7 +225,7 @@ void DX11Context::CreateRenderTargetView()
 	m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
 
 	//m_Device->CreateRenderTargetView(backBuffer.Get(), 0, &m_RenderTargetView);
-	//m_RenderTarget = std::make_shared<DX11OutputOnlyRenderTarget>(*this, backBuffer.Get());
+	//m_BackBuffer = std::make_shared<DX11OutputOnlyRenderTarget>(*this, backBuffer.Get());
 	m_RenderTarget = std::shared_ptr<DX11OutputOnlyRenderTarget>(new DX11OutputOnlyRenderTarget(*this, backBuffer.Get()));
 }
 

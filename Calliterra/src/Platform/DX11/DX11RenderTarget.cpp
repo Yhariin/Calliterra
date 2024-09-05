@@ -50,7 +50,11 @@ void DX11ShaderInputRenderTarget::Bind() const
 
 void DX11ShaderInputRenderTarget::Clear() const
 {
-	const auto color = m_Context.GetClearColor();
+	Clear({0.f, 0.f, 0.f, 0.f});
+}
+
+void DX11ShaderInputRenderTarget::Clear(DX::XMFLOAT4 color) const
+{
 	const float colorBuff[4] = { color.x, color.y, color.z, color.w };
 	m_Context.GetDeviceContext().ClearRenderTargetView(m_TargetView.Get(), colorBuff);
 }
@@ -97,7 +101,11 @@ void DX11OutputOnlyRenderTarget::Bind() const
 
 void DX11OutputOnlyRenderTarget::Clear() const
 {
-	const auto color = m_Context.GetClearColor();
+	Clear({0.f, 0.f, 0.f, 0.f});
+}
+
+void DX11OutputOnlyRenderTarget::Clear(DX::XMFLOAT4 color) const
+{
 	const float colorBuff[4] = { color.x, color.y, color.z, color.w };
 	m_Context.GetDeviceContext().ClearRenderTargetView(m_TargetView.Get(), colorBuff);
 }

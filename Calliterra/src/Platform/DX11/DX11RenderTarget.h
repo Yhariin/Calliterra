@@ -10,6 +10,7 @@ public:
 	DX11ShaderInputRenderTarget(DX11Context& context, uint32_t width, uint32_t height, uint32_t slot);
 	void Bind() const override; // Binds as a texture to be used in a shader
 	void Clear() const override;
+	void Clear(DX::XMFLOAT4) const override;
 
 	void BindAsBuffer() const override; // Binds as a buffer to render to
 	void BindAsBuffer(BufferResource* depthStencil) const override;
@@ -36,6 +37,7 @@ class DX11OutputOnlyRenderTarget : public OutputOnlyRenderTarget
 public:
 	void Bind() const override;
 	void Clear() const override;
+	void Clear(DX::XMFLOAT4) const override;
 
 	void BindAsBuffer() const override;
 	void BindAsBuffer(BufferResource* depthStencil) const override;
