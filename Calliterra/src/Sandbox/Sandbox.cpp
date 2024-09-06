@@ -5,6 +5,7 @@
 #include "Sandbox/BasicShapes/IcoSphere.h"
 #include "Sandbox/BasicShapes/Plane.h"
 #include "Sandbox/Components/PointLight.h"
+#include "Sandbox/Components/Sun.h"
 #include "Asset/Model.h"
 #include "Asset/ModelLoader.h"
 
@@ -17,7 +18,7 @@ Sandbox::Sandbox(float aspectRatio)
 void Sandbox::OnUpdate(float dt)
 {
 	m_Camera.OnUpdate(dt);
-
+	
 	for (auto& drawable : m_Drawables)
 	{
 		drawable->SetViewMatrix(m_Camera.GetViewMatrix());
@@ -40,6 +41,7 @@ void Sandbox::LoadSandboxPreset()
 	//CreatePlane();
 
 	CreatePointLight();
+	CreateSun();
 
 	//std::shared_ptr<rapidobj::Result> dragonModel = ModelLoader::LoadModelObj("assets/models/dragon.obj");
 	//std::shared_ptr<fastgltf::Asset> vaseClayModel = ModelLoader::LoadModelGltf("assets/models/Vase_Clay.gltf");
@@ -94,6 +96,11 @@ void Sandbox::CreatePlane()
 void Sandbox::CreatePointLight()
 {
 	m_Drawables.emplace_back(std::make_unique<PointLight>(DX::XMMatrixTranslation(0.f, 20.f, 10.f), DX::XMFLOAT3(1.f, 1.f, 1.f) ));
+}
+
+void Sandbox::CreateSun()
+{
+	m_Drawables.emplace_back(std::make_unique<Sun>());
 }
 
 const Camera& Sandbox::GetCamera() const

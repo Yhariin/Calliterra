@@ -62,6 +62,7 @@ void RenderQueue::Accept(const Step& step, PassName targetPass)
 
 void RenderQueue::Execute()
 {
+	//m_BackBuffer->BindAsBuffer();
 	for (const auto& pass : m_Passes)
 	{
 		pass->Execute();

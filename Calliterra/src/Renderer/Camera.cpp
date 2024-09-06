@@ -1,21 +1,7 @@
 #include "pch.h"
 #include "Camera.h"
 #include "Core/Input.h"
-
-static float wrapAngle(float theta)
-{
-	constexpr float twoPi = static_cast<float>(2 * std::numbers::pi);
-	const float mod = (float)fmod(theta, twoPi);
-	if (mod > (float)std::numbers::pi)
-	{
-		return mod - twoPi;
-	}
-	else if (mod < -(float)std::numbers::pi)
-	{
-		return mod + twoPi;
-	}
-	return mod;
-}
+#include "Core/Utils.h"
 
 Camera::Camera(float aspectRatio, float fov)
 	: m_AspectRatio(aspectRatio), 
@@ -127,6 +113,6 @@ void Camera::Translate(DX::XMFLOAT3 translation)
 
 void Camera::Rotate(float dx, float dy)
 {
-	m_Yaw = wrapAngle(m_Yaw + (dx * m_Sensitivity));
+	m_Yaw = Utils::wrapAngle(m_Yaw + (dx * m_Sensitivity));
 	m_Pitch = std::clamp(m_Pitch + (dy * m_Sensitivity), 0.995f * (float)-std::numbers::pi / 2.0f, 0.995f * (float)std::numbers::pi / 2.0f);
 }

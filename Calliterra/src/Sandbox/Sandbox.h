@@ -19,6 +19,7 @@ public:
 	void CreateIcoSphere();
 	void CreatePlane();
 	void CreatePointLight();
+	void CreateSun();
 
 	const Camera& GetCamera() const;
 

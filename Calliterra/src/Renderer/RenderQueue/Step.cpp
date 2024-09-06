@@ -35,8 +35,6 @@ void Step::SetIndexCount(uint32_t indexCount)
 
 void Step::Submit() const
 {
-	//ASSERT(m_TargetPass != nullptr);
-	//m_TargetPass->Accept(*this);
 	Renderer::GetRenderQueue().Accept(*this, m_TargetPass);
 }
 

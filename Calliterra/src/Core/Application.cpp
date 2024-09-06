@@ -49,6 +49,7 @@ void Application::OnEvent(Event& e)
 void Application::Run()
 {
 	m_Sandbox->LoadSandboxPreset();
+	m_LastFrameTime = DeltaTime::GetCurrentTimeMicroseconds();
 	while (m_Running)
 	{
 		// Calculate deltaTime

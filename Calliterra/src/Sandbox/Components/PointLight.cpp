@@ -19,10 +19,10 @@ void PointLight::Submit() const
 		posViewSpace,
 		{ 0.05f, 0.05f, 0.05f },
 		{ 1.f, 1.f, 1.f },
+		0.7f,
 		1.f,
-		1.f,
-		0.015f,
-		0.0015f
+		0.0015f,
+		0.00015f
 	};
 	Renderer::UpdateConstantBuffer(m_LightConstantBuffer, cb);
 
