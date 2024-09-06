@@ -7,6 +7,7 @@
 
 class RenderQueue : public SettingsSubscriber
 {
+	friend class GraphicsContext;
 public:
 	RenderQueue(GraphicsContext&);
 
@@ -15,7 +16,9 @@ public:
 	void Reset();
 
 	void OnSettingsUpdate(SettingsType type);
-
+private:
+	void InitPasses();
+	void FreeBuffers();
 private:
 	std::array<std::unique_ptr<RenderPass>, (int)PassName::NumPasses> m_Passes;
 	GraphicsContext& m_Context;

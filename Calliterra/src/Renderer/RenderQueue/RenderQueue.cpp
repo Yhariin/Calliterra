@@ -13,15 +13,7 @@
 RenderQueue::RenderQueue(GraphicsContext& context)
 	: m_Context(context), m_BackBuffer(context.GetBackBufferTarget())
 {
-	m_RenderTarget = Renderer::CreateRenderTarget();
-	m_MasterDepthStencilBuffer = Renderer::CreateDepthStencilBuffer(0, 0, false);
-
-	m_Passes[(int)PassName::ClearRenderTarget] = std::make_unique<ClearBufferPass>(m_RenderTarget);
-	m_Passes[(int)PassName::ClearDepthStencilBuffer] = std::make_unique<ClearBufferPass>(m_MasterDepthStencilBuffer);
-	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_MasterDepthStencilBuffer, m_FillMode, m_CullMode);
-	m_Passes[(int)PassName::OutlineMask] = std::make_unique<OutlineMaskPass>();
-	m_Passes[(int)PassName::OutlineDraw] = std::make_unique<OutlineDrawPass>();
-	m_Passes[(int)PassName::PostProcessing] = std::make_unique<PostProcessingPass>(m_Context, m_BackBuffer, m_RenderTarget);
+	InitPasses();
 
 	std::vector<SettingsType> settings = { SettingsType::IsWireFrame, SettingsType::CullMode };
 	GlobalSettings::Register(settings, this);
@@ -62,7 +54,6 @@ void RenderQueue::Accept(const Step& step, PassName targetPass)
 
 void RenderQueue::Execute()
 {
-	//m_BackBuffer->BindAsBuffer();
 	for (const auto& pass : m_Passes)
 	{
 		pass->Execute();
@@ -112,5 +103,31 @@ void RenderQueue::OnSettingsUpdate(SettingsType type)
 	}
 	}
 
+}
+
+void RenderQueue::InitPasses()
+{
+	if (!m_BackBuffer)
+	{
+		m_BackBuffer = m_Context.GetBackBufferTarget();
+	}
+	m_RenderTarget = Renderer::CreateRenderTarget();
+	m_MasterDepthStencilBuffer = Renderer::CreateDepthStencilBuffer(0, 0, false);
+
+	m_Passes[(int)PassName::ClearRenderTarget] = std::make_unique<ClearBufferPass>(m_RenderTarget);
+	m_Passes[(int)PassName::ClearDepthStencilBuffer] = std::make_unique<ClearBufferPass>(m_MasterDepthStencilBuffer);
+	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_MasterDepthStencilBuffer, m_FillMode, m_CullMode);
+	m_Passes[(int)PassName::OutlineMask] = std::make_unique<OutlineMaskPass>();
+	m_Passes[(int)PassName::OutlineDraw] = std::make_unique<OutlineDrawPass>();
+	m_Passes[(int)PassName::PostProcessing] = std::make_unique<PostProcessingPass>(m_Context, m_BackBuffer, m_RenderTarget);
+}
+
+void RenderQueue::FreeBuffers()
+{
+	m_BackBuffer.reset();
+	for (auto& pass : m_Passes)
+	{
+		pass.reset();
+	}
 }
 

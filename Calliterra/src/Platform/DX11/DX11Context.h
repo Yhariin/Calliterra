@@ -10,9 +10,9 @@
 #include "Core/Window.h"
 #include "Core/GlobalSettings.h"
 #include "DX11OutputDevices.h"
+#include "Renderer/RenderQueue/RenderQueue.h"
 
 class DX11OutputOnlyRenderTarget;
-
 
 class DX11Context : public GraphicsContext
 {
@@ -34,14 +34,13 @@ public:
 
 	ID3D11Device& GetDevice() const { return *m_Device.Get(); }
 	ID3D11DeviceContext& GetDeviceContext() const { return *m_DeviceContext.Get(); }
-	ID3D11DepthStencilView& GetDepthStencilView() const { return *m_DepthStencilView.Get(); }
 
 private:
 	void CreateDeviceContext();
 	void CreateSwapChain();
-	void CreateRenderTargetView();
-	void CreateDepthStencilBuffer();
+	void CreateRenderTarget();
 	void SetRenderViewport(float x, float y, float width, float height);
+	void FreeBuffers() override;
 
 private:
 	HWND* m_Hwnd;
@@ -51,8 +50,6 @@ private:
 	ComPtr<IDXGISwapChain1> m_SwapChain;
 	ComPtr<ID3D11DeviceContext> m_DeviceContext;
 
-	ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
-	ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
 	std::shared_ptr<DX11OutputOnlyRenderTarget> m_RenderTarget = nullptr;
 
 	bool m_VSyncEnabled = true;

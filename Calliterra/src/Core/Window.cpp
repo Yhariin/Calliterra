@@ -193,10 +193,11 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 			m_WindowProps.PosX = windowRect.left;
 			m_WindowProps.PosY = windowRect.top;
 
+			m_GraphicsContext->OnWindowResize();
+
 			WindowResizeEvent event(m_WindowProps.Width, m_WindowProps.Height);
 			m_EventCallback(event);
 
-			m_GraphicsContext->OnWindowResize();
 		}
 		break;
 	}
@@ -224,10 +225,10 @@ LRESULT Window::MessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		// the user first grabbed the resize bars
 		if (oldWindowWidth != m_WindowProps.Width || oldWindowHeight != m_WindowProps.Height)
 		{
+			m_GraphicsContext->OnWindowResize();
+
 			WindowResizeEvent event(m_WindowProps.Width, m_WindowProps.Height);
 			m_EventCallback(event);
-
-			m_GraphicsContext->OnWindowResize();
 
 		}
 

@@ -18,8 +18,7 @@ void DX11Context::Init()
 {
 	CreateDeviceContext();
 	CreateSwapChain();
-	CreateRenderTargetView();
-	CreateDepthStencilBuffer();
+	CreateRenderTarget();
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
 
 	m_OutputDevices = DX11OutputDevices(m_Device);
@@ -144,38 +143,12 @@ void DX11Context::CreateSwapChain()
 
 }
 
-void DX11Context::CreateRenderTargetView()
+void DX11Context::CreateRenderTarget()
 {
 	ComPtr<ID3D11Texture2D> backBuffer;
 	m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
 
 	m_RenderTarget = std::shared_ptr<DX11OutputOnlyRenderTarget>(new DX11OutputOnlyRenderTarget(*this, backBuffer.Get()));
-}
-
-void DX11Context::CreateDepthStencilBuffer()
-{
-	D3D11_TEXTURE2D_DESC depthStencilDesc = {};
-	depthStencilDesc.Width = m_WindowProps.Width;
-	depthStencilDesc.Height = m_WindowProps.Height;
-	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilDesc.SampleDesc.Count = 1;
-	depthStencilDesc.SampleDesc.Quality = 0;
-	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0;
-	depthStencilDesc.MiscFlags = 0;
-
-	ASSERT_HR(m_Device->CreateTexture2D(&depthStencilDesc, nullptr, &m_DepthStencilBuffer));
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC  descDSV = {};
-	descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	descDSV.Texture2D.MipSlice = 0;
-	ASSERT_HR(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &descDSV, &m_DepthStencilView));
-
-	m_DeviceContext->OMSetRenderTargets(1, m_RenderTarget->GetRenderTargetView().GetAddressOf(), m_DepthStencilView.Get());
 }
 
 void DX11Context::SetRenderViewport(float x, float y, float width, float height)
@@ -197,16 +170,21 @@ void DX11Context::OnWindowResize()
 	ASSERT(m_Device);
 	ASSERT(m_SwapChain);
 
-	m_RenderTarget.reset();
-	m_DepthStencilView.Reset();
-	m_DepthStencilBuffer.Reset();
+	FreeBuffers();
 
 	m_SwapChain->ResizeBuffers(2, 0, 0, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
-	CreateRenderTargetView();
-	CreateDepthStencilBuffer();
+	CreateRenderTarget();
 
 	SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
+
+	InitRenderQueueBuffers();
+}
+
+void DX11Context::FreeBuffers()
+{
+	m_RenderTarget.reset();
+	FreeRenderQueueBuffers();
 }
 
 void DX11Context::ToggleFullscreen()
@@ -236,10 +214,7 @@ void DX11Context::ToggleFullscreen()
 
 		ASSERT_HR(m_SwapChain->ResizeTarget(&modeDesc));
 
-		//m_RenderTargetView.Reset();
-		m_RenderTarget.reset();
-		m_DepthStencilView.Reset();
-		m_DepthStencilBuffer.Reset();
+		FreeBuffers();
 		ASSERT_HR(m_SwapChain->ResizeBuffers(
 			0, // 0 preserves the existing number of buffers
 			0,
@@ -249,9 +224,10 @@ void DX11Context::ToggleFullscreen()
 			)
 		);
 
-		CreateRenderTargetView();
-		CreateDepthStencilBuffer();
+		CreateRenderTarget();
 
 		SetRenderViewport(0.0f, 0.0f, static_cast<float>(m_WindowProps.Width), static_cast<float>(m_WindowProps.Height));
+
+		InitRenderQueueBuffers();
 	}
 }

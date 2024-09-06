@@ -52,7 +52,7 @@ void Sandbox::LoadSandboxPreset()
 	DX::XMMATRIX transform3 = DX::XMMatrixScaling(0.05f, 0.05f, 0.05f);
 
 	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nano_textured/nanosuit.obj", transform2, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
-	m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
 	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f) * DX::XMMatrixTranslation(6.f, 0.f, 0.f));
 	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f));
 

@@ -3,6 +3,7 @@
 
 #include "Renderer/Renderer.h"
 #include "Platform/DX11/DX11Context.h"
+#include "Renderer/RenderQueue/RenderQueue.h"
 
 std::shared_ptr<GraphicsContext> GraphicsContext::Create(void* window, WindowProps& windowProps)
 {
@@ -19,3 +20,14 @@ std::shared_ptr<GraphicsContext> GraphicsContext::Create(void* window, WindowPro
 	return nullptr;
 
 }
+
+void GraphicsContext::FreeRenderQueueBuffers()
+{
+	m_RenderQueue->FreeBuffers();
+}
+
+void GraphicsContext::InitRenderQueueBuffers()
+{
+	m_RenderQueue->InitPasses();
+}
+

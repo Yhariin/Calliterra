@@ -17,6 +17,7 @@ void Renderer::Init(std::shared_ptr<GraphicsContext> graphicsContext)
 
 	s_RendererAPI->Init(s_GraphicsContext);
 	s_RenderQueue = std::make_unique<RenderQueue>(*s_GraphicsContext);
+	s_GraphicsContext->LinkRenderQueueReference(s_RenderQueue.get());
 }
 
 void Renderer::Shutdown()
