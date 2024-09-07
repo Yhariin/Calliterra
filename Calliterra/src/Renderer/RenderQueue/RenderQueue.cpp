@@ -5,6 +5,7 @@
 #include "Renderer/Renderer.h"
 #include "Passes/ClearBufferPass.h"
 #include "Passes/LambertianPass.h"
+#include "Passes/SkyBoxPass.h"
 #include "Passes/OutlineMaskPass.h"
 #include "Passes/OutlineDrawPass.h"
 #include "Passes/ColorInvertPass.h"
@@ -28,6 +29,13 @@ void RenderQueue::Accept(const Step& step, PassName targetPass)
 	case PassName::Lambertian:
 	{
 		auto p = dynamic_cast<LambertianPass*>(m_Passes[(int)targetPass].get());
+		ASSERT(p, "Cannot add Steps to this pass type");
+		p->Accept(step);
+		break;
+	}
+	case PassName::SkyBox:
+	{
+		auto p = dynamic_cast<SkyBoxPass*>(m_Passes[(int)targetPass].get());
 		ASSERT(p, "Cannot add Steps to this pass type");
 		p->Accept(step);
 		break;
@@ -117,6 +125,7 @@ void RenderQueue::InitPasses()
 	m_Passes[(int)PassName::ClearRenderTarget] = std::make_unique<ClearBufferPass>(m_RenderTarget);
 	m_Passes[(int)PassName::ClearDepthStencilBuffer] = std::make_unique<ClearBufferPass>(m_MasterDepthStencilBuffer);
 	m_Passes[(int)PassName::Lambertian] = std::make_unique<LambertianPass>(m_RenderTarget, m_MasterDepthStencilBuffer, m_FillMode, m_CullMode);
+	m_Passes[(int)PassName::SkyBox] = std::make_unique<SkyBoxPass>();
 	m_Passes[(int)PassName::OutlineMask] = std::make_unique<OutlineMaskPass>();
 	m_Passes[(int)PassName::OutlineDraw] = std::make_unique<OutlineDrawPass>();
 	m_Passes[(int)PassName::PostProcessing] = std::make_unique<PostProcessingPass>(m_Context, m_BackBuffer, m_RenderTarget);

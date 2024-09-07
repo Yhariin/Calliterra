@@ -7,6 +7,7 @@ enum class PassName : int
 	ClearRenderTarget,
 	ClearDepthStencilBuffer,
 	Lambertian,
+	SkyBox,
 	OutlineMask,
 	OutlineDraw,
 	PostProcessing,

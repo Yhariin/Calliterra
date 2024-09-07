@@ -40,6 +40,19 @@ public:
 	void Bind() const override;
 
 protected:
-	inline static std::shared_ptr<ConstantBuffer> m_ConstantBuffer = nullptr;
+	inline static std::shared_ptr<ConstantBuffer> s_ConstantBuffer = nullptr;
+	const Drawable* m_Parent = nullptr;
+};
+
+class SkyBoxTransformConstantBuffer : public Bindable
+{
+public:
+	SkyBoxTransformConstantBuffer();
+	void InitializeParentReference(const Drawable& parent) override;
+	virtual DX::XMMATRIX GetTransform() const;
+	void Bind() const override;
+
+protected:
+	inline static std::shared_ptr<ConstantBuffer> s_ConstantBuffer = nullptr;
 	const Drawable* m_Parent = nullptr;
 };

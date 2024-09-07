@@ -42,6 +42,7 @@ void Sandbox::LoadSandboxPreset()
 
 	CreatePointLight();
 	CreateSun();
+	CreateSkyBox();
 
 	//std::shared_ptr<rapidobj::Result> dragonModel = ModelLoader::LoadModelObj("assets/models/dragon.obj");
 	//std::shared_ptr<fastgltf::Asset> vaseClayModel = ModelLoader::LoadModelGltf("assets/models/Vase_Clay.gltf");
@@ -52,7 +53,7 @@ void Sandbox::LoadSandboxPreset()
 	DX::XMMATRIX transform3 = DX::XMMatrixScaling(0.05f, 0.05f, 0.05f);
 
 	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/nano_textured/nanosuit.obj", transform2, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
-	//m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
+	m_Drawables.emplace_back(std::make_unique<Model>(ModelLoader::GetModel("assets/models/Sponza/sponza.obj", transform3, DX::XMFLOAT3(0.2f, 0.4f, 0.9f))));
 	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f) * DX::XMMatrixTranslation(6.f, 0.f, 0.f));
 	CreateCube(DX::XMMatrixScaling(5.f, 5.f, 5.f));
 
@@ -67,6 +68,7 @@ void Sandbox::LoadSandboxPreset()
 void Sandbox::CreateCube(const DX::XMMATRIX& transform)
 {
 	m_Drawables.emplace_back(std::make_unique<Cube>(transform));
+	dynamic_cast<Cube*>(m_Drawables.back().get())->MakeIndependent();
 }
 
 void Sandbox::CreateRadialSphere()
@@ -101,6 +103,12 @@ void Sandbox::CreatePointLight()
 void Sandbox::CreateSun()
 {
 	m_Drawables.emplace_back(std::make_unique<Sun>());
+}
+
+void Sandbox::CreateSkyBox()
+{
+	m_Drawables.emplace_back(std::make_unique<Cube>());
+	dynamic_cast<Cube*>(m_Drawables.back().get())->MakeSkyBox();
 }
 
 const Camera& Sandbox::GetCamera() const

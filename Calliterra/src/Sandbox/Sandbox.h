@@ -20,6 +20,7 @@ public:
 	void CreatePlane();
 	void CreatePointLight();
 	void CreateSun();
+	void CreateSkyBox();
 
 	const Camera& GetCamera() const;
 

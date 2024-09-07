@@ -4,14 +4,43 @@
 
 Cube::Cube(DX::XMMATRIX transform, DX::XMFLOAT3 color)
 	: Drawable(transform, color)
-{ 
-	InitBuffers();
+{
 }
 
-void Cube::InitBuffers()
+void Cube::MakeSkyBox()
+{
+	const auto geometryTag = "$CubeMap";
+
+	Technique drawTech;
+	Step onlyStep(PassName::SkyBox);
+
+	auto vShader = Shader::Resolve("assets/shaders/SkyBoxVS.hlsl", Shader::VERTEX_SHADER);
+	auto pShader = Shader::Resolve("assets/shaders/SkyBoxPS.hlsl", Shader::PIXEL_SHADER);
+
+	onlyStep.AddBindable(vShader);
+	onlyStep.AddBindable(pShader);
+
+	auto vBuff = VertexBuffer::Resolve(geometryTag, m_CubeVertices);
+	onlyStep.AddBindable(IndexBuffer::Resolve(geometryTag, m_CubeIndices));
+
+	vBuff->CreateLayout({
+		{"POSITION", 0, ShaderDataType::Float3}
+		}, vShader.get());
+
+	onlyStep.AddBindable(vBuff);
+	onlyStep.AddBindable(Texture::Resolve("assets/textures/sky/", 0, Texture::Filter::Linear, Texture::TextureType::CubeMap));
+	onlyStep.AddBindable(Rasterizer::Resolve(FillMode::Solid, CullMode::None));
+
+	onlyStep.AddBindable(std::make_shared<SkyBoxTransformConstantBuffer>());
+
+	drawTech.AddStep(std::move(onlyStep));
+	AddTechnique(std::move(drawTech));
+}
+
+void Cube::MakeIndependent()
 {
 	using namespace std::string_literals;
-	const auto geometryTag = "$Cube.";
+	const auto geometryTag = "$CubeIndependent.";
 	const auto outlineTag = geometryTag + "Outline"s;
 	CalculateNormals();
 

@@ -6,7 +6,8 @@ class Cube : public Drawable
 public:
 	Cube(DX::XMMATRIX transform = DX::XMMatrixIdentity(), DX::XMFLOAT3 color = {-1.f, -1.f, -1.f});
     
-	void InitBuffers();
+	void MakeSkyBox();
+	void MakeIndependent();
 
 	void Update(float dt) override;
 
@@ -32,16 +33,16 @@ private:
 	};
 
 	inline static constexpr float side = 1.0f / 2.f;
-	inline static const std::vector<float> m_CubeVertices =
+	inline static const std::vector<DX::XMFLOAT3> m_CubeVertices =
 	{
-		-side, -side, -side, 
-		 side, -side, -side, 
-		-side,  side, -side, 
-		 side,  side, -side, 
-		-side, -side,  side, 
-		 side, -side,  side, 
-		-side,  side,  side, 
-		 side,  side,  side 
+		{ -side, -side, -side },
+		{  side, -side, -side },
+		{ -side,  side, -side },
+		{  side,  side, -side },
+		{ -side, -side,  side },
+		{  side, -side,  side },
+		{ -side,  side,  side },
+		{  side,  side,  side }
 	};
 
 	inline static std::vector<CubeVertex> m_IndependentCubeVertices =

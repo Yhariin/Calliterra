@@ -36,7 +36,7 @@ DX11DepthStencilMask::DX11DepthStencilMask(const DX11Context& context, Mode mode
 	}
 	else if (m_Mode == Mode::DepthFirst)
 	{
-		stencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		stencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 		stencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	}
 

@@ -5,7 +5,7 @@ RadialSphere::RadialSphere(const int latDiv, const int longDiv, DX::XMMATRIX tra
 	: m_LatDiv(latDiv), m_LongDiv(longDiv), Drawable(transform, color)
 {
 	CalculateSphere(latDiv, longDiv);
-	//InitBuffers();
+	//MakeIndependent();
 }
 
 /*
